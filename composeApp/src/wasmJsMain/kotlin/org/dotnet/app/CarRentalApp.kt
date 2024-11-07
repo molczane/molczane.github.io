@@ -25,7 +25,7 @@ fun CarRentalApp() {
                 .padding(16.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Text("Wypożyczalnia Samochodów", style = MaterialTheme.typography.h5)
+            Text("Wypożyczalnia Samochodów marzeń", style = MaterialTheme.typography.h5)
 
             Spacer(modifier = Modifier.height(16.dp))
 
@@ -38,7 +38,7 @@ fun CarRentalApp() {
                     selectedBrand = brand
                     selectedModel = null  // Reset model selection when brand changes
                 },
-                modifier = Modifier.fillMaxWidth(0.5f) // Set width to half of the screen
+                modifier = Modifier.fillMaxWidth(0.5f) // Set dropdown width to half of the screen
             )
 
             Spacer(modifier = Modifier.height(8.dp))
@@ -50,7 +50,7 @@ fun CarRentalApp() {
                     options = models,
                     selectedOption = selectedModel,
                     onOptionSelected = { model -> selectedModel = model },
-                    modifier = Modifier.fillMaxWidth(0.5f) // Set width to half of the screen
+                    modifier = Modifier.fillMaxWidth(0.5f) // Set dropdown width to half of the screen
                 )
             }
 
@@ -60,6 +60,16 @@ fun CarRentalApp() {
             val selectedCar = cars.find { it.brand == selectedBrand && it.model == selectedModel }
             if (selectedCar != null) {
                 CarDetailsCard(car = selectedCar, modifier = Modifier.fillMaxWidth(0.5f)) // Set Card width to half of the screen
+
+                Spacer(modifier = Modifier.height(16.dp))
+
+                // "Wypożycz Samochód" button
+                Button(
+                    onClick = { /* Implement rental functionality here */ },
+                    modifier = Modifier.fillMaxWidth(0.5f) // Set button width to half of the screen
+                ) {
+                    Text("Wypożycz Samochód")
+                }
             } else {
                 Text("Brak wyników", style = MaterialTheme.typography.body1)
             }
@@ -101,7 +111,7 @@ fun DropdownMenu(
             value = selectedOption ?: "",
             onValueChange = {},
             label = { Text(label) },
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier.fillMaxWidth(), // Set the width of the dropdown to half of the screen
             readOnly = true,
             trailingIcon = {
                 IconButton(onClick = { expanded = !expanded }) {
@@ -113,7 +123,7 @@ fun DropdownMenu(
         DropdownMenu(
             expanded = expanded,
             onDismissRequest = { expanded = false },
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier.fillMaxWidth(0.5f) // Set width of dropdown menu to half of the screen
         ) {
             options.forEach { option ->
                 DropdownMenuItem(onClick = {
