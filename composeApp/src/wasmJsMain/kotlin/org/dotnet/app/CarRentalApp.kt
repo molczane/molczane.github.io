@@ -8,6 +8,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import org.dotnet.app.dataSource.cars
 import org.dotnet.app.model.Car
 
@@ -73,7 +74,33 @@ fun CarRentalApp() {
             } else {
                 Text("Brak wyników", style = MaterialTheme.typography.body1)
             }
+
+            // Footer at the bottom
+            Footer()
         }
+    }
+}
+
+@Composable
+fun Footer() {
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(16.dp),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Divider(thickness = 1.dp, color = MaterialTheme.colors.onSurface.copy(alpha = 0.2f))
+        Spacer(modifier = Modifier.height(8.dp))
+        Text(
+            text = "© 2024 Wypożyczalnia Samochodów by Developers in Crime",
+            fontSize = 12.sp,
+            color = MaterialTheme.colors.onSurface.copy(alpha = 0.6f)
+        )
+        Text(
+            text = "All rights reserved.",
+            fontSize = 12.sp,
+            color = MaterialTheme.colors.onSurface.copy(alpha = 0.6f)
+        )
     }
 }
 
