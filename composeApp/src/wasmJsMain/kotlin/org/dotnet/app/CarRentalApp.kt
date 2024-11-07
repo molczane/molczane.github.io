@@ -1,6 +1,5 @@
 package org.dotnet.app
 
-import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
@@ -10,6 +9,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import org.dotnet.app.dataSource.cars
+import org.dotnet.app.model.Car
 
 @Composable
 fun CarRentalApp() {
@@ -37,7 +37,8 @@ fun CarRentalApp() {
                 onOptionSelected = { brand ->
                     selectedBrand = brand
                     selectedModel = null  // Reset model selection when brand changes
-                }
+                },
+                modifier = Modifier.fillMaxWidth(0.5f) // Set width to half of the screen
             )
 
             Spacer(modifier = Modifier.height(8.dp))
@@ -48,32 +49,39 @@ fun CarRentalApp() {
                     label = "Wybierz model",
                     options = models,
                     selectedOption = selectedModel,
-                    onOptionSelected = { model -> selectedModel = model }
+                    onOptionSelected = { model -> selectedModel = model },
+                    modifier = Modifier.fillMaxWidth(0.5f) // Set width to half of the screen
                 )
             }
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            // Display filtered results
-            val filteredCars = cars.filter {
-                (selectedBrand == null || it.brand == selectedBrand) &&
-                        (selectedModel == null || it.model == selectedModel)
-            }
-
-            AnimatedVisibility(visible = filteredCars.isNotEmpty()) {
-                Column(
-                    Modifier.fillMaxWidth(),
-                    horizontalAlignment = Alignment.CenterHorizontally
-                ) {
-                    filteredCars.forEach { car ->
-                        Text("Marka: ${car.brand}, Model: ${car.model}")
-                    }
-                }
-            }
-
-            if (filteredCars.isEmpty()) {
+            // Display selected car details as Card only when model is selected
+            val selectedCar = cars.find { it.brand == selectedBrand && it.model == selectedModel }
+            if (selectedCar != null) {
+                CarDetailsCard(car = selectedCar, modifier = Modifier.fillMaxWidth(0.5f)) // Set Card width to half of the screen
+            } else {
                 Text("Brak wyników", style = MaterialTheme.typography.body1)
             }
+        }
+    }
+}
+
+@Composable
+fun CarDetailsCard(car: Car, modifier: Modifier = Modifier) {
+    Card(
+        modifier = modifier
+            .padding(8.dp),
+        elevation = 4.dp
+    ) {
+        Column(
+            Modifier
+                .fillMaxWidth()
+                .padding(16.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Text("Marka: ${car.brand}", style = MaterialTheme.typography.h6)
+            Text("Model: ${car.model}", style = MaterialTheme.typography.body1)
         }
     }
 }
@@ -83,11 +91,12 @@ fun DropdownMenu(
     label: String,
     options: List<String>,
     selectedOption: String?,
-    onOptionSelected: (String) -> Unit
+    onOptionSelected: (String) -> Unit,
+    modifier: Modifier = Modifier
 ) {
     var expanded by remember { mutableStateOf(false) }
 
-    Box(Modifier.fillMaxWidth()) {
+    Box(modifier) {
         OutlinedTextField(
             value = selectedOption ?: "",
             onValueChange = {},
