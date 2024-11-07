@@ -1,37 +1,23 @@
 package org.dotnet.app
 
 import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.material.Button
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Text
+import androidx.compose.foundation.layout.*
+import androidx.compose.material.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-
-import androidx.compose.foundation.layout.*
-import androidx.compose.material.*
-import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
+import org.dotnet.app.dataSource.cars
 
 @Composable
 fun CarRentalApp() {
     MaterialTheme {
-        var showContent by remember { mutableStateOf(false) }
-        var searchBrand by remember { mutableStateOf(TextFieldValue("")) }
-        var searchModel by remember { mutableStateOf(TextFieldValue("")) }
-        val cars = listOf(
-            Car("Toyota", "Corolla"),
-            Car("Honda", "Civic"),
-            Car("Ford", "Mustang"),
-            Car("BMW", "3 Series"),
-            Car("Volskwagen", "Passat")
-        )
-        val filteredCars = cars.filter {
-            it.brand.contains(searchBrand.text, ignoreCase = true) &&
-                    it.model.contains(searchModel.text, ignoreCase = true)
-        }
+        var selectedBrand by remember { mutableStateOf<String?>(null) }
+        var selectedModel by remember { mutableStateOf<String?>(null) }
+        val brands = cars.map { it.brand }.distinct().sorted()
+        val models = cars.filter { it.brand == selectedBrand }.map { it.model }.distinct().sorted()
 
         Column(
             Modifier
@@ -43,44 +29,91 @@ fun CarRentalApp() {
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            OutlinedTextField(
-                value = searchBrand,
-                onValueChange = { searchBrand = it },
-                label = { Text("Wyszukaj po marce") },
-                modifier = Modifier.fillMaxWidth()
+            // Dropdown for car brand selection
+            DropdownMenu(
+                label = "Wybierz markę",
+                options = brands,
+                selectedOption = selectedBrand,
+                onOptionSelected = { brand ->
+                    selectedBrand = brand
+                    selectedModel = null  // Reset model selection when brand changes
+                }
             )
 
             Spacer(modifier = Modifier.height(8.dp))
 
-            OutlinedTextField(
-                value = searchModel,
-                onValueChange = { searchModel = it },
-                label = { Text("Wyszukaj po modelu") },
-                modifier = Modifier.fillMaxWidth()
-            )
+            // Dropdown for car model selection
+            if (selectedBrand != null) {
+                DropdownMenu(
+                    label = "Wybierz model",
+                    options = models,
+                    selectedOption = selectedModel,
+                    onOptionSelected = { model -> selectedModel = model }
+                )
+            }
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            Button(onClick = { showContent = !showContent }) {
-                Text("Pokaż Wyniki")
+            // Display filtered results
+            val filteredCars = cars.filter {
+                (selectedBrand == null || it.brand == selectedBrand) &&
+                        (selectedModel == null || it.model == selectedModel)
             }
 
-            AnimatedVisibility(showContent) {
+            AnimatedVisibility(visible = filteredCars.isNotEmpty()) {
                 Column(
                     Modifier.fillMaxWidth(),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    if (filteredCars.isNotEmpty()) {
-                        filteredCars.forEach { car ->
-                            Text("Marka: ${car.brand}, Model: ${car.model}")
-                        }
-                    } else {
-                        Text("Brak wyników")
+                    filteredCars.forEach { car ->
+                        Text("Marka: ${car.brand}, Model: ${car.model}")
                     }
                 }
+            }
+
+            if (filteredCars.isEmpty()) {
+                Text("Brak wyników", style = MaterialTheme.typography.body1)
             }
         }
     }
 }
 
-data class Car(val brand: String, val model: String)
+@Composable
+fun DropdownMenu(
+    label: String,
+    options: List<String>,
+    selectedOption: String?,
+    onOptionSelected: (String) -> Unit
+) {
+    var expanded by remember { mutableStateOf(false) }
+
+    Box(Modifier.fillMaxWidth()) {
+        OutlinedTextField(
+            value = selectedOption ?: "",
+            onValueChange = {},
+            label = { Text(label) },
+            modifier = Modifier.fillMaxWidth(),
+            readOnly = true,
+            trailingIcon = {
+                IconButton(onClick = { expanded = !expanded }) {
+                    Icon(Icons.Default.ArrowDropDown, contentDescription = null)
+                }
+            }
+        )
+
+        DropdownMenu(
+            expanded = expanded,
+            onDismissRequest = { expanded = false },
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            options.forEach { option ->
+                DropdownMenuItem(onClick = {
+                    onOptionSelected(option)
+                    expanded = false
+                }) {
+                    Text(option)
+                }
+            }
+        }
+    }
+}
