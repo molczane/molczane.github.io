@@ -25,7 +25,8 @@ fun CarRentalApp() {
             Car("Toyota", "Corolla"),
             Car("Honda", "Civic"),
             Car("Ford", "Mustang"),
-            Car("BMW", "3 Series")
+            Car("BMW", "3 Series"),
+            Car("Volskwagen", "Passat")
         )
         val filteredCars = cars.filter {
             it.brand.contains(searchBrand.text, ignoreCase = true) &&
