@@ -10,7 +10,7 @@
 git add .
 
 # Commit changes with a message
-git commit -m "Changed layout, first search page, you can click to open login page"
+git commit -m "Changed login post body."
 
 # Push changes to the repository
 git push origin main

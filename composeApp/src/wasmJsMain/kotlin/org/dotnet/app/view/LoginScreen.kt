@@ -29,6 +29,7 @@ import io.ktor.client.engine.js.*
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.client.request.*
 import io.ktor.client.statement.*
+import io.ktor.http.*
 import io.ktor.serialization.kotlinx.json.json
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -86,14 +87,15 @@ fun LoginScreen(onLoginSuccess: () -> Unit) {
                         println("Logging...")
 
                         val response: HttpResponse = httpClient
-                            .post("http://webapplication2-dev.eba-sstwvfur.us-east-1.elasticbeanstalk.com/api/users/signIn?login=${login}&password=${password}") {
-//                            contentType(io.ktor.http.ContentType.Application.Json)
-//                            setBody(
-//                                mapOf(
-//                                    "login" to username,
-//                                    "password" to password
-//                                )
-//                            )
+                            .post("http://webapplication2-dev.eba-sstwvfur.us-east-1.elasticbeanstalk.com/api/users/signIn") {
+                            contentType(ContentType.Application.Json)
+                            setBody(
+                                mapOf(
+                                    "login" to login,
+                                    "password" to password
+                                )
+                            )
+                            //.post("http://webapplication2-dev.eba-sstwvfur.us-east-1.elasticbeanstalk.com/api/users/signIn?login=${login}&password=${password}") {
                         }
 
                         withContext(Dispatchers.Main) {
