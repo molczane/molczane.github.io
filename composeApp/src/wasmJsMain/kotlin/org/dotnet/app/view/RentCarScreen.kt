@@ -14,87 +14,113 @@ import org.dotnet.app.model.Car
 
 @Composable
 fun RentCarScreen() {
-    MaterialTheme {
-        Scaffold(
-            topBar = {
-                TopAppBar(
-                    title = { Text("Wypożyczalnia Samochodów") },
-                    backgroundColor = MaterialTheme.colors.primaryVariant,
-                    actions = {
-                        Button(
-                            onClick = { /* Implement login functionality here */ },
-                            elevation = ButtonDefaults.elevation(defaultElevation = 15.dp),
-                            modifier = Modifier.padding(12.dp)
-                        ) {
-                            Text("Zaloguj się")
-                        }
+    var isLoginDialogShown by remember { mutableStateOf(false) }
+    Scaffold(
+        topBar = {
+            TopAppBar(
+                title = { Text("Wypożyczalnia Samochodów") },
+                backgroundColor = MaterialTheme.colors.primaryVariant,
+                actions = {
+                    Button(
+                        onClick = { isLoginDialogShown = true },
+                        elevation = ButtonDefaults.elevation(defaultElevation = 15.dp),
+                        modifier = Modifier.padding(12.dp)
+                    ) {
+                        Text("Zaloguj się")
                     }
+                }
+            )
+        },
+        content = { innerPadding ->
+            Column(
+                Modifier
+                    .fillMaxSize()
+                    .padding(innerPadding)
+                    .padding(16.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                var selectedBrand by remember { mutableStateOf<String?>(null) }
+                var selectedModel by remember { mutableStateOf<String?>(null) }
+                val brands = cars.map { it.brand }.distinct().sorted()
+                val models = cars.filter { it.brand == selectedBrand }.map { it.model }.distinct().sorted()
+
+                Spacer(modifier = Modifier.height(16.dp))
+
+                // Dropdown for car brand selection
+                DropdownMenu(
+                    label = "Wybierz markę",
+                    options = brands,
+                    selectedOption = selectedBrand,
+                    onOptionSelected = { brand ->
+                        selectedBrand = brand
+                        selectedModel = null  // Reset model selection when brand changes
+                    },
+                    modifier = Modifier.fillMaxWidth(0.5f) // Set dropdown width to half of the screen
                 )
-            },
-            content = { innerPadding ->
-                Column(
-                    Modifier
-                        .fillMaxSize()
-                        .padding(innerPadding)
-                        .padding(16.dp),
-                    horizontalAlignment = Alignment.CenterHorizontally
-                ) {
-                    var selectedBrand by remember { mutableStateOf<String?>(null) }
-                    var selectedModel by remember { mutableStateOf<String?>(null) }
-                    val brands = cars.map { it.brand }.distinct().sorted()
-                    val models = cars.filter { it.brand == selectedBrand }.map { it.model }.distinct().sorted()
 
-                    Spacer(modifier = Modifier.height(16.dp))
+                Spacer(modifier = Modifier.height(8.dp))
 
-                    // Dropdown for car brand selection
+                // Dropdown for car model selection
+                if (selectedBrand != null) {
                     DropdownMenu(
-                        label = "Wybierz markę",
-                        options = brands,
-                        selectedOption = selectedBrand,
-                        onOptionSelected = { brand ->
-                            selectedBrand = brand
-                            selectedModel = null  // Reset model selection when brand changes
-                        },
+                        label = "Wybierz model",
+                        options = models,
+                        selectedOption = selectedModel,
+                        onOptionSelected = { model -> selectedModel = model },
                         modifier = Modifier.fillMaxWidth(0.5f) // Set dropdown width to half of the screen
                     )
+                }
 
-                    Spacer(modifier = Modifier.height(8.dp))
+                Spacer(modifier = Modifier.height(16.dp))
 
-                    // Dropdown for car model selection
-                    if (selectedBrand != null) {
-                        DropdownMenu(
-                            label = "Wybierz model",
-                            options = models,
-                            selectedOption = selectedModel,
-                            onOptionSelected = { model -> selectedModel = model },
-                            modifier = Modifier.fillMaxWidth(0.5f) // Set dropdown width to half of the screen
-                        )
-                    }
+                // Display selected car details as Card only when model is selected
+                val selectedCar = cars.find { it.brand == selectedBrand && it.model == selectedModel }
+                if (selectedCar != null) {
+                    CarDetailsCard(
+                        car = selectedCar,
+                        modifier = Modifier.fillMaxWidth(0.5f)
+                    ) // Set Card width to half of the screen
 
                     Spacer(modifier = Modifier.height(16.dp))
 
-                    // Display selected car details as Card only when model is selected
-                    val selectedCar = cars.find { it.brand == selectedBrand && it.model == selectedModel }
-                    if (selectedCar != null) {
-                        CarDetailsCard(car = selectedCar, modifier = Modifier.fillMaxWidth(0.5f)) // Set Card width to half of the screen
-
-                        Spacer(modifier = Modifier.height(16.dp))
-
-                        // "Wypożycz Samochód" button
-                        Button(
-                            onClick = { /* Implement rental functionality here */ },
-                            modifier = Modifier.fillMaxWidth(0.5f) // Set button width to half of the screen
-                        ) {
-                            Text("Wypożycz Samochód")
-                        }
-                    } else {
-                        Text("Brak wyników", style = MaterialTheme.typography.body1)
+                    // "Wypożycz Samochód" button
+                    Button(
+                        onClick = { /* Implement rental functionality here */ },
+                        modifier = Modifier.fillMaxWidth(0.5f) // Set button width to half of the screen
+                    ) {
+                        Text("Wypożycz Samochód")
                     }
+                } else {
+                    Text("Brak wyników", style = MaterialTheme.typography.body1)
+                }
 
-                    Spacer(modifier = Modifier.height(16.dp))
+                Spacer(modifier = Modifier.height(16.dp))
 
-                    // Footer at the bottom
-                    Footer()
+                // Footer at the bottom
+                Footer()
+            }
+        }
+    )
+    if(isLoginDialogShown) {
+        AlertDialog(
+            onDismissRequest = { isLoginDialogShown = false },
+            title = {
+                Text(
+                    text = "Zaloguj się",
+                    style = MaterialTheme.typography.h6
+                )
+            },
+            text = {
+                LoginScreen(
+                    onLoginSuccess = {}
+                )
+            },
+            confirmButton = {
+                // Optional: Add a custom confirm button if needed
+            },
+            dismissButton = {
+                Button(onClick = { isLoginDialogShown = false }) {
+                    Text("Anuluj")
                 }
             }
         )
