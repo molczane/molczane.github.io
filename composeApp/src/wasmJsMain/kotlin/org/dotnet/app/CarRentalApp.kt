@@ -1,165 +1,29 @@
 package org.dotnet.app
 
-import androidx.compose.foundation.layout.*
-import androidx.compose.material.*
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.runtime.*
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
-import org.dotnet.app.dataSource.cars
-import org.dotnet.app.model.Car
+import kotlinx.browser.window
+import org.dotnet.app.view.LoginScreen
+import org.dotnet.app.view.RentCarScreen
 
 @Composable
 fun CarRentalApp() {
-    MaterialTheme {
-        var selectedBrand by remember { mutableStateOf<String?>(null) }
-        var selectedModel by remember { mutableStateOf<String?>(null) }
-        val brands = cars.map { it.brand }.distinct().sorted()
-        val models = cars.filter { it.brand == selectedBrand }.map { it.model }.distinct().sorted()
+    var isLoggedIn by remember { mutableStateOf(false) }
 
-        Column(
-            Modifier
-                .fillMaxSize()
-                .padding(16.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            Text("Wypożyczalnia Samochodów marzeń", style = MaterialTheme.typography.h5)
-
-            Spacer(modifier = Modifier.height(16.dp))
-
-            // Dropdown for car brand selection
-            DropdownMenu(
-                label = "Wybierz markę",
-                options = brands,
-                selectedOption = selectedBrand,
-                onOptionSelected = { brand ->
-                    selectedBrand = brand
-                    selectedModel = null  // Reset model selection when brand changes
-                },
-                modifier = Modifier.fillMaxWidth(0.5f) // Set dropdown width to half of the screen
-            )
-
-            Spacer(modifier = Modifier.height(8.dp))
-
-            // Dropdown for car model selection
-            if (selectedBrand != null) {
-                DropdownMenu(
-                    label = "Wybierz model",
-                    options = models,
-                    selectedOption = selectedModel,
-                    onOptionSelected = { model -> selectedModel = model },
-                    modifier = Modifier.fillMaxWidth(0.5f) // Set dropdown width to half of the screen
-                )
-            }
-
-            Spacer(modifier = Modifier.height(16.dp))
-
-            // Display selected car details as Card only when model is selected
-            val selectedCar = cars.find { it.brand == selectedBrand && it.model == selectedModel }
-            if (selectedCar != null) {
-                CarDetailsCard(car = selectedCar, modifier = Modifier.fillMaxWidth(0.5f)) // Set Card width to half of the screen
-
-                Spacer(modifier = Modifier.height(16.dp))
-
-                // "Wypożycz Samochód" button
-                Button(
-                    onClick = { /* Implement rental functionality here */ },
-                    modifier = Modifier.fillMaxWidth(0.5f) // Set button width to half of the screen
-                ) {
-                    Text("Wypożycz Samochód")
-                }
-            } else {
-                Text("Brak wyników", style = MaterialTheme.typography.body1)
-            }
-
-            // Footer at the bottom
-            Footer()
+    // Check if the user has an access token in localStorage (for example, Google OAuth token)
+    LaunchedEffect(Unit) {
+        val token = window.localStorage.getItem("access_token")
+        if (token != null) {
+            isLoggedIn = true
         }
     }
-}
 
-@Composable
-fun Footer() {
-    Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(16.dp),
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        Divider(thickness = 1.dp, color = MaterialTheme.colors.onSurface.copy(alpha = 0.2f))
-        Spacer(modifier = Modifier.height(8.dp))
-        Text(
-            text = "© 2024 Wypożyczalnia Samochodów by Developers in Crime",
-            fontSize = 12.sp,
-            color = MaterialTheme.colors.onSurface.copy(alpha = 0.6f)
-        )
-        Text(
-            text = "All rights reserved.",
-            fontSize = 12.sp,
-            color = MaterialTheme.colors.onSurface.copy(alpha = 0.6f)
-        )
-    }
-}
-
-@Composable
-fun CarDetailsCard(car: Car, modifier: Modifier = Modifier) {
-    Card(
-        modifier = modifier
-            .padding(8.dp),
-        elevation = 4.dp
-    ) {
-        Column(
-            Modifier
-                .fillMaxWidth()
-                .padding(16.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            Text("Marka: ${car.brand}", style = MaterialTheme.typography.h6)
-            Text("Model: ${car.model}", style = MaterialTheme.typography.body1)
-        }
-    }
-}
-
-@Composable
-fun DropdownMenu(
-    label: String,
-    options: List<String>,
-    selectedOption: String?,
-    onOptionSelected: (String) -> Unit,
-    modifier: Modifier = Modifier
-) {
-    var expanded by remember { mutableStateOf(false) }
-
-    Box(modifier) {
-        OutlinedTextField(
-            value = selectedOption ?: "",
-            onValueChange = {},
-            label = { Text(label) },
-            modifier = Modifier.fillMaxWidth(), // Set the width of the dropdown to half of the screen
-            readOnly = true,
-            trailingIcon = {
-                IconButton(onClick = { expanded = !expanded }) {
-                    Icon(Icons.Default.ArrowDropDown, contentDescription = null)
-                }
-            }
-        )
-
-        DropdownMenu(
-            expanded = expanded,
-            onDismissRequest = { expanded = false },
-            modifier = Modifier.fillMaxWidth(0.5f) // Set width of dropdown menu to half of the screen
-        ) {
-            options.forEach { option ->
-                DropdownMenuItem(onClick = {
-                    onOptionSelected(option)
-                    expanded = false
-                }) {
-                    Text(option)
-                }
-            }
-        }
+    if (isLoggedIn) {
+        RentCarScreen()
+    } else {
+        LoginScreen(onLoginSuccess = { token ->
+            // Store token and update login state
+            window.localStorage.setItem("access_token", token)
+            isLoggedIn = true
+        })
     }
 }
