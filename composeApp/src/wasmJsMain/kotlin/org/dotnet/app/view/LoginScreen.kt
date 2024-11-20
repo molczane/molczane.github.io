@@ -29,7 +29,6 @@ import io.ktor.client.engine.js.*
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.client.request.*
 import io.ktor.client.statement.*
-import io.ktor.http.contentType
 import io.ktor.serialization.kotlinx.json.json
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -38,7 +37,7 @@ import kotlinx.coroutines.withContext
 
 @Composable
 fun LoginScreen(onLoginSuccess: () -> Unit) {
-    var username by remember { mutableStateOf("") }
+    var login by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     var isLoading by remember { mutableStateOf(false) }
     var loginResult by remember { mutableStateOf<String?>(null) }
@@ -61,8 +60,8 @@ fun LoginScreen(onLoginSuccess: () -> Unit) {
         Spacer(modifier = Modifier.height(16.dp))
 
         OutlinedTextField(
-            value = username,
-            onValueChange = { username = it },
+            value = login,
+            onValueChange = { login = it },
             label = { Text("Username") },
             modifier = Modifier.fillMaxWidth()
         )
@@ -87,7 +86,7 @@ fun LoginScreen(onLoginSuccess: () -> Unit) {
                         println("Logging...")
 
                         val response: HttpResponse = httpClient
-                            .post("http://webapplication2-dev.eba-sstwvfur.us-east-1.elasticbeanstalk.com/api/users/signIn?login=${username}&password=${password}") {
+                            .post("http://webapplication2-dev.eba-sstwvfur.us-east-1.elasticbeanstalk.com/api/users/signIn?login=${login}&password=${password}") {
 //                            contentType(io.ktor.http.ContentType.Application.Json)
 //                            setBody(
 //                                mapOf(

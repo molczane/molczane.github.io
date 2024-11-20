@@ -9,11 +9,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import org.dotnet.app.CarRentalAppViewModel
 import org.dotnet.app.dataSource.cars
 import org.dotnet.app.model.Car
 
 @Composable
-fun RentCarScreen() {
+fun RentCarScreen(viewModel: CarRentalAppViewModel) {
     var isLoginDialogShown by remember { mutableStateOf(false) }
     Scaffold(
         topBar = {

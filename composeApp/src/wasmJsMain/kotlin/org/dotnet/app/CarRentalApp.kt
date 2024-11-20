@@ -7,5 +7,6 @@ import org.dotnet.app.view.RentCarScreen
 
 @Composable
 fun CarRentalApp() {
-    RentCarScreen()
+    val viewModel = CarRentalAppViewModel()
+    RentCarScreen(viewModel)
 }
