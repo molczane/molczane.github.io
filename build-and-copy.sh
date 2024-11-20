@@ -13,4 +13,4 @@ git add .
 git commit -m "Updated executables"
 
 # Push changes to the repository
-git push
+git push origin main
