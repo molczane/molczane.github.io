@@ -84,14 +84,17 @@ fun LoginScreen(onLoginSuccess: (String) -> Unit) {
                 isLoading = true
                 CoroutineScope(Dispatchers.Default).launch {
                     try {
-                        val response: HttpResponse = httpClient.post("http://webapplication2-dev.eba-sstwvfur.us-east-1.elasticbeanstalk.com/api/users/signIn") {
-                            contentType(io.ktor.http.ContentType.Application.Json)
-                            setBody(
-                                mapOf(
-                                    "username" to username,
-                                    "password" to password
-                                )
-                            )
+                        println("Logging...")
+
+                        val response: HttpResponse = httpClient
+                            .post("http://webapplication2-dev.eba-sstwvfur.us-east-1.elasticbeanstalk.com/api/users/signIn?login=${username}&password=${password}") {
+//                            contentType(io.ktor.http.ContentType.Application.Json)
+//                            setBody(
+//                                mapOf(
+//                                    "login" to username,
+//                                    "password" to password
+//                                )
+//                            )
                         }
 
                         withContext(Dispatchers.Main) {
