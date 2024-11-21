@@ -19,7 +19,6 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.dotnet.app.model.Car
 import org.dotnet.app.model.Offer
-import org.dotnet.app.model.OfferRequest
 import org.dotnet.app.model.User
 
 data class CarRentalAppUiState(
@@ -92,7 +91,7 @@ class CarRentalAppViewModel : ViewModel() {
                         user = response.body()
                         isUserLoggedIn.value = true
 
-                        println("Logged in as: ${user?.first_Name} ${user?.last_Name}")
+                        println("Logged in as: ${user?.firstname} ${user?.lastname}")
 
                         onLoginResultChange("Login successful!")
                     } else {
