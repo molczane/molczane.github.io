@@ -83,45 +83,12 @@ fun LoginScreen(onLoginSuccess: () -> Unit, viewModel: CarRentalAppViewModel) {
         Button(
             onClick = {
                 isLoading = true
-                CoroutineScope(Dispatchers.Default).launch {
-                    try {
-                        println("Logging...")
-
-                        viewModel.signIn(
-                            login,
-                            password,
-                            onLoginResultChange = { loginResult = it },
-                            onIsLoadingChange = {isLoading = it}
-                            )
-
-
-
-//                        val response: HttpResponse = httpClient
-//                            .post("http://webapplication2-dev.eba-sstwvfur.us-east-1.elasticbeanstalk.com/api/users/signIn") {
-//                            contentType(ContentType.Application.Json)
-//                            setBody(
-//                                mapOf(
-//                                    "login" to login,
-//                                    "password" to password
-//                                )
-//                            )
-//                        }
-//
-//                        withContext(Dispatchers.Main) {
-//                            loginResult = if (response.status.value == 200) {
-//                                "Login successful!"
-//                            } else {
-//                                "Login failed: ${response.status.value}"
-//                            }
-//                            isLoading = false
-//                        }
-                    } catch (e: Exception) {
-                        withContext(Dispatchers.Main) {
-                            loginResult = "Error: ${e.message}"
-                            isLoading = false
-                        }
-                    }
-                }
+                viewModel.signIn(
+                    login,
+                    password,
+                    onLoginResultChange = { loginResult = it },
+                    onIsLoadingChange = { isLoading = it }
+                )
             },
             enabled = !isLoading,
             modifier = Modifier.fillMaxWidth()
