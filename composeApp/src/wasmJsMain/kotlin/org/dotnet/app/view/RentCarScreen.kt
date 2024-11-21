@@ -27,6 +27,16 @@ fun RentCarScreen(viewModel: CarRentalAppViewModel) {
 
     var areCarsLoaded by remember { mutableStateOf(false) }
 
+    LaunchedEffect(Unit) {
+        viewModel.updateCars()
+    }
+
+    // Observe changes in cars list
+    LaunchedEffect(uiState.listOfCars) {
+        cars = uiState.listOfCars
+        areCarsLoaded = cars.isNotEmpty()
+    }
+
     Scaffold(
         topBar = {
             TopAppBar(

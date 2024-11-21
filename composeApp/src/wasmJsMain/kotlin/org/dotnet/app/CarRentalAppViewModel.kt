@@ -56,13 +56,18 @@ class CarRentalAppViewModel : ViewModel() {
     }
 
     private suspend fun getAllCars(): List<Car> {
-        val carsResponse =  httpClient
-            .get("http://webapplication2-dev.eba-sstwvfur.us-east-1.elasticbeanstalk.com/api/cars/getAllCars")
-            .body<List<Car>>()
+        return try {
+            println("Fetching cars...")
 
-        println(carsResponse)
-
-        return carsResponse
+            val carsResponse = httpClient
+                .get("http://webapplication2-dev.eba-sstwvfur.us-east-1.elasticbeanstalk.com/api/cars/getAllCars")
+                .body<List<Car>>()
+            println("Cars loaded: $carsResponse")
+            carsResponse
+        } catch (e: Exception) {
+            println("Error fetching cars: ${e.message}")
+            emptyList()
+        }
     }
 
     fun signIn(login: String, password: String, onLoginResultChange: (String?) -> Unit, onIsLoadingChange: (isLoading: Boolean) -> Unit) {
