@@ -60,6 +60,7 @@ class CarRentalAppViewModel : ViewModel() {
             .get("http://webapplication2-dev.eba-sstwvfur.us-east-1.elasticbeanstalk.com/api/cars/getAllCars")
             .body<List<Car>>()
 
+        println(carsResponse)
 
         return carsResponse
     }
