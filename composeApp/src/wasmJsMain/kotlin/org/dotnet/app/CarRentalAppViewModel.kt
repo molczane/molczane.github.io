@@ -4,12 +4,12 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import io.ktor.client.*
 import io.ktor.client.call.*
+import io.ktor.client.engine.js.*
 import io.ktor.client.plugins.contentnegotiation.*
 import io.ktor.client.request.*
 import io.ktor.client.statement.*
 import io.ktor.http.*
 import io.ktor.serialization.kotlinx.json.*
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -31,13 +31,13 @@ class CarRentalAppViewModel : ViewModel() {
     private val _uiState = MutableStateFlow(CarRentalAppUiState())
     val uiState = _uiState.asStateFlow()
 
-    private val user: User? = null
+    private var user: User? = null
 
     init {
         //updateCars()
     }
 
-    private val httpClient = HttpClient {
+    private val httpClient = HttpClient(Js) {
         install(ContentNegotiation) {
             json()
         }
@@ -78,6 +78,10 @@ class CarRentalAppViewModel : ViewModel() {
 
                 withContext(Dispatchers.Main) {
                     if (response.status.value == 200) {
+                        user = response.body()
+
+                        println("Logged in as: ${user?.first_Name} ${user?.last_Name}")
+
                         onLoginResultChange("Login successful!")
                     } else {
                         onLoginResultChange("Login failed: ${response.status.value}")

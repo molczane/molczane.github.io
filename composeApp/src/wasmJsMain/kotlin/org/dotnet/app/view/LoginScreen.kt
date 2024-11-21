@@ -23,18 +23,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
-import kotlinx.browser.window
 import io.ktor.client.*
 import io.ktor.client.engine.js.*
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
-import io.ktor.client.request.*
-import io.ktor.client.statement.*
-import io.ktor.http.*
 import io.ktor.serialization.kotlinx.json.json
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import org.dotnet.app.CarRentalAppViewModel
 
 @Composable
@@ -106,22 +98,4 @@ fun LoginScreen(onLoginSuccess: () -> Unit, viewModel: CarRentalAppViewModel) {
             Text(it, style = MaterialTheme.typography.body1, color = MaterialTheme.colors.primary)
         }
     }
-}
-
-// Dummy function to simulate opening Google login (should be replaced with actual OAuth flow)
-fun openGoogleLogin() {
-    val googleOAuthUrl = "https://accounts.google.com/o/oauth2/v2/auth?" +
-            "client_id=YOUR_GOOGLE_CLIENT_ID&" +
-            "redirect_uri=${window.location.origin}/callback&" +
-            "response_type=token&scope=email"
-    window.open(googleOAuthUrl, "_self")
-}
-
-// Simulated function to extract access token from URL fragment after redirect
-fun getAccessTokenFromURL(): String? {
-    val hash = window.location.hash
-    if (hash.contains("access_token")) {
-        return hash.substringAfter("access_token=").substringBefore("&")
-    }
-    return null
 }
