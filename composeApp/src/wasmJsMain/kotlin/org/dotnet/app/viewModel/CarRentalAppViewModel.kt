@@ -1,4 +1,4 @@
-package org.dotnet.app
+package org.dotnet.app.viewModel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -8,6 +8,7 @@ import io.ktor.client.engine.js.*
 import io.ktor.client.plugins.contentnegotiation.*
 import io.ktor.client.request.*
 import io.ktor.client.statement.*
+import io.ktor.client.plugins.auth.*
 import io.ktor.http.*
 import io.ktor.serialization.kotlinx.json.*
 import kotlinx.coroutines.Dispatchers
@@ -43,6 +44,9 @@ class CarRentalAppViewModel : ViewModel() {
     private val httpClient = HttpClient(Js) {
         install(ContentNegotiation) {
             json()
+        }
+        install(Auth) {
+            // Configure authentication
         }
     }
 
@@ -146,6 +150,8 @@ class CarRentalAppViewModel : ViewModel() {
 
         }
     }
+
+    //TODO("Zrobić config file")
 
     private val _valuationResult = MutableStateFlow<Offer?>(null)
     val valuationResult: StateFlow<Offer?> = _valuationResult
