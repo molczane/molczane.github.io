@@ -123,7 +123,7 @@ class CarRentalAppViewModel : ViewModel() {
                 "startDate": "$startDate",
                 "endDate": "$endDate",
                 "car": {
-                    "id": ${car.id},
+                    "id": ${car.id}
                 },
                 "user": {
                     "id": ${user.id}
