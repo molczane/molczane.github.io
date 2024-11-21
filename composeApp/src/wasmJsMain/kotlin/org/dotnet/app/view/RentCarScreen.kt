@@ -7,6 +7,7 @@ import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import org.dotnet.app.CarRentalAppViewModel
@@ -171,16 +172,50 @@ fun RentCarScreen(viewModel: CarRentalAppViewModel) {
                     }
 
                     if (isCarRented) {
-                        Column(
-                            Modifier
+                        Box(
+                            modifier = Modifier
                                 .fillMaxSize()
-                                .padding(innerPadding)
-                                .padding(16.dp),
-                            horizontalAlignment = Alignment.CenterHorizontally
+                                .padding(innerPadding),
+                            contentAlignment = Alignment.Center // Centers the content within the Box
                         ) {
-                            Text("Car ${selectedCar!!} rented! ", style = MaterialTheme.typography.body1)
+                            Card(
+                                modifier = Modifier
+                                    .fillMaxWidth(0.5f) // 50% of the screen width
+                                    .padding(16.dp),
+                                elevation = 8.dp
+                            ) {
+                                Column(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(16.dp),
+                                    horizontalAlignment = Alignment.CenterHorizontally
+                                ) {
+                                    Text(
+                                        text = "Samochód wynajęty!",
+                                        style = MaterialTheme.typography.h6,
+                                        color = MaterialTheme.colors.primary
+                                    )
+                                    Spacer(modifier = Modifier.height(8.dp))
+                                    Text(
+                                        text = "Dziękujemy za wynajęcie ${selectedCar!!.producer} ${selectedCar!!.model}.",
+                                        style = MaterialTheme.typography.body1,
+                                        color = MaterialTheme.colors.onSurface.copy(alpha = 0.8f),
+                                        textAlign = TextAlign.Center
+                                    )
+                                    Spacer(modifier = Modifier.height(16.dp))
+                                    Button(
+                                        onClick = {
+                                            // Handle additional actions, e.g., navigate to home or details
+                                        },
+                                        modifier = Modifier.fillMaxWidth()
+                                    ) {
+                                        Text("Powrót do Strony Głównej")
+                                    }
+                                }
+                            }
                         }
                     }
+
 
                     // Footer at the bottom
                     Footer()
