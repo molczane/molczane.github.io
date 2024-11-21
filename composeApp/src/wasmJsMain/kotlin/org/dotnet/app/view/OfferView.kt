@@ -10,7 +10,12 @@ import kotlinx.coroutines.delay
 import org.dotnet.app.model.Offer
 
 @Composable
-fun OfferView(offer: Offer, onTimerEnd: () -> Unit) {
+fun OfferView(
+    offer: Offer,
+    onTimerEnd: () -> Unit,
+    onRent: (Boolean) -> Unit = {},
+    onRentClick: (onRent: (Boolean) -> Unit ) -> Unit = {},
+) {
     var timeLeft by remember { mutableStateOf(10 * 60) } // 10 minutes in seconds
     val minutes = timeLeft / 60
     val seconds = timeLeft % 60
@@ -54,6 +59,16 @@ fun OfferView(offer: Offer, onTimerEnd: () -> Unit) {
                 style = MaterialTheme.typography.h5,
                 color = if (timeLeft > 0) MaterialTheme.colors.primary else MaterialTheme.colors.error
             )
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            Button(
+                onClick = { onRentClick(onRent) },
+                elevation = ButtonDefaults.elevation(defaultElevation = 15.dp),
+                modifier = Modifier.padding(12.dp)
+            ) {
+                Text("Rent this car")
+            }
         }
     }
 }

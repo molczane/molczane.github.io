@@ -33,7 +33,7 @@ class CarRentalAppViewModel : ViewModel() {
     private val _uiState = MutableStateFlow(CarRentalAppUiState())
     val uiState = _uiState.asStateFlow()
 
-    private var user: User? = null
+    var user: User? = null
     val isUserLoggedIn = MutableStateFlow(false)
 
     init {
@@ -45,6 +45,8 @@ class CarRentalAppViewModel : ViewModel() {
             json()
         }
     }
+
+    val rentedCar : Car? = null
 
     fun updateCars(){
         viewModelScope.launch {
@@ -68,6 +70,10 @@ class CarRentalAppViewModel : ViewModel() {
             println("Error fetching cars: ${e.message}")
             emptyList()
         }
+    }
+
+    fun resetValuationResult() {
+        _valuationResult.value = null
     }
 
     fun signIn(login: String, password: String, onLoginResultChange: (String?) -> Unit, onIsLoadingChange: (isLoading: Boolean) -> Unit) {
@@ -105,6 +111,40 @@ class CarRentalAppViewModel : ViewModel() {
                     onIsLoadingChange(false)
                 }
             }
+        }
+    }
+
+    fun requestRent( car: Car, user: User, startDate: String, endDate: String, onRent: (Boolean) -> Unit ) {
+        viewModelScope.launch {
+            println("Sending rent request...")
+
+            val jsonBody = """
+            {
+                "startDate": "$startDate",
+                "endDate": "$endDate",
+                "car": {
+                    "id": ${car.id},
+                },
+                "user": {
+                    "id": ${user.id}
+                }
+            }
+            """.trimIndent()
+
+            try {
+                val response: HttpResponse = httpClient.post("http://webapplication2-dev.eba-sstwvfur.us-east-1.elasticbeanstalk.com/api/cars/rent") {
+                    contentType(ContentType.Application.Json)
+                    setBody(jsonBody)
+                }
+
+                if (response.status.isSuccess()) {
+                    _valuationResult.value = response.body() // Zakładamy, że serwer zwraca wycenę jako json
+                    onRent(true)
+                }
+            } catch (e: Exception) {
+                throw e
+            }
+
         }
     }
 
@@ -147,4 +187,6 @@ class CarRentalAppViewModel : ViewModel() {
             }
         }
     }
+
+
 }

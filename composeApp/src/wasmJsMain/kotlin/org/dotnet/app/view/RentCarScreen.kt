@@ -31,6 +31,9 @@ fun RentCarScreen(viewModel: CarRentalAppViewModel) {
 
     val valuationResult by viewModel.valuationResult.collectAsState()
 
+    var isCarRented by remember { mutableStateOf(false) }
+
+
     LaunchedEffect(Unit) {
         viewModel.updateCars()
     }
@@ -146,8 +149,37 @@ fun RentCarScreen(viewModel: CarRentalAppViewModel) {
                     if(valuationResult != null) {
                         OfferView(
                             valuationResult!!,
-                            {}
+                            onTimerEnd = { viewModel.resetValuationResult() },
+                            onRent = { isCarRented = it },
+                            onRentClick = {
+                                if(viewModel.user != null) {
+                                    viewModel.user?.let { user ->
+                                        viewModel.requestRent(
+                                            car = selectedCar!!,
+                                            user = user,
+                                            onRent = { isCarRented = it },
+                                            startDate = "2024-12-10",
+                                            endDate = "2024-12-12"
+                                        )
+                                    }
+                                }
+                                else {
+                                    isLoginDialogShown = true
+                                }
+                            },
                         )
+                    }
+
+                    if (isCarRented) {
+                        Column(
+                            Modifier
+                                .fillMaxSize()
+                                .padding(innerPadding)
+                                .padding(16.dp),
+                            horizontalAlignment = Alignment.CenterHorizontally
+                        ) {
+                            Text("Car ${selectedCar!!} rented! ", style = MaterialTheme.typography.body1)
+                        }
                     }
 
                     // Footer at the bottom
