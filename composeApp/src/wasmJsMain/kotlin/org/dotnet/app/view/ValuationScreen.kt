@@ -45,7 +45,7 @@ fun ValuationScreen(
         OutlinedTextField(
             value = startDate,
             onValueChange = { startDate = it },
-            label = { Text("Data początkowa (YYYY-MM-DD)") },
+            label = { Text("Data początkowa (DD/MM/yyyy)") },
             modifier = Modifier.fillMaxWidth()
         )
 
@@ -55,7 +55,7 @@ fun ValuationScreen(
         OutlinedTextField(
             value = endDate,
             onValueChange = { endDate = it },
-            label = { Text("Data końcowa (YYYY-MM-DD)") },
+            label = { Text("Data końcowa (DD/MM/yyyy)") },
             modifier = Modifier.fillMaxWidth()
         )
 

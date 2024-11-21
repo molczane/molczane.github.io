@@ -113,6 +113,8 @@ class CarRentalAppViewModel : ViewModel() {
 
     fun requestValuation(startDate: String, endDate: String, car: Car) {
         viewModelScope.launch {
+            println("Sending valuation request...")
+
             try {
                 val response: HttpResponse = httpClient.post("http://webapplication2-dev.eba-sstwvfur.us-east-1.elasticbeanstalk.com/api/cars/getOffer") {
                     contentType(ContentType.Application.Json)

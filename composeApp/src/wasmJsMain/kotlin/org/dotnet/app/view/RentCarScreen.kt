@@ -27,6 +27,8 @@ fun RentCarScreen(viewModel: CarRentalAppViewModel) {
 
     var areCarsLoaded by remember { mutableStateOf(false) }
 
+    var selectedCar : Car? by remember { mutableStateOf(null) }
+
     LaunchedEffect(Unit) {
         viewModel.updateCars()
     }
@@ -67,7 +69,7 @@ fun RentCarScreen(viewModel: CarRentalAppViewModel) {
             )
         },
         content = { innerPadding ->
-            if(!areCarsLoaded) {
+            if(!areCarsLoaded) { // time
                 Column(Modifier.padding(innerPadding)) {
                     Footer()
                 }
@@ -115,10 +117,10 @@ fun RentCarScreen(viewModel: CarRentalAppViewModel) {
                     Spacer(modifier = Modifier.height(16.dp))
 
                     // Display selected car details as Card only when model is selected
-                    val selectedCar = cars.find { it.producer == selectedBrand && it.model == selectedModel }
+                    selectedCar = cars.find { it.producer == selectedBrand && it.model == selectedModel }
                     if (selectedCar != null) {
                         CarDetailsCard(
-                            car = selectedCar,
+                            car = selectedCar!!,
                             modifier = Modifier.fillMaxWidth(0.5f)
                         ) // Set Card width to half of the screen
 
@@ -126,8 +128,10 @@ fun RentCarScreen(viewModel: CarRentalAppViewModel) {
 
                         // "Wypożycz Samochód" button
                         Button(
-                            onClick = { /* Implement rental functionality here */ },
-                            modifier = Modifier.fillMaxWidth(0.5f) // Set button width to half of the screen
+                            onClick = {
+                                isValuationDialogShown = true
+                            },
+                            modifier = Modifier.fillMaxWidth(.25f) // Set button width to half of the screen
                         ) {
                             Text("Wypożycz Samochód")
                         }
@@ -181,23 +185,15 @@ fun RentCarScreen(viewModel: CarRentalAppViewModel) {
             title = {
             },
             text = {
-                ValuationScreen(
-                    {   startDate, endDate, car ->
-                        viewModel.requestValuation(startDate, endDate, car)
-                    },
-                    valuationResult = "",
-                    car = Car(
-                        id = 1,
-                        rentalService = "BestCarRental",
-                        producer = "Toyota",
-                        model = "Corolla",
-                        yearOfProduction = "2020",
-                        numberOfSeats = 5,
-                        type = "Sedan",
-                        isAvailable = 1,
-                        location = "Warsaw, Poland"
+                selectedCar?.let { car ->
+                    ValuationScreen(
+                        {   startDate, endDate, carB ->
+                            selectedCar?.let { viewModel.requestValuation(startDate, endDate, it) }
+                        },
+                        valuationResult = "",
+                        car = car
                     )
-                )
+                }
             },
             confirmButton = {
                 // Optional: Add a custom confirm button if needed
