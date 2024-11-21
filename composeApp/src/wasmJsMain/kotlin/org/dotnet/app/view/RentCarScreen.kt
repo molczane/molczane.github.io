@@ -69,24 +69,6 @@ fun RentCarScreen(viewModel: CarRentalAppViewModel) {
         content = { innerPadding ->
             if(!areCarsLoaded) {
                 Column(Modifier.padding(innerPadding)) {
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(16.dp), // Optional padding around the row
-                        horizontalArrangement = Arrangement.Center // Centers content horizontally
-                    ) {
-                        Button(
-                            onClick = {
-                                viewModel.updateCars()
-                                cars = uiState.listOfCars
-                                areCarsLoaded = true
-                            },
-                            elevation = ButtonDefaults.elevation(defaultElevation = 15.dp),
-                            modifier = Modifier.padding(12.dp)
-                        ) {
-                            Text("Load Cars")
-                        }
-                    }
                     Footer()
                 }
             }
