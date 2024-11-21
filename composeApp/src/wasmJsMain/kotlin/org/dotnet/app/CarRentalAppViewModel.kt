@@ -80,6 +80,7 @@ class CarRentalAppViewModel : ViewModel() {
                 withContext(Dispatchers.Main) {
                     if (response.status.value == 200) {
                         user = response.body()
+                        isUserLoggedIn.value = true
 
                         println("Logged in as: ${user?.first_Name} ${user?.last_Name}")
 
