@@ -30,7 +30,12 @@ fun RentCarScreen(viewModel: CarRentalAppViewModel) {
                         elevation = ButtonDefaults.elevation(defaultElevation = 15.dp),
                         modifier = Modifier.padding(12.dp)
                     ) {
-                        Text("Zaloguj się")
+                        if(!viewModel.isUserLoggedIn.value) {
+                            Text("Zaloguj się")
+                        }
+                        else {
+                            Text("Wyloguj się")
+                        }
                     }
                 }
             )

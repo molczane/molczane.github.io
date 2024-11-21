@@ -32,6 +32,7 @@ class CarRentalAppViewModel : ViewModel() {
     val uiState = _uiState.asStateFlow()
 
     private var user: User? = null
+    val isUserLoggedIn = MutableStateFlow(false)
 
     init {
         //updateCars()
