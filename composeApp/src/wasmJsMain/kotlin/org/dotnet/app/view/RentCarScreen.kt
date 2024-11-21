@@ -29,6 +29,8 @@ fun RentCarScreen(viewModel: CarRentalAppViewModel) {
 
     var selectedCar : Car? by remember { mutableStateOf(null) }
 
+    val valuationResult by viewModel.valuationResult.collectAsState()
+
     LaunchedEffect(Unit) {
         viewModel.updateCars()
     }
@@ -141,16 +143,12 @@ fun RentCarScreen(viewModel: CarRentalAppViewModel) {
 
                     Spacer(modifier = Modifier.height(16.dp))
 
-                    OfferView(
-                        Offer(
-                            id = 101,
-                            carID = 1,
-                            dayRate = 150L,
-                            insuranceRate = 20L,
-                            validUntil = "2024-12-31T23:59:59"
-                        ),
-                        {}
-                    )
+                    if(valuationResult != null) {
+                        OfferView(
+                            valuationResult!!,
+                            {}
+                        )
+                    }
 
                     // Footer at the bottom
                     Footer()

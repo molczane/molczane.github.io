@@ -70,11 +70,11 @@ fun ValuationScreen(
             modifier = Modifier.fillMaxWidth(),
             enabled = startDate.isNotBlank() && endDate.isNotBlank() && !isLoading
         ) {
-            if (isLoading) {
-                CircularProgressIndicator(modifier = Modifier.size(24.dp))
-            } else {
+//            if (isLoading) {
+//                CircularProgressIndicator(modifier = Modifier.size(24.dp))
+//            } else {
                 Text("Wyślij zapytanie o wycenę")
-            }
+            // }
         }
 
         Spacer(modifier = Modifier.height(16.dp))

@@ -36,12 +36,6 @@ fun LoginScreen(onLoginSuccess: () -> Unit, viewModel: CarRentalAppViewModel) {
     var isLoading by remember { mutableStateOf(false) }
     var loginResult by remember { mutableStateOf<String?>(null) }
 
-    val httpClient = remember { HttpClient(Js) {
-        install(ContentNegotiation) {
-            json()
-        }
-    } }
-
     Column(
         modifier = Modifier
             .padding(16.dp),

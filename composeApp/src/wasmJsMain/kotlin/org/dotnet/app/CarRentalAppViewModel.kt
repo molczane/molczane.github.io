@@ -138,12 +138,6 @@ class CarRentalAppViewModel : ViewModel() {
                 val response: HttpResponse = httpClient.post("http://webapplication2-dev.eba-sstwvfur.us-east-1.elasticbeanstalk.com/api/cars/getOffer") {
                     contentType(ContentType.Application.Json)
                     setBody(jsonBody)
-//                        mapOf(
-//                            "startDate" to startDate,
-//                            "endDate" to endDate,
-//                            "car" to car
-//                        )
-//                    )
                 }
 
                 if (response.status.isSuccess()) {
