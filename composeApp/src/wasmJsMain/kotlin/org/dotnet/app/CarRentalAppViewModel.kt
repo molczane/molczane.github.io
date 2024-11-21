@@ -138,7 +138,6 @@ class CarRentalAppViewModel : ViewModel() {
                 }
 
                 if (response.status.isSuccess()) {
-                    _valuationResult.value = response.body() // Zakładamy, że serwer zwraca wycenę jako json
                     onRent(true)
                 }
             } catch (e: Exception) {
