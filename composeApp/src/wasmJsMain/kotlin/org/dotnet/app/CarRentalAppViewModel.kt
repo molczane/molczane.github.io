@@ -19,6 +19,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.dotnet.app.model.Car
 import org.dotnet.app.model.Offer
+import org.dotnet.app.model.OfferRequest
 import org.dotnet.app.model.User
 
 data class CarRentalAppUiState(
@@ -115,16 +116,22 @@ class CarRentalAppViewModel : ViewModel() {
         viewModelScope.launch {
             println("Sending valuation request...")
 
+            val offerRequest = OfferRequest(
+                startDate = startDate,
+                endDate = endDate,
+                car = car
+            )
+
             try {
                 val response: HttpResponse = httpClient.post("http://webapplication2-dev.eba-sstwvfur.us-east-1.elasticbeanstalk.com/api/cars/getOffer") {
                     contentType(ContentType.Application.Json)
-                    setBody(
-                        mapOf(
-                            "startDate" to startDate,
-                            "endDate" to endDate,
-                            "car" to car
-                        )
-                    )
+                    setBody(offerRequest)
+//                        mapOf(
+//                            "startDate" to startDate,
+//                            "endDate" to endDate,
+//                            "car" to car
+//                        )
+//                    )
                 }
 
                 if (response.status.isSuccess()) {
