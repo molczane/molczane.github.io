@@ -174,7 +174,7 @@ fun RentCarScreen(viewModel: CarRentalAppViewModel) {
                     if (isCarRented) {
                         Box(
                             modifier = Modifier
-                                .fillMaxSize()
+                                .fillMaxWidth()
                                 .padding(innerPadding),
                             contentAlignment = Alignment.Center // Centers the content within the Box
                         ) {
@@ -215,7 +215,6 @@ fun RentCarScreen(viewModel: CarRentalAppViewModel) {
                             }
                         }
                     }
-
 
                     // Footer at the bottom
                     Footer()
