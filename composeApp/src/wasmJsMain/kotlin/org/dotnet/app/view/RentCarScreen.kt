@@ -64,13 +64,13 @@ fun RentCarScreen(viewModel: CarRentalAppViewModel) {
                         }
                     }
 
-                    Button(
-                        onClick = { isValuationDialogShown = true },
-                        elevation = ButtonDefaults.elevation(defaultElevation = 15.dp),
-                        modifier = Modifier.padding(12.dp)
-                    ) {
-                        Text("Show Valuation Dialog")
-                    }
+//                    Button(
+//                        onClick = { isValuationDialogShown = true },
+//                        elevation = ButtonDefaults.elevation(defaultElevation = 15.dp),
+//                        modifier = Modifier.padding(12.dp)
+//                    ) {
+//                        Text("Show Valuation Dialog")
+//                    }
                 }
             )
         },
