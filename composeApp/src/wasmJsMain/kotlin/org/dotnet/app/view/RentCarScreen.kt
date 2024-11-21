@@ -135,7 +135,7 @@ fun RentCarScreen(viewModel: CarRentalAppViewModel) {
                             },
                             modifier = Modifier.fillMaxWidth(.25f) // Set button width to half of the screen
                         ) {
-                            Text("Wypożycz Samochód")
+                            Text("Wyceń wypożyczenie")
                         }
                     } else {
                         Text("Brak wyników", style = MaterialTheme.typography.body1)
