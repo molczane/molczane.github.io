@@ -24,7 +24,7 @@ import org.dotnet.app.model.User
 data class CarRentalAppUiState(
     val listOfCars: List<Car> = emptyList(),
 ) {
-    val brands = listOfCars.map { it.model }.toSet()
+    val producers = listOfCars.map { it.model }.toSet()
 }
 
 

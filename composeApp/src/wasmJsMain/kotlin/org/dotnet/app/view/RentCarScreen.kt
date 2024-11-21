@@ -10,15 +10,17 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import org.dotnet.app.CarRentalAppViewModel
-import org.dotnet.app.dataSource.cars
+//import org.dotnet.app.dataSource.cars
 import org.dotnet.app.model.Car
 import org.dotnet.app.model.Offer
 
 @Composable
 fun RentCarScreen(viewModel: CarRentalAppViewModel) {
     val uiState by viewModel.uiState.collectAsState()
-    val brands = uiState.brands
+    val brands = uiState.producers
     val isSignedIn = viewModel.isUserLoggedIn.collectAsState()
+
+    val cars = uiState.listOfCars
 
     var isLoginDialogShown by remember { mutableStateOf(false) }
 
@@ -171,10 +173,10 @@ fun RentCarScreen(viewModel: CarRentalAppViewModel) {
                         rentalService = "BestCarRental",
                         producer = "Toyota",
                         model = "Corolla",
-                        yearOfProduction = 2020,
+                        yearOfProduction = "2020",
                         numberOfSeats = 5,
                         type = "Sedan",
-                        isAvailable = true,
+                        isAvailable = 1,
                         location = "Warsaw, Poland"
                     )
                 )
