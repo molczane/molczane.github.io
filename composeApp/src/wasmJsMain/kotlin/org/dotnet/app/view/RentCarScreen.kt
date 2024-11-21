@@ -17,14 +17,15 @@ import org.dotnet.app.model.Offer
 @Composable
 fun RentCarScreen(viewModel: CarRentalAppViewModel) {
     val uiState by viewModel.uiState.collectAsState()
-    val brands = uiState.producers
     val isSignedIn = viewModel.isUserLoggedIn.collectAsState()
 
-    val cars = uiState.listOfCars
+    var cars by remember { mutableStateOf<List<Car>>(emptyList()) }
 
     var isLoginDialogShown by remember { mutableStateOf(false) }
 
     var isValuationDialogShown by remember { mutableStateOf(false) }
+
+    var areCarsLoaded by remember { mutableStateOf(false) }
 
     Scaffold(
         topBar = {
@@ -56,83 +57,108 @@ fun RentCarScreen(viewModel: CarRentalAppViewModel) {
             )
         },
         content = { innerPadding ->
-            Column(
-                Modifier
-                    .fillMaxSize()
-                    .padding(innerPadding)
-                    .padding(16.dp),
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                var selectedBrand by remember { mutableStateOf<String?>(null) }
-                var selectedModel by remember { mutableStateOf<String?>(null) }
-                val brands = cars.map { it.producer }.distinct().sorted()
-                val models = cars.filter { it.producer == selectedBrand }.map { it.model }.distinct().sorted()
-
-                Spacer(modifier = Modifier.height(16.dp))
-
-                // Dropdown for car brand selection
-                DropdownMenu(
-                    label = "Wybierz markę",
-                    options = brands,
-                    selectedOption = selectedBrand,
-                    onOptionSelected = { brand ->
-                        selectedBrand = brand
-                        selectedModel = null  // Reset model selection when brand changes
-                    },
-                    modifier = Modifier.fillMaxWidth(0.5f) // Set dropdown width to half of the screen
-                )
-
-                Spacer(modifier = Modifier.height(8.dp))
-
-                // Dropdown for car model selection
-                if (selectedBrand != null) {
-                    DropdownMenu(
-                        label = "Wybierz model",
-                        options = models,
-                        selectedOption = selectedModel,
-                        onOptionSelected = { model -> selectedModel = model },
-                        modifier = Modifier.fillMaxWidth(0.5f) // Set dropdown width to half of the screen
-                    )
+            if(!areCarsLoaded) {
+                Column(Modifier.padding(innerPadding)) {
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(16.dp), // Optional padding around the row
+                        horizontalArrangement = Arrangement.Center // Centers content horizontally
+                    ) {
+                        Button(
+                            onClick = {
+                                viewModel.updateCars()
+                                cars = uiState.listOfCars
+                                areCarsLoaded = true
+                            },
+                            elevation = ButtonDefaults.elevation(defaultElevation = 15.dp),
+                            modifier = Modifier.padding(12.dp)
+                        ) {
+                            Text("Load Cars")
+                        }
+                    }
+                    Footer()
                 }
-
-                Spacer(modifier = Modifier.height(16.dp))
-
-                // Display selected car details as Card only when model is selected
-                val selectedCar = cars.find { it.producer == selectedBrand && it.model == selectedModel }
-                if (selectedCar != null) {
-                    CarDetailsCard(
-                        car = selectedCar,
-                        modifier = Modifier.fillMaxWidth(0.5f)
-                    ) // Set Card width to half of the screen
+            }
+            else {
+                Column(
+                    Modifier
+                        .fillMaxSize()
+                        .padding(innerPadding)
+                        .padding(16.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    var selectedBrand by remember { mutableStateOf<String?>(null) }
+                    var selectedModel by remember { mutableStateOf<String?>(null) }
+                    val brands = cars.map { it.producer }.distinct().sorted()
+                    val models = cars.filter { it.producer == selectedBrand }.map { it.model }.distinct().sorted()
 
                     Spacer(modifier = Modifier.height(16.dp))
 
-                    // "Wypożycz Samochód" button
-                    Button(
-                        onClick = { /* Implement rental functionality here */ },
-                        modifier = Modifier.fillMaxWidth(0.5f) // Set button width to half of the screen
-                    ) {
-                        Text("Wypożycz Samochód")
+                    // Dropdown for car brand selection
+                    DropdownMenu(
+                        label = "Wybierz markę",
+                        options = brands,
+                        selectedOption = selectedBrand,
+                        onOptionSelected = { brand ->
+                            selectedBrand = brand
+                            selectedModel = null  // Reset model selection when brand changes
+                        },
+                        modifier = Modifier.fillMaxWidth(0.5f) // Set dropdown width to half of the screen
+                    )
+
+                    Spacer(modifier = Modifier.height(8.dp))
+
+                    // Dropdown for car model selection
+                    if (selectedBrand != null) {
+                        DropdownMenu(
+                            label = "Wybierz model",
+                            options = models,
+                            selectedOption = selectedModel,
+                            onOptionSelected = { model -> selectedModel = model },
+                            modifier = Modifier.fillMaxWidth(0.5f) // Set dropdown width to half of the screen
+                        )
                     }
-                } else {
-                    Text("Brak wyników", style = MaterialTheme.typography.body1)
+
+                    Spacer(modifier = Modifier.height(16.dp))
+
+                    // Display selected car details as Card only when model is selected
+                    val selectedCar = cars.find { it.producer == selectedBrand && it.model == selectedModel }
+                    if (selectedCar != null) {
+                        CarDetailsCard(
+                            car = selectedCar,
+                            modifier = Modifier.fillMaxWidth(0.5f)
+                        ) // Set Card width to half of the screen
+
+                        Spacer(modifier = Modifier.height(16.dp))
+
+                        // "Wypożycz Samochód" button
+                        Button(
+                            onClick = { /* Implement rental functionality here */ },
+                            modifier = Modifier.fillMaxWidth(0.5f) // Set button width to half of the screen
+                        ) {
+                            Text("Wypożycz Samochód")
+                        }
+                    } else {
+                        Text("Brak wyników", style = MaterialTheme.typography.body1)
+                    }
+
+                    Spacer(modifier = Modifier.height(16.dp))
+
+                    OfferView(
+                        Offer(
+                            id = 101,
+                            carID = 1,
+                            dayRate = 150L,
+                            insuranceRate = 20L,
+                            validUntil = "2024-12-31T23:59:59"
+                        ),
+                        {}
+                    )
+
+                    // Footer at the bottom
+                    Footer()
                 }
-
-                Spacer(modifier = Modifier.height(16.dp))
-
-                OfferView(
-                    Offer(
-                        id = 101,
-                        carID = 1,
-                        dayRate = 150L,
-                        insuranceRate = 20L,
-                        validUntil = "2024-12-31T23:59:59"
-                    ),
-                    {}
-                )
-
-                // Footer at the bottom
-                Footer()
             }
         }
     )

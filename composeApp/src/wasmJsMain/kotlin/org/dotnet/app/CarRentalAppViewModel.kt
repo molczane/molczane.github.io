@@ -37,7 +37,7 @@ class CarRentalAppViewModel : ViewModel() {
     val isUserLoggedIn = MutableStateFlow(false)
 
     init {
-        updateCars()
+        //updateCars()
     }
 
     private val httpClient = HttpClient(Js) {
@@ -46,7 +46,7 @@ class CarRentalAppViewModel : ViewModel() {
         }
     }
 
-    private fun updateCars(){
+    fun updateCars(){
         viewModelScope.launch {
             val cars = getAllCars()
             _uiState.update {
