@@ -12,6 +12,7 @@ import androidx.compose.ui.unit.sp
 import org.dotnet.app.CarRentalAppViewModel
 import org.dotnet.app.dataSource.cars
 import org.dotnet.app.model.Car
+import org.dotnet.app.model.Offer
 
 @Composable
 fun RentCarScreen(viewModel: CarRentalAppViewModel) {
@@ -20,6 +21,9 @@ fun RentCarScreen(viewModel: CarRentalAppViewModel) {
     val isSignedIn = viewModel.isUserLoggedIn.collectAsState()
 
     var isLoginDialogShown by remember { mutableStateOf(false) }
+
+    var isValuationDialogShown by remember { mutableStateOf(false) }
+
     Scaffold(
         topBar = {
             TopAppBar(
@@ -31,12 +35,20 @@ fun RentCarScreen(viewModel: CarRentalAppViewModel) {
                         elevation = ButtonDefaults.elevation(defaultElevation = 15.dp),
                         modifier = Modifier.padding(12.dp)
                     ) {
-                        if(isSignedIn.value) {
+                        if(!isSignedIn.value) {
                             Text("Zaloguj się")
                         }
                         else {
                             Text("Wyloguj się")
                         }
+                    }
+
+                    Button(
+                        onClick = { isValuationDialogShown = true },
+                        elevation = ButtonDefaults.elevation(defaultElevation = 15.dp),
+                        modifier = Modifier.padding(12.dp)
+                    ) {
+                        Text("Show Valuation Dialog")
                     }
                 }
             )
@@ -51,8 +63,8 @@ fun RentCarScreen(viewModel: CarRentalAppViewModel) {
             ) {
                 var selectedBrand by remember { mutableStateOf<String?>(null) }
                 var selectedModel by remember { mutableStateOf<String?>(null) }
-                val brands = cars.map { it.brand }.distinct().sorted()
-                val models = cars.filter { it.brand == selectedBrand }.map { it.model }.distinct().sorted()
+                val brands = cars.map { it.producer }.distinct().sorted()
+                val models = cars.filter { it.producer == selectedBrand }.map { it.model }.distinct().sorted()
 
                 Spacer(modifier = Modifier.height(16.dp))
 
@@ -84,7 +96,7 @@ fun RentCarScreen(viewModel: CarRentalAppViewModel) {
                 Spacer(modifier = Modifier.height(16.dp))
 
                 // Display selected car details as Card only when model is selected
-                val selectedCar = cars.find { it.brand == selectedBrand && it.model == selectedModel }
+                val selectedCar = cars.find { it.producer == selectedBrand && it.model == selectedModel }
                 if (selectedCar != null) {
                     CarDetailsCard(
                         car = selectedCar,
@@ -106,6 +118,17 @@ fun RentCarScreen(viewModel: CarRentalAppViewModel) {
 
                 Spacer(modifier = Modifier.height(16.dp))
 
+                OfferView(
+                    Offer(
+                        id = 101,
+                        carID = 1,
+                        dayRate = 150L,
+                        insuranceRate = 20L,
+                        validUntil = "2024-12-31T23:59:59"
+                    ),
+                    {}
+                )
+
                 // Footer at the bottom
                 Footer()
             }
@@ -115,10 +138,6 @@ fun RentCarScreen(viewModel: CarRentalAppViewModel) {
         AlertDialog(
             onDismissRequest = { isLoginDialogShown = false },
             title = {
-                Text(
-                    text = "Zaloguj się",
-                    style = MaterialTheme.typography.h6
-                )
             },
             text = {
                 LoginScreen(
@@ -131,6 +150,40 @@ fun RentCarScreen(viewModel: CarRentalAppViewModel) {
             },
             dismissButton = {
                 Button(onClick = { isLoginDialogShown = false }) {
+                    Text("Anuluj")
+                }
+            }
+        )
+    }
+    if(isValuationDialogShown) {
+        AlertDialog(
+            onDismissRequest = { isValuationDialogShown = false },
+            title = {
+            },
+            text = {
+                ValuationScreen(
+                    {   startDate, endDate, car ->
+                        viewModel.requestValuation(startDate, endDate, car)
+                    },
+                    valuationResult = "",
+                    car = Car(
+                        id = 1,
+                        rentalService = "BestCarRental",
+                        producer = "Toyota",
+                        model = "Corolla",
+                        yearOfProduction = 2020,
+                        numberOfSeats = 5,
+                        type = "Sedan",
+                        isAvailable = true,
+                        location = "Warsaw, Poland"
+                    )
+                )
+            },
+            confirmButton = {
+                // Optional: Add a custom confirm button if needed
+            },
+            dismissButton = {
+                Button(onClick = { isValuationDialogShown = false }) {
                     Text("Anuluj")
                 }
             }
@@ -174,7 +227,7 @@ fun CarDetailsCard(car: Car, modifier: Modifier = Modifier) {
                 .padding(16.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Text("Marka: ${car.brand}", style = MaterialTheme.typography.h6)
+            Text("Marka: ${car.producer}", style = MaterialTheme.typography.h6)
             Text("Model: ${car.model}", style = MaterialTheme.typography.body1)
         }
     }

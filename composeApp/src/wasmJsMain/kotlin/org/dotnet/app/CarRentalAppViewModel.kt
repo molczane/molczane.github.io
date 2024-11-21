@@ -12,17 +12,19 @@ import io.ktor.http.*
 import io.ktor.serialization.kotlinx.json.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.dotnet.app.model.Car
+import org.dotnet.app.model.Offer
 import org.dotnet.app.model.User
 
 data class CarRentalAppUiState(
     val listOfCars: List<Car> = emptyList(),
 ) {
-    val brands = listOfCars.map { it.brand }.toSet()
+    val brands = listOfCars.map { it.model }.toSet()
 }
 
 
@@ -35,7 +37,7 @@ class CarRentalAppViewModel : ViewModel() {
     val isUserLoggedIn = MutableStateFlow(false)
 
     init {
-        //updateCars()
+        updateCars()
     }
 
     private val httpClient = HttpClient(Js) {
@@ -55,7 +57,7 @@ class CarRentalAppViewModel : ViewModel() {
 
     private suspend fun getAllCars(): List<Car> {
         val carsResponse =  httpClient
-            .get("http://webapplication2-dev.eba-sstwvfur.us-east-1.elasticbeanstalk.com/api/getAllCars")
+            .get("http://webapplication2-dev.eba-sstwvfur.us-east-1.elasticbeanstalk.com/api/cars/getAllCars")
             .body<List<Car>>()
 
         return carsResponse
@@ -99,4 +101,29 @@ class CarRentalAppViewModel : ViewModel() {
         }
     }
 
+    private val _valuationResult = MutableStateFlow<Offer?>(null)
+    val valuationResult: StateFlow<Offer?> = _valuationResult
+
+    fun requestValuation(startDate: String, endDate: String, car: Car) {
+        viewModelScope.launch {
+            try {
+                val response: HttpResponse = httpClient.post("http://webapplication2-dev.eba-sstwvfur.us-east-1.elasticbeanstalk.com/api/cars/getOffer") {
+                    contentType(ContentType.Application.Json)
+                    setBody(
+                        mapOf(
+                            "startDate" to startDate,
+                            "endDate" to endDate,
+                            "car" to car
+                        )
+                    )
+                }
+
+                if (response.status.isSuccess()) {
+                    _valuationResult.value = response.body() // Zakładamy, że serwer zwraca wycenę jako json
+                }
+            } catch (e: Exception) {
+                throw e
+            }
+        }
+    }
 }

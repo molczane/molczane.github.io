@@ -43,7 +43,7 @@ kotlin {
             implementation(libs.androidx.lifecycle.runtime.compose)
             implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.7.3")
             implementation(libs.bundles.ktor.common)
-        }
+            implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.6.1")        }
     }
 }
 
