@@ -15,6 +15,9 @@ import org.dotnet.app.model.Car
 
 @Composable
 fun RentCarScreen(viewModel: CarRentalAppViewModel) {
+    val uiState by viewModel.uiState.collectAsState()
+    val brands = uiState.brands
+
     var isLoginDialogShown by remember { mutableStateOf(false) }
     Scaffold(
         topBar = {
@@ -113,7 +116,8 @@ fun RentCarScreen(viewModel: CarRentalAppViewModel) {
             },
             text = {
                 LoginScreen(
-                    onLoginSuccess = {}
+                    onLoginSuccess = {},
+                    viewModel = viewModel
                 )
             },
             confirmButton = {

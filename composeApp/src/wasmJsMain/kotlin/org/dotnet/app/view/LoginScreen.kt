@@ -35,9 +35,10 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import org.dotnet.app.CarRentalAppViewModel
 
 @Composable
-fun LoginScreen(onLoginSuccess: () -> Unit) {
+fun LoginScreen(onLoginSuccess: () -> Unit, viewModel: CarRentalAppViewModel) {
     var login by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     var isLoading by remember { mutableStateOf(false) }
@@ -86,26 +87,34 @@ fun LoginScreen(onLoginSuccess: () -> Unit) {
                     try {
                         println("Logging...")
 
-                        val response: HttpResponse = httpClient
-                            .post("http://webapplication2-dev.eba-sstwvfur.us-east-1.elasticbeanstalk.com/api/users/signIn") {
-                            contentType(ContentType.Application.Json)
-                            setBody(
-                                mapOf(
-                                    "login" to login,
-                                    "password" to password
-                                )
+                        viewModel.signIn(
+                            login,
+                            password,
+                            onLoginResultChange = { loginResult = it },
+                            onIsLoadingChange = {isLoading = it}
                             )
-                            //.post("http://webapplication2-dev.eba-sstwvfur.us-east-1.elasticbeanstalk.com/api/users/signIn?login=${login}&password=${password}") {
-                        }
 
-                        withContext(Dispatchers.Main) {
-                            loginResult = if (response.status.value == 200) {
-                                "Login successful!"
-                            } else {
-                                "Login failed: ${response.status.value}"
-                            }
-                            isLoading = false
-                        }
+
+
+//                        val response: HttpResponse = httpClient
+//                            .post("http://webapplication2-dev.eba-sstwvfur.us-east-1.elasticbeanstalk.com/api/users/signIn") {
+//                            contentType(ContentType.Application.Json)
+//                            setBody(
+//                                mapOf(
+//                                    "login" to login,
+//                                    "password" to password
+//                                )
+//                            )
+//                        }
+//
+//                        withContext(Dispatchers.Main) {
+//                            loginResult = if (response.status.value == 200) {
+//                                "Login successful!"
+//                            } else {
+//                                "Login failed: ${response.status.value}"
+//                            }
+//                            isLoading = false
+//                        }
                     } catch (e: Exception) {
                         withContext(Dispatchers.Main) {
                             loginResult = "Error: ${e.message}"

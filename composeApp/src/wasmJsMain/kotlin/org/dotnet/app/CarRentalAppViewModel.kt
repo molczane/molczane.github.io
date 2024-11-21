@@ -6,11 +6,16 @@ import io.ktor.client.*
 import io.ktor.client.call.*
 import io.ktor.client.plugins.contentnegotiation.*
 import io.ktor.client.request.*
+import io.ktor.client.statement.*
+import io.ktor.http.*
 import io.ktor.serialization.kotlinx.json.*
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import org.dotnet.app.model.Car
 import org.dotnet.app.model.User
 
@@ -53,6 +58,39 @@ class CarRentalAppViewModel : ViewModel() {
             .body<List<Car>>()
 
         return carsResponse
+    }
+
+    fun signIn(login: String, password: String, onLoginResultChange: (String?) -> Unit, onIsLoadingChange: (isLoading: Boolean) -> Unit) {
+        viewModelScope.launch {
+            try {
+                println("Logging...")
+
+                val response: HttpResponse = httpClient
+                    .post("http://webapplication2-dev.eba-sstwvfur.us-east-1.elasticbeanstalk.com/api/users/signIn") {
+                        contentType(ContentType.Application.Json)
+                        setBody(
+                            mapOf(
+                                "login" to login,
+                                "password" to password
+                            )
+                        )
+                    }
+
+                withContext(Dispatchers.Main) {
+                    if (response.status.value == 200) {
+                        onLoginResultChange("Login successful!")
+                    } else {
+                        onLoginResultChange("Login failed: ${response.status.value}")
+                    }
+                    onIsLoadingChange(false)
+                }
+            } catch (e: Exception) {
+                withContext(Dispatchers.Main) {
+                    onLoginResultChange("Error: ${e.message}")
+                    onIsLoadingChange(false)
+                }
+            }
+        }
     }
 
 }
