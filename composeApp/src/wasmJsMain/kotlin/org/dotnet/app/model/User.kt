@@ -11,7 +11,7 @@ data class User(
     val lastname: String,
     val login: String,
     val password: String,
-    val rentalService: String,
-    val birthday: String,
-    val driverLicenseReceiveDate: String
+    val rentalService: String?,
+    val birthday: String?,
+    val driverLicenseReceiveDate: String?
 )
