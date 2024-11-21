@@ -17,6 +17,7 @@ import org.dotnet.app.model.Car
 fun RentCarScreen(viewModel: CarRentalAppViewModel) {
     val uiState by viewModel.uiState.collectAsState()
     val brands = uiState.brands
+    val isSignedIn = viewModel.isUserLoggedIn.collectAsState()
 
     var isLoginDialogShown by remember { mutableStateOf(false) }
     Scaffold(
@@ -30,7 +31,7 @@ fun RentCarScreen(viewModel: CarRentalAppViewModel) {
                         elevation = ButtonDefaults.elevation(defaultElevation = 15.dp),
                         modifier = Modifier.padding(12.dp)
                     ) {
-                        if(!viewModel.isUserLoggedIn.value) {
+                        if(isSignedIn.value) {
                             Text("Zaloguj się")
                         }
                         else {
