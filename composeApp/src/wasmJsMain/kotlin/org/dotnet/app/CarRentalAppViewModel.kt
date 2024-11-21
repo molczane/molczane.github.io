@@ -116,16 +116,28 @@ class CarRentalAppViewModel : ViewModel() {
         viewModelScope.launch {
             println("Sending valuation request...")
 
-            val offerRequest = OfferRequest(
-                startDate = startDate,
-                endDate = endDate,
-                car = car
-            )
+            val jsonBody = """
+            {
+                "startDate": "$startDate",
+                "endDate": "$endDate",
+                "car": {
+                    "id": ${car.id},
+                    "rentalService": "${car.rentalService}",
+                    "producer": "${car.producer}",
+                    "model": "${car.model}",
+                    "type": "${car.type}",
+                    "yearOfProduction": "${car.yearOfProduction}",
+                    "numberOfSeats": ${car.numberOfSeats},
+                    "isAvailable": ${car.isAvailable},
+                    "location": "${car.location}"
+                }
+            }
+            """.trimIndent()
 
             try {
                 val response: HttpResponse = httpClient.post("http://webapplication2-dev.eba-sstwvfur.us-east-1.elasticbeanstalk.com/api/cars/getOffer") {
                     contentType(ContentType.Application.Json)
-                    setBody(offerRequest)
+                    setBody(jsonBody)
 //                        mapOf(
 //                            "startDate" to startDate,
 //                            "endDate" to endDate,
