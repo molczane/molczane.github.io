@@ -1,35 +1,24 @@
 package org.dotnet.app.view
 
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.material.Button
-import androidx.compose.material.CircularProgressIndicator
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.OutlinedTextField
-
-import androidx.compose.material.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.foundation.layout.*
+import androidx.compose.material.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import org.dotnet.app.viewModel.CarRentalAppViewModel
+import kotlinx.browser.window
+import kotlinx.coroutines.launch
 
 @Composable
 fun LoginScreen(onLoginSuccess: () -> Unit, viewModel: CarRentalAppViewModel) {
-    var login by remember { mutableStateOf("") }
-    var password by remember { mutableStateOf("") }
     var isLoading by remember { mutableStateOf(false) }
     var loginResult by remember { mutableStateOf<String?>(null) }
+    val coroutineScope = rememberCoroutineScope()
+
+    // Google OAuth configuration
+    val googleClientId = "248107412465-i64fdf66a6f4nrj7232ghdmvbsg91pp3.apps.googleusercontent.com"
+    val redirectUri = window.location.origin + "/oauth2callback"
 
     Column(
         modifier = Modifier
@@ -41,49 +30,76 @@ fun LoginScreen(onLoginSuccess: () -> Unit, viewModel: CarRentalAppViewModel) {
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        OutlinedTextField(
-            value = login,
-            onValueChange = { login = it },
-            label = { Text("Username") },
-            modifier = Modifier.fillMaxWidth()
-        )
-
-        Spacer(modifier = Modifier.height(8.dp))
-
-        OutlinedTextField(
-            value = password,
-            onValueChange = { password = it },
-            label = { Text("Password") },
-            visualTransformation = PasswordVisualTransformation(),
-            modifier = Modifier.fillMaxWidth()
-        )
-
-        Spacer(modifier = Modifier.height(16.dp))
-
+        // Google Sign-In Button
         Button(
             onClick = {
-                isLoading = true
-                viewModel.signIn(
-                    login,
-                    password,
-                    onLoginResultChange = { loginResult = it },
-                    onIsLoadingChange = { isLoading = it }
-                )
+                initiateGoogleSignIn(googleClientId, redirectUri)
             },
-            enabled = !isLoading,
             modifier = Modifier.fillMaxWidth()
         ) {
             if (isLoading) {
                 CircularProgressIndicator(modifier = Modifier.size(24.dp))
             } else {
-                Text("Login")
+                Text("Sign in with Google")
             }
         }
 
+        // Optional: Existing username/password login
         Spacer(modifier = Modifier.height(16.dp))
+        Text("Or continue with:", style = MaterialTheme.typography.subtitle1)
+
+        Spacer(modifier = Modifier.height(16.dp))
+        Button(
+            onClick = {
+                // Toggle to show traditional login fields
+            },
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Text("Use Username/Password")
+        }
 
         loginResult?.let {
             Text(it, style = MaterialTheme.typography.body1, color = MaterialTheme.colors.primary)
         }
+    }
+
+    // Handle OAuth callback
+    LaunchedEffect(Unit) {
+        handleOAuthCallback(viewModel, onLoginSuccess)
+    }
+}
+
+// JavaScript interop function to initiate Google Sign-In
+private fun initiateGoogleSignIn(clientId: String, redirectUri: String) {
+    val scope = "openid%20email%20profile"
+    val googleOAuthUrl = "https://accounts.google.com/o/oauth2/v2/auth" +
+            "?client_id=$clientId" +
+            "&redirect_uri=$redirectUri" +
+            "&response_type=code" +
+            "&scope=$scope"
+
+    window.location.href = googleOAuthUrl
+}
+
+// Handle OAuth callback and token exchange
+private fun handleOAuthCallback(
+    viewModel: CarRentalAppViewModel,
+    onLoginSuccess: () -> Unit
+) {
+    val urlParams = window.location.search
+    if (urlParams.contains("code=")) {
+        val authorizationCode = urlParams.substringAfter("code=").substringBefore("&")
+
+        // Exchange authorization code for access token
+        // This would typically be done server-side for security
+        viewModel.exchangeGoogleAuthCode(
+            authorizationCode,
+            onSuccess = {
+                onLoginSuccess()
+            },
+            onError = { errorMessage ->
+                // Handle login error
+            }
+        )
     }
 }

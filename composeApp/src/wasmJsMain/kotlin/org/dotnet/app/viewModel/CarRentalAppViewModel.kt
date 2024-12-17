@@ -41,14 +41,22 @@ class CarRentalAppViewModel : ViewModel() {
     var user: User? = null
     val isUserLoggedIn = MutableStateFlow(false)
 
-    var authReady by remember { mutableStateOf(false)}
-
-
     init {
         //updateCars()
-        LaunchedEffect(Unit) {
-            // GoogleAuthProvider.create()
-        }
+    }
+
+    // In CarRentalAppViewModel
+    fun exchangeGoogleAuthCode(
+        code: String,
+        onSuccess: () -> Unit,
+        onError: (String) -> Unit
+    ) {
+        // Implement server-side token exchange
+        // This method would typically call your backend API to:
+        // 1. Exchange the authorization code for an access token
+        // 2. Verify the token
+        // 3. Create or log in the user
+        // 4. Return a session token or user information
     }
 
     fun loadGoogleScript(onLoaded: () -> Unit) {
