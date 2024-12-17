@@ -44,6 +44,10 @@ kotlin {
             implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.7.3")
             implementation(libs.bundles.ktor.common)
             implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.6.1")
+
+            implementation("io.github.mirzemehdi:kmpauth-google:2.2.0") //Google One Tap Sign-In
+            implementation("io.github.mirzemehdi:kmpauth-firebase:2.2.0") //Integrated Authentications with Firebase
+            implementation("io.github.mirzemehdi:kmpauth-uihelper:2.2.0") //UiHelper SignIn buttons (AppleSignIn, GoogleSignInButton)
         }
     }
 }
