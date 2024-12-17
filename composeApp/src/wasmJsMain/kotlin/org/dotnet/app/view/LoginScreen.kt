@@ -18,7 +18,7 @@ fun LoginScreen(onLoginSuccess: () -> Unit, viewModel: CarRentalAppViewModel) {
 
     // Google OAuth configuration
     val googleClientId = "248107412465-i64fdf66a6f4nrj7232ghdmvbsg91pp3.apps.googleusercontent.com"
-    val redirectUri = window.location.origin + "/oauth2callback"
+    val redirectUri = "https://molczane.github.io/"
 
     Column(
         modifier = Modifier
