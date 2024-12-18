@@ -100,6 +100,8 @@ private fun initiateGoogleSignIn(clientId: String, redirectUri: String) {
     window.location.href = googleOAuthUrl
 }
 
+external fun decodeURIComponent(encodedURI: String): String
+
 // Handle OAuth callback and token exchange
 private fun handleOAuthCallback(
     viewModel: CarRentalAppViewModel,
@@ -111,7 +113,8 @@ private fun handleOAuthCallback(
         println(authorizationCode)
         // Exchange authorization code for access token
         // This would typically be done server-side for security
-        viewModel.sendAuthCodeToBackend(authorizationCode)
+
+        // viewModel.sendAuthCodeToBackend(authorizationCode)
 
 //        viewModel.exchangeGoogleAuthCode(
 //            authorizationCode,
