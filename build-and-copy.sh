@@ -10,7 +10,7 @@
 git add .
 
 # Commit changes with a message
-git commit -m "Changed login post body."
+git commit -m "Commit to trigger publication."
 
 # Push changes to the repository
 git push origin main

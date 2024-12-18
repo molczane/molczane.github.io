@@ -65,10 +65,15 @@ fun LoginScreen(onLoginSuccess: () -> Unit, viewModel: CarRentalAppViewModel) {
     }
 
     // Handle OAuth callback
-    LaunchedEffect(window.location.search) {
-        println("Handling OAuth callback")
-        handleOAuthCallback(viewModel, onLoginSuccess)
+    if(window.location.search.contains("code=")) {
+        coroutineScope.launch {
+            handleOAuthCallback(viewModel, onLoginSuccess)
+        }
     }
+//    LaunchedEffect(window.location.search) {
+//        println("Handling OAuth callback")
+//        handleOAuthCallback(viewModel, onLoginSuccess)
+//    }
 }
 
 // JavaScript interop function to initiate Google Sign-In
