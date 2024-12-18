@@ -4,7 +4,7 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class AuthResponse(
-    var Token: String,
-    var User: UserDTO,
-    val IsNewUser: Boolean
+    var token: String,
+    var user: UserDTO,
+    val isNewUser: Boolean
 )

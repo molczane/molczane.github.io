@@ -233,7 +233,8 @@ class CarRentalAppViewModel : ViewModel() {
                     _authResponse.value = response.body() // Zakładamy, że serwer zwraca wycenę jako json
                 }
 
-                println("Auth response: ${_authResponse.value?.Token}")
+                println("Auth response: ${_authResponse.value?.user!!.name}")
+                println("Auth response: ${_authResponse.value?.user!!.email}")
                 // Zapisanie tokenu sesji
 
                 // Zapisanie informacji o użytkowniku
