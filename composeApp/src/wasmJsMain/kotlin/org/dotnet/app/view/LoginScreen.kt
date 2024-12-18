@@ -65,7 +65,7 @@ fun LoginScreen(onLoginSuccess: () -> Unit, viewModel: CarRentalAppViewModel) {
     }
 
     // Handle OAuth callback
-    LaunchedEffect(Unit) {
+    LaunchedEffect(window.location.search) {
         handleOAuthCallback(viewModel, onLoginSuccess)
     }
 }
