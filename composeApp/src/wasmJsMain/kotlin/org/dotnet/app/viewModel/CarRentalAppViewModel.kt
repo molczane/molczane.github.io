@@ -219,12 +219,12 @@ class CarRentalAppViewModel : ViewModel() {
         viewModelScope.launch {
             try {
                 val response: HttpResponse = httpClient
-                    .post("http://webapplication2-dev.eba-sstwvfur.us-east-1.elasticbeanstalk.com/api/auth/google") {
+                    .post("https://user-api-dotnet.azurewebsites.net/api/users/google") {
                         contentType(ContentType.Application.Json)
                         setBody(
                             mapOf(
-                                "authCode" to authCode,
-                                "redirectUri" to "https://molczane.github.io/"
+                                "Code" to authCode,
+                                "RedirectUri" to "https://molczane.github.io/"
                             )
                         )
                     }
@@ -232,19 +232,16 @@ class CarRentalAppViewModel : ViewModel() {
                 if (response.status.isSuccess()) {
                     _authResponse.value = response.body() // Zakładamy, że serwer zwraca wycenę jako json
                 }
+
+                println("Auth response: ${_authResponse.value?.Token}")
                 // Zapisanie tokenu sesji
 
                 // Zapisanie informacji o użytkowniku
 
                 // Przekierowanie lub zmiana stanu aplikacji
-//                if (authResponse.isNewUser) {
-//                    navigateToProfileCompletion()
-//                } else {
-//                    navigateToDashboard()
-//                }
+
             } catch (e: Exception) {
                 // Obsługa błędów logowania
-                //handleLoginError(e)
                 throw e
             }
         }

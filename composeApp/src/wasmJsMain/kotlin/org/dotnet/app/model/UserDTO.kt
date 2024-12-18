@@ -4,9 +4,8 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class UserDTO(
-    val id: Int,
-    val mail: String,
-    val name: String,
-    val surname: String,
-    val profileCompleted: Boolean
+    val Id: Int,
+    val Email: String,
+    val Name: String,
+    val ProfileCompleted: Boolean
 )
