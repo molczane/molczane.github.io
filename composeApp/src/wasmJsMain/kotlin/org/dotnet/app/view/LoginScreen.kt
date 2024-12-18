@@ -19,6 +19,7 @@ fun LoginScreen(onLoginSuccess: () -> Unit, viewModel: CarRentalAppViewModel) {
     // Google OAuth configuration
     val googleClientId = "248107412465-i64fdf66a6f4nrj7232ghdmvbsg91pp3.apps.googleusercontent.com"
     val redirectUri = "https://molczane.github.io/"
+    //val redirectUri = "http://localhost:8080"
 
     Column(
         modifier = Modifier
@@ -89,7 +90,7 @@ private fun handleOAuthCallback(
     val urlParams = window.location.search
     if (urlParams.contains("code=")) {
         val authorizationCode = urlParams.substringAfter("code=").substringBefore("&")
-
+        println(authorizationCode)
         // Exchange authorization code for access token
         // This would typically be done server-side for security
         viewModel.exchangeGoogleAuthCode(
