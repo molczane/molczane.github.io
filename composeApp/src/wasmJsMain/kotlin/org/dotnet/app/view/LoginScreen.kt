@@ -15,6 +15,7 @@ fun LoginScreen(onLoginSuccess: () -> Unit, viewModel: CarRentalAppViewModel) {
     var isLoading by remember { mutableStateOf(false) }
     var loginResult by remember { mutableStateOf<String?>(null) }
     val coroutineScope = rememberCoroutineScope()
+    var isCallbackHandled by remember { mutableStateOf(false) } // To prevent repeated calls
 
     // Google OAuth configuration
     val googleClientId = "248107412465-i64fdf66a6f4nrj7232ghdmvbsg91pp3.apps.googleusercontent.com"
@@ -68,6 +69,17 @@ fun LoginScreen(onLoginSuccess: () -> Unit, viewModel: CarRentalAppViewModel) {
     if(window.location.search.contains("code=")) {
         coroutineScope.launch {
             handleOAuthCallback(viewModel, onLoginSuccess)
+        }
+    }
+
+    // Handle OAuth callback
+    LaunchedEffect(window.location.search) {
+        val searchParams = window.location.search
+        if (!isCallbackHandled && searchParams.contains("code=")) {
+            isCallbackHandled = true // Mark callback as handled to prevent re-execution
+            coroutineScope.launch {
+                handleOAuthCallback(viewModel, onLoginSuccess)
+            }
         }
     }
 //    LaunchedEffect(window.location.search) {

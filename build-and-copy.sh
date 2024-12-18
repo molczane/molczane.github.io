@@ -10,7 +10,7 @@
 git add .
 
 # Commit changes with a message
-git commit -m "Commit to trigger publication."
+git commit -m "Trying to trigger handler after OAuth success."
 
 # Push changes to the repository
 git push origin main
