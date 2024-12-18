@@ -114,7 +114,7 @@ private fun handleOAuthCallback(
         // Exchange authorization code for access token
         // This would typically be done server-side for security
 
-        viewModel.sendAuthCodeToBackend(authorizationCode)
+        // viewModel.sendAuthCodeToBackend(authorizationCode)
 
 //        viewModel.exchangeGoogleAuthCode(
 //            authorizationCode,
