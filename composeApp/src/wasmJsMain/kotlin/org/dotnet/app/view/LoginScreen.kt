@@ -93,14 +93,16 @@ private fun handleOAuthCallback(
         println(authorizationCode)
         // Exchange authorization code for access token
         // This would typically be done server-side for security
-        viewModel.exchangeGoogleAuthCode(
-            authorizationCode,
-            onSuccess = {
-                onLoginSuccess()
-            },
-            onError = { errorMessage ->
-                // Handle login error
-            }
-        )
+        viewModel.sendAuthCodeToBackend(authorizationCode)
+
+//        viewModel.exchangeGoogleAuthCode(
+//            authorizationCode,
+//            onSuccess = {
+//                onLoginSuccess()
+//            },
+//            onError = { errorMessage ->
+//                // Handle login error
+//            }
+//        )
     }
 }

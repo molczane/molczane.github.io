@@ -21,6 +21,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import org.dotnet.app.model.AuthResponse
 import org.dotnet.app.model.Car
 import org.dotnet.app.model.Offer
 import org.dotnet.app.model.User
@@ -57,17 +58,6 @@ class CarRentalAppViewModel : ViewModel() {
         // 2. Verify the token
         // 3. Create or log in the user
         // 4. Return a session token or user information
-    }
-
-    fun loadGoogleScript(onLoaded: () -> Unit) {
-        val script = document.createElement("script") as HTMLScriptElement
-        script.src = "https://accounts.google.com/gsi/client"
-        script.async = true
-        script.defer = true
-        script.onload = {
-            onLoaded()
-        }
-        document.head?.appendChild(script)
     }
 
     private val httpClient = HttpClient(Js) {
@@ -222,5 +212,41 @@ class CarRentalAppViewModel : ViewModel() {
         }
     }
 
+    private val _authResponse = MutableStateFlow<AuthResponse?>(null)
+    val authResponse: StateFlow<AuthResponse?> = _authResponse
 
+    fun sendAuthCodeToBackend(authCode: String) {
+        viewModelScope.launch {
+            try {
+                val response: HttpResponse = httpClient
+                    .post("http://webapplication2-dev.eba-sstwvfur.us-east-1.elasticbeanstalk.com/api/auth/google") {
+                        contentType(ContentType.Application.Json)
+                        setBody(
+                            mapOf(
+                                "authCode" to authCode,
+                                "redirectUri" to "https://molczane.github.io/"
+                            )
+                        )
+                    }
+
+                if (response.status.isSuccess()) {
+                    _authResponse.value = response.body() // Zakładamy, że serwer zwraca wycenę jako json
+                }
+                // Zapisanie tokenu sesji
+
+                // Zapisanie informacji o użytkowniku
+
+                // Przekierowanie lub zmiana stanu aplikacji
+//                if (authResponse.isNewUser) {
+//                    navigateToProfileCompletion()
+//                } else {
+//                    navigateToDashboard()
+//                }
+            } catch (e: Exception) {
+                // Obsługa błędów logowania
+                //handleLoginError(e)
+                throw e
+            }
+        }
+    }
 }

@@ -1,7 +1,6 @@
 package org.dotnet.app.model
 
 import kotlinx.serialization.Serializable
-import org.w3c.dom.DOMStringMap
 
 @Serializable
 data class User(
