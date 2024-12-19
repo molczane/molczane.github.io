@@ -56,16 +56,19 @@ class CarRentalAppViewModel : ViewModel() {
 
     val currentCarPage = MutableStateFlow(List<Car>(
         size = 5,
-        init = TODO()
+        init = { index -> Car(0, "RentalService", "Producer", "Model", "Type", "YearOfProduction", 5, 1, "Location") }
     ))
 
     init {
         //updateCars()
         viewModelScope.launch {
             pagesCount.value = getPageCount()
+            println("Pages count: ${pagesCount.value}")
+            println("fetching first page")
+            getPage(1)
         }
         viewModelScope.launch {
-            getPage(1)
+
         }
     }
 
@@ -87,13 +90,17 @@ class CarRentalAppViewModel : ViewModel() {
                     contentType(ContentType.Application.Json)
                     setBody(
                         mapOf(
-                            "Page" to currentPageNumber.value
+                            "Page" to page
                         )
                     )
                 }
 
             if (response.status.isSuccess()) {
                 currentCarPage.value = response.body()
+                println("Fetched first car page!")
+            }
+            else {
+                println("Error fetching first car page: ${response.status.value}")
             }
         }
     }
