@@ -35,6 +35,8 @@ fun RentCarScreen(viewModel: CarRentalAppViewModel) {
 
     var currentUrl by remember { mutableStateOf(window.location.href) }
 
+    var currentCarPage by remember { mutableStateOf(viewModel.currentCarPage) }
+
     LaunchedEffect(Unit) {
         viewModel.updateCars()
     }
@@ -52,7 +54,7 @@ fun RentCarScreen(viewModel: CarRentalAppViewModel) {
     }
 
     // Observe changes in cars list
-    LaunchedEffect(uiState.listOfCars) {
+    LaunchedEffect(currentCarPage) {
         cars = uiState.listOfCars
         areCarsLoaded = viewModel.currentCarPage.value.isNotEmpty()
     }
