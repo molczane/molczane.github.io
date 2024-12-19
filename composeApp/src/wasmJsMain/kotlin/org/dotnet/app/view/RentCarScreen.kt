@@ -399,23 +399,23 @@ fun RentCarScreen(viewModel: CarRentalAppViewModel) {
             }
         )
     }
-    if(viewModel.isDuringServerCheck.value) {
-        AlertDialog(
-            onDismissRequest = {  },
-            title = {
-            },
-            text = {
-                CircularProgressIndicator(
-                    modifier = Modifier.size(24.dp),
-                    color = MaterialTheme.colors.onPrimary
-                )
-            },
-            confirmButton = {
-            },
-            dismissButton = {
-            }
-        )
-    }
+//    if(viewModel.isDuringServerCheck.value) {
+//        AlertDialog(
+//            onDismissRequest = {  },
+//            title = {
+//            },
+//            text = {
+//                CircularProgressIndicator(
+//                    modifier = Modifier.size(24.dp),
+//                    color = MaterialTheme.colors.onPrimary
+//                )
+//            },
+//            confirmButton = {
+//            },
+//            dismissButton = {
+//            }
+//        )
+//    }
     if(isValuationDialogShown) {
         AlertDialog(
             onDismissRequest = { isValuationDialogShown = false },
