@@ -10,6 +10,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import kotlinx.browser.window
 import org.dotnet.app.viewModel.CarRentalAppViewModel
 //import org.dotnet.app.dataSource.cars
 import org.dotnet.app.model.Car
@@ -33,9 +34,20 @@ fun RentCarScreen(viewModel: CarRentalAppViewModel) {
 
     var isCarRented by remember { mutableStateOf(false) }
 
+    var currentUrl by remember { mutableStateOf(window.location.href) }
 
     LaunchedEffect(Unit) {
         viewModel.updateCars()
+    }
+
+    LaunchedEffect(currentUrl) {
+        if (currentUrl.contains("code=")) {
+            val code = window.location.search
+                .substringAfter("code=")
+                .substringBefore("&")
+            viewModel.sendAuthCodeToBackend(code)
+            window.history.replaceState(null, "", window.location.pathname)
+        }
     }
 
     // Observe changes in cars list
