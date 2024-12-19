@@ -56,6 +56,7 @@ fun RentCarScreen(viewModel: CarRentalAppViewModel) {
     // Observe changes in cars list
     LaunchedEffect(currentCarPage) {
         areCarsLoaded = viewModel.currentCarPage.value.isNotEmpty()
+        println("Cars loaded: $areCarsLoaded")
     }
 
     Scaffold(
