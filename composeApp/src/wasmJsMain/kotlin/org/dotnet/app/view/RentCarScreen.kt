@@ -94,7 +94,7 @@ fun RentCarScreen(viewModel: CarRentalAppViewModel) {
             )
         },
         content = { innerPadding ->
-            if(!areCarsLoaded) { // time
+            if(!viewModel.areCarsLoaded.value) { // time
                 Column(Modifier.padding(innerPadding)) {
                     Footer()
                 }

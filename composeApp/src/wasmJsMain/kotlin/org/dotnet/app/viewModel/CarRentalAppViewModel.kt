@@ -39,6 +39,8 @@ class CarRentalAppViewModel : ViewModel() {
     var user: User? = null
     val isUserLoggedIn = MutableStateFlow(false)
 
+    val areCarsLoaded = MutableStateFlow(false)
+
     val isDuringServerCheck = MutableStateFlow(false)
 
     val pagesCount = MutableStateFlow(0)
@@ -97,7 +99,8 @@ class CarRentalAppViewModel : ViewModel() {
                 }
 
             if (response.status.isSuccess()) {
-                // currentCarPage.value = response.body()
+                currentCarPage.value = response.body()
+                areCarsLoaded.value = true
                 println("Fetched first car page!")
             }
             else {
