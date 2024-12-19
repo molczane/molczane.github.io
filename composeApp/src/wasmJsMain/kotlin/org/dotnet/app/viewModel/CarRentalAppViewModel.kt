@@ -54,10 +54,12 @@ class CarRentalAppViewModel : ViewModel() {
 
     val currentPageNumber = MutableStateFlow(1)
 
-    val currentCarPage = MutableStateFlow(List<Car>(
-        size = 5,
-        init = { index -> Car(0, "RentalService", "Producer", "Model", "Type", "YearOfProduction", 5, 1, "Location") }
-    ))
+//    val currentCarPage = MutableStateFlow(List<Car>(
+//        size = 5,
+//        init = { index -> Car(0, "RentalService", "Producer", "Model", "Type", "YearOfProduction", 5, 1, "Location") }
+//    ))
+
+    private lateinit var currentCarPage: MutableStateFlow<List<Car>>
 
     init {
         //updateCars()
@@ -66,9 +68,6 @@ class CarRentalAppViewModel : ViewModel() {
             println("Pages count: ${pagesCount.value}")
             println("fetching first page")
             getPage(1)
-        }
-        viewModelScope.launch {
-
         }
     }
 
