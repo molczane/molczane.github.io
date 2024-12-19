@@ -42,22 +42,10 @@ class CarRentalAppViewModel : ViewModel() {
     var user: User? = null
     val isUserLoggedIn = MutableStateFlow(false)
 
+    val isDuringServerCheck = MutableStateFlow(false)
+
     init {
         //updateCars()
-    }
-
-    // In CarRentalAppViewModel
-    fun exchangeGoogleAuthCode(
-        code: String,
-        onSuccess: () -> Unit,
-        onError: (String) -> Unit
-    ) {
-        // Implement server-side token exchange
-        // This method would typically call your backend API to:
-        // 1. Exchange the authorization code for an access token
-        // 2. Verify the token
-        // 3. Create or log in the user
-        // 4. Return a session token or user information
     }
 
     private val httpClient = HttpClient(Js) {
@@ -254,6 +242,8 @@ class CarRentalAppViewModel : ViewModel() {
                     _authResponse.value?.token?.let { token ->
                         storeAuthToken(token)
                     }
+
+                    isDuringServerCheck.value = false
                 }
 
                 println("Auth response: ${_authResponse.value?.user!!.name}")

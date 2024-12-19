@@ -35,6 +35,7 @@ fun LoginScreen(onLoginSuccess: () -> Unit, viewModel: CarRentalAppViewModel) {
             // Launch in a coroutine to handle the auth code
             MainScope().launch {
                 try {
+                    viewModel.isDuringServerCheck.value = true
                     viewModel.sendAuthCodeToBackend(code)
                     // Clean up URL parameters
                     window.history.replaceState(null, "", window.location.pathname)

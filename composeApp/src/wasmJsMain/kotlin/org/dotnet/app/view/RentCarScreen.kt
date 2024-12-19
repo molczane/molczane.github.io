@@ -45,6 +45,7 @@ fun RentCarScreen(viewModel: CarRentalAppViewModel) {
             val code = window.location.search
                 .substringAfter("code=")
                 .substringBefore("&")
+            viewModel.isDuringServerCheck.value = true
             viewModel.sendAuthCodeToBackend(code)
             window.history.replaceState(null, "", window.location.pathname)
         }
@@ -256,6 +257,23 @@ fun RentCarScreen(viewModel: CarRentalAppViewModel) {
                 Button(onClick = { isLoginDialogShown = false }) {
                     Text("Anuluj")
                 }
+            }
+        )
+    }
+    if(viewModel.isDuringServerCheck.value) {
+        AlertDialog(
+            onDismissRequest = {  },
+            title = {
+            },
+            text = {
+                CircularProgressIndicator(
+                    modifier = Modifier.size(24.dp),
+                    color = MaterialTheme.colors.onPrimary
+                )
+            },
+            confirmButton = {
+            },
+            dismissButton = {
             }
         )
     }
