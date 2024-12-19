@@ -105,14 +105,14 @@ fun RentCarScreen(viewModel: CarRentalAppViewModel) {
                         .padding(16.dp),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-//                    viewModel.currentCarPage.value.forEach { car ->
-//                        CarDetailsCard(
-//                            car = selectedCar!!,
-//                            modifier = Modifier.fillMaxWidth(0.5f)
-//                        ) // Set Card width to half of the screen
-//
-//                        Spacer(modifier = Modifier.height(16.dp))
-//                    }
+                    viewModel.currentCarPage.value.forEach { car ->
+                        CarDetailsCard(
+                            car = selectedCar!!,
+                            modifier = Modifier.fillMaxWidth(0.5f)
+                        ) // Set Card width to half of the screen
+
+                        Spacer(modifier = Modifier.height(16.dp))
+                    }
 
 //                    var selectedBrand by remember { mutableStateOf<String?>(null) }
 //                    var selectedModel by remember { mutableStateOf<String?>(null) }
