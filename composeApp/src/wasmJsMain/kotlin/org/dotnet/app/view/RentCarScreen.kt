@@ -55,10 +55,13 @@ fun RentCarScreen(viewModel: CarRentalAppViewModel) {
     LaunchedEffect(currentUrl) {
         if (currentUrl.contains("code=")) {
             println("sending authentication code to backend!")
+
             viewModel.isDuringServerCheck.value = true
             val code = window.location.search
                 .substringAfter("code=")
                 .substringBefore("&")
+            println("code:")
+            println(code)
             viewModel.sendAuthCodeToBackend(code)
             window.history.replaceState(null, "", window.location.pathname)
         }
@@ -400,23 +403,6 @@ fun RentCarScreen(viewModel: CarRentalAppViewModel) {
             }
         )
     }
-//    if(viewModel.isDuringServerCheck.value) {
-//        AlertDialog(
-//            onDismissRequest = {  },
-//            title = {
-//            },
-//            text = {
-//                CircularProgressIndicator(
-//                    modifier = Modifier.size(24.dp),
-//                    color = MaterialTheme.colors.onPrimary
-//                )
-//            },
-//            confirmButton = {
-//            },
-//            dismissButton = {
-//            }
-//        )
-//    }
     if(isValuationDialogShown) {
         AlertDialog(
             onDismissRequest = { isValuationDialogShown = false },
