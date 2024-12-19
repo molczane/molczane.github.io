@@ -50,19 +50,24 @@ fun RentCarScreen(viewModel: CarRentalAppViewModel) {
                 title = { Text("Wypożyczalnia Samochodów") },
                 backgroundColor = MaterialTheme.colors.primaryVariant,
                 actions = {
-                    Button(
-                        onClick = { isLoginDialogShown = true },
-                        elevation = ButtonDefaults.elevation(defaultElevation = 15.dp),
-                        modifier = Modifier.padding(12.dp)
-                    ) {
-                        if(!isSignedIn.value) {
+                    if(!isSignedIn.value) {
+                        Button(
+                            onClick = { isLoginDialogShown = true },
+                            elevation = ButtonDefaults.elevation(defaultElevation = 15.dp),
+                            modifier = Modifier.padding(12.dp)
+                        ) {
                             Text("Zaloguj się")
                         }
-                        else {
+                    }
+                    if(isSignedIn.value) {
+                        Button(
+                            onClick = { viewModel.logout() },
+                            elevation = ButtonDefaults.elevation(defaultElevation = 15.dp),
+                            modifier = Modifier.padding(12.dp)
+                        ) {
                             Text("Wyloguj się")
                         }
                     }
-
 //                    Button(
 //                        onClick = { isValuationDialogShown = true },
 //                        elevation = ButtonDefaults.elevation(defaultElevation = 15.dp),

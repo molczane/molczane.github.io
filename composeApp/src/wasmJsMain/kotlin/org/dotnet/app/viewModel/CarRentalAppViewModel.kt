@@ -212,8 +212,25 @@ class CarRentalAppViewModel : ViewModel() {
         }
     }
 
+    fun storeAuthToken(token: String) {
+        kotlinx.browser.localStorage.setItem("auth_token", token)
+    }
+
+    fun getStoredToken(): String? {
+        return kotlinx.browser.localStorage.getItem("auth_token")
+    }
+
     private val _authResponse = MutableStateFlow<AuthResponse?>(null)
     val authResponse: StateFlow<AuthResponse?> = _authResponse
+
+    fun logout() {
+        isUserLoggedIn.value = false
+        user = null
+        kotlinx.browser.localStorage.removeItem("auth_token")
+        _authResponse.value = null
+
+        println("Logged out successfully")
+    }
 
     fun sendAuthCodeToBackend(authCode: String) {
         viewModelScope.launch {
@@ -231,6 +248,12 @@ class CarRentalAppViewModel : ViewModel() {
 
                 if (response.status.isSuccess()) {
                     _authResponse.value = response.body() // Zakładamy, że serwer zwraca wycenę jako json
+                    isUserLoggedIn.value = true
+
+                    // Store the token after successful login
+                    _authResponse.value?.token?.let { token ->
+                        storeAuthToken(token)
+                    }
                 }
 
                 println("Auth response: ${_authResponse.value?.user!!.name}")
