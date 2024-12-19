@@ -104,30 +104,9 @@ class CarRentalAppViewModel : ViewModel() {
         }
     }
 
-//    fun getPage(page: Int) : List<Car> {
-//        viewModelScope.launch {
-//            val response: HttpResponse = httpClient
-//                .post("https://user-api-dotnet.azurewebsites.net/api/cars/getPage") {
-//                    contentType(ContentType.Application.Json)
-//                    setBody(
-//                        mapOf(
-//                            "Page" to page
-//                        )
-//                    )
-//                }
-//
-//            if (response.status.isSuccess()) {
-//                currentCarPage.value = response.body()
-//                areCarsLoaded.value = true
-//                println("Fetched first car page!")
-//            }
-//            else {
-//                println("Error fetching first car page: ${response.status.value}")
-//            }
-//            return@launch response.body()
-//        }
-//        return emptyList()
-//    }
+    fun updatePageNumber(pageNumber: Int) {
+        currentPageNumber.value = pageNumber
+    }
 
     // Changed to suspend function that returns the cars directly
     private suspend fun fetchPage(page: Int): List<Car> {

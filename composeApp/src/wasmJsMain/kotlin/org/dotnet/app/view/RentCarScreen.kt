@@ -1,10 +1,14 @@
 package org.dotnet.app.view
 
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import kotlinx.browser.window
 import org.dotnet.app.viewModel.CarRentalAppViewModel
@@ -36,9 +40,16 @@ fun RentCarScreen(viewModel: CarRentalAppViewModel) {
 
     val areCarsLoaded = viewModel.areCarsLoaded.collectAsState()
 
-    LaunchedEffect(Unit) {
-        viewModel.updateCars()
-    }
+    // Filter states
+    var selectedBrand by remember { mutableStateOf<String?>(null) }
+    var selectedModel by remember { mutableStateOf<String?>(null) }
+    var selectedYear by remember { mutableStateOf<String?>(null) }
+    var selectedType by remember { mutableStateOf<String?>(null) }
+    var selectedLocation by remember { mutableStateOf<String?>(null) }
+
+//    LaunchedEffect(Unit) {
+//        viewModel.updateCars()
+//    }
 
     // observe changes in user login status
     LaunchedEffect(currentUrl) {
@@ -93,43 +104,147 @@ fun RentCarScreen(viewModel: CarRentalAppViewModel) {
             )
         },
         content = { innerPadding ->
-            if(!areCarsLoaded.value) { // time
-                Column(Modifier.padding(innerPadding)) {
-                    CircularProgressIndicator(
-                        modifier = Modifier.size(24.dp),
-                        color = MaterialTheme.colors.onPrimary
-                    )
-                    Footer()
-                }
-            }
-            else {
-                Column(
-                    Modifier
-                        .fillMaxSize()
-                        .padding(innerPadding)
-                        .padding(16.dp),
-                    horizontalAlignment = Alignment.CenterHorizontally
+            Row (
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(innerPadding)
+            ) {
+                // Filtering Sidebar (20% width)
+                Card(
+                    modifier = Modifier
+                        .fillMaxHeight()
+                        .fillMaxWidth(0.2f)  // Changed to use fillMaxWidth with fraction
+                        .padding(8.dp),
+                    elevation = 4.dp
                 ) {
-                    if (viewModel.currentCarPage.value.isNotEmpty()) {
-                        viewModel.currentCarPage.value.forEach { car ->
-                            CarDetailsCard(
-                                car = car,
-                                modifier = Modifier.fillMaxWidth(0.5f)
+                    Column(
+                        modifier = Modifier
+                            .padding(16.dp)
+                            .verticalScroll(rememberScrollState())
+                    ) {
+                        Text(
+                            "Filtry",
+                            style = MaterialTheme.typography.h6,
+                            modifier = Modifier.padding(bottom = 16.dp)
+                        )
+
+                        // Brand Filter
+                        FilterSection(
+                            title = "Marka",
+                            options = uiState.listOfCars.map { it.producer }.distinct().sorted(),
+                            selectedOption = selectedBrand,
+                            onOptionSelected = {
+                                selectedBrand = it
+                                selectedModel = null // Reset model when brand changes
+                            }
+                        )
+
+                        Spacer(modifier = Modifier.height(16.dp))
+
+                        // Model Filter (dependent on selected brand)
+                        if (selectedBrand != null) {
+                            FilterSection(
+                                title = "Model",
+                                options = uiState.listOfCars
+                                    .filter { it.producer == selectedBrand }
+                                    .map { it.model }
+                                    .distinct()
+                                    .sorted(),
+                                selectedOption = selectedModel,
+                                onOptionSelected = { selectedModel = it }
                             )
+
                             Spacer(modifier = Modifier.height(16.dp))
                         }
 
-                        PaginationControls(
-                            currentPage = viewModel.currentPageNumber.collectAsState().value,
-                            totalPages = viewModel.pagesCount.collectAsState().value,
-                            onPageSelected = { newPage ->
-                                viewModel.currentPageNumber.value = newPage
-                                viewModel.getPage(newPage)
-                            }
+                        // Type Filter
+                        FilterSection(
+                            title = "Typ",
+                            options = uiState.listOfCars.map { it.type }.distinct().sorted(),
+                            selectedOption = selectedType,
+                            onOptionSelected = { selectedType = it }
                         )
-                    } else {
-                        Text("Brak dostępnych samochodów")
+
+                        Spacer(modifier = Modifier.height(16.dp))
+
+                        // Year Filter
+                        FilterSection(
+                            title = "Rok produkcji",
+                            options = uiState.listOfCars.map { it.yearOfProduction }.distinct().sorted(),
+                            selectedOption = selectedYear,
+                            onOptionSelected = { selectedYear = it }
+                        )
+
+                        Spacer(modifier = Modifier.height(16.dp))
+
+                        // Location Filter
+                        FilterSection(
+                            title = "Lokalizacja",
+                            options = uiState.listOfCars.map { it.location }.distinct().sorted(),
+                            selectedOption = selectedLocation,
+                            onOptionSelected = { selectedLocation = it }
+                        )
+
+                        Spacer(modifier = Modifier.height(16.dp))
+
+                        // Reset Filters Button
+                        Button(
+                            onClick = {
+                                selectedBrand = null
+                                selectedModel = null
+                                selectedYear = null
+                                selectedType = null
+                                selectedLocation = null
+                            },
+                            modifier = Modifier.fillMaxWidth()
+                        ) {
+                            Text("Resetuj filtry")
+                        }
                     }
+                }
+
+                Column (
+                    modifier = Modifier
+                        .weight(1f)  // This will take up the remaining space
+                        .padding(16.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    if (!areCarsLoaded.value) { // time
+                        Column(Modifier.padding(innerPadding)) {
+                            CircularProgressIndicator(
+                                modifier = Modifier.size(24.dp),
+                                color = MaterialTheme.colors.onPrimary
+                            )
+                            Footer()
+                        }
+                    } else {
+                        Column(
+                            Modifier
+                                .fillMaxSize()
+                                .padding(innerPadding)
+                                .padding(16.dp),
+                            horizontalAlignment = Alignment.CenterHorizontally
+                        ) {
+                            if (viewModel.currentCarPage.value.isNotEmpty()) {
+                                viewModel.currentCarPage.value.forEach { car ->
+                                    CarDetailsCard(
+                                        car = car,
+                                        modifier = Modifier.fillMaxWidth(0.5f)
+                                    )
+                                    Spacer(modifier = Modifier.height(16.dp))
+                                }
+
+                                PaginationControls(
+                                    currentPage = viewModel.currentPageNumber.collectAsState().value,
+                                    totalPages = viewModel.pagesCount.collectAsState().value,
+                                    onPageSelected = { newPage ->
+                                        viewModel.updatePageNumber(newPage)
+                                        viewModel.getPage(newPage)
+                                    }
+                                )
+                            } else {
+                                Text("Brak dostępnych samochodów")
+                            }
 
 //                    var selectedBrand by remember { mutableStateOf<String?>(null) }
 //                    var selectedModel by remember { mutableStateOf<String?>(null) }
@@ -259,8 +374,10 @@ fun RentCarScreen(viewModel: CarRentalAppViewModel) {
 //                        }
 //                    }
 
-                    // Footer at the bottom
-                    Footer()
+                            // Footer at the bottom
+                        }
+                        Footer()
+                    }
                 }
             }
         }
@@ -352,7 +469,7 @@ fun PaginationControls(
             enabled = currentPage > 1,
             modifier = Modifier.padding(horizontal = 4.dp)
         ) {
-            Text("←")
+            Text("<-")
         }
 
         // Page numbers
@@ -397,7 +514,7 @@ fun PaginationControls(
             enabled = currentPage < totalPages,
             modifier = Modifier.padding(horizontal = 4.dp)
         ) {
-            Text("→")
+            Text("->")
         }
     }
 }
@@ -432,4 +549,50 @@ private fun calculateVisiblePages(currentPage: Int, totalPages: Int): List<Int> 
     visiblePages.add(totalPages)
 
     return visiblePages
+}
+
+@Composable
+private fun FilterSection(
+    title: String,
+    options: List<String>,
+    selectedOption: String?,
+    onOptionSelected: (String) -> Unit
+) {
+    Column {
+        Text(
+            text = title,
+            style = MaterialTheme.typography.subtitle1,
+            modifier = Modifier.padding(bottom = 8.dp)
+        )
+
+        var expanded by remember { mutableStateOf(false) }
+
+        OutlinedButton(
+            onClick = { expanded = true },
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Text(
+                text = selectedOption ?: "Wybierz $title",
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis
+            )
+        }
+
+        DropdownMenu(
+            expanded = expanded,
+            onDismissRequest = { expanded = false },
+            modifier = Modifier.fillMaxWidth(0.9f)
+        ) {
+            options.forEach { option ->
+                DropdownMenuItem(
+                    onClick = {
+                        onOptionSelected(option)
+                        expanded = false
+                    }
+                ) {
+                    Text(option)
+                }
+            }
+        }
+    }
 }
