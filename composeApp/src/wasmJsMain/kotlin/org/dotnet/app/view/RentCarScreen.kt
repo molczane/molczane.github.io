@@ -25,7 +25,7 @@ fun RentCarScreen(viewModel: CarRentalAppViewModel) {
 
     var isValuationDialogShown by remember { mutableStateOf(false) }
 
-    var areCarsLoaded by remember { mutableStateOf(false) }
+    //var areCarsLoaded by remember { mutableStateOf(false) }
 
     var selectedCar : Car? by remember { mutableStateOf(null) }
 
@@ -36,6 +36,8 @@ fun RentCarScreen(viewModel: CarRentalAppViewModel) {
     var currentUrl by remember { mutableStateOf(window.location.href) }
 
     val currentCarPage = viewModel.currentCarPage.collectAsState()
+
+    val areCarsLoaded = viewModel.areCarsLoaded.collectAsState()
 
     LaunchedEffect(Unit) {
         viewModel.updateCars()
@@ -54,10 +56,10 @@ fun RentCarScreen(viewModel: CarRentalAppViewModel) {
     }
 
     // Observe changes in cars list
-    LaunchedEffect(currentCarPage) {
-        areCarsLoaded = viewModel.currentCarPage.value.isNotEmpty()
-        println("Cars loaded: $areCarsLoaded")
-    }
+//    LaunchedEffect(currentCarPage) {
+//        areCarsLoaded = viewModel.currentCarPage.value.isNotEmpty()
+//        println("Cars loaded: $areCarsLoaded")
+//    }
 
     Scaffold(
         topBar = {
@@ -94,8 +96,12 @@ fun RentCarScreen(viewModel: CarRentalAppViewModel) {
             )
         },
         content = { innerPadding ->
-            if(!viewModel.areCarsLoaded.value) { // time
+            if(!areCarsLoaded.value) { // time
                 Column(Modifier.padding(innerPadding)) {
+                    CircularProgressIndicator(
+                        modifier = Modifier.size(24.dp),
+                        color = MaterialTheme.colors.onPrimary
+                    )
                     Footer()
                 }
             }
