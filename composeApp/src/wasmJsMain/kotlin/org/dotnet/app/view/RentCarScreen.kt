@@ -41,11 +41,11 @@ fun RentCarScreen(viewModel: CarRentalAppViewModel) {
     }
 
     LaunchedEffect(currentUrl) {
+        viewModel.isDuringServerCheck.value = true
         if (currentUrl.contains("code=")) {
             val code = window.location.search
                 .substringAfter("code=")
                 .substringBefore("&")
-            viewModel.isDuringServerCheck.value = true
             viewModel.sendAuthCodeToBackend(code)
             window.history.replaceState(null, "", window.location.pathname)
         }
