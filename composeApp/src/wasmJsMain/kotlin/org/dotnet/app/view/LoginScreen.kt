@@ -8,6 +8,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import org.dotnet.app.viewModel.CarRentalAppViewModel
 import kotlinx.browser.window
+import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
 
 @Composable
@@ -20,6 +21,32 @@ fun LoginScreen(onLoginSuccess: () -> Unit, viewModel: CarRentalAppViewModel) {
         { code: String ->
             viewModel.sendAuthCodeToBackend(code)
         }
+    }
+
+    // Create a disposable effect that triggers once when coming back from Google
+    DisposableEffect(Unit) {
+        val currentUrl = window.location.href
+        if (currentUrl.contains("code=")) {
+            isLoading = true
+            val code = window.location.search
+                .substringAfter("code=")
+                .substringBefore("&")
+
+            // Launch in a coroutine to handle the auth code
+            MainScope().launch {
+                try {
+                    viewModel.sendAuthCodeToBackend(code)
+                    // Clean up URL parameters
+                    window.history.replaceState(null, "", window.location.pathname)
+                    onLoginSuccess()
+                } finally {
+                    isLoading = false
+                }
+            }
+        }
+
+        // Cleanup function
+        onDispose { }
     }
 
     // Handle initial load and subsequent navigation
