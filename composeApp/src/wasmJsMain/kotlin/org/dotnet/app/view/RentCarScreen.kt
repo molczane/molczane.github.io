@@ -7,7 +7,6 @@ import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import kotlinx.browser.window
@@ -55,7 +54,7 @@ fun RentCarScreen(viewModel: CarRentalAppViewModel) {
     // Observe changes in cars list
     LaunchedEffect(uiState.listOfCars) {
         cars = uiState.listOfCars
-        areCarsLoaded = cars.isNotEmpty()
+        areCarsLoaded = viewModel.currentCarPage.value.isNotEmpty()
     }
 
     Scaffold(
@@ -106,133 +105,142 @@ fun RentCarScreen(viewModel: CarRentalAppViewModel) {
                         .padding(16.dp),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    var selectedBrand by remember { mutableStateOf<String?>(null) }
-                    var selectedModel by remember { mutableStateOf<String?>(null) }
-                    val brands = cars.map { it.producer }.distinct().sorted()
-                    val models = cars.filter { it.producer == selectedBrand }.map { it.model }.distinct().sorted()
-
-                    Spacer(modifier = Modifier.height(16.dp))
-
-                    // Dropdown for car brand selection
-                    DropdownMenu(
-                        label = "Wybierz markę",
-                        options = brands,
-                        selectedOption = selectedBrand,
-                        onOptionSelected = { brand ->
-                            selectedBrand = brand
-                            selectedModel = null  // Reset model selection when brand changes
-                        },
-                        modifier = Modifier.fillMaxWidth(0.5f) // Set dropdown width to half of the screen
-                    )
-
-                    Spacer(modifier = Modifier.height(8.dp))
-
-                    // Dropdown for car model selection
-                    if (selectedBrand != null) {
-                        DropdownMenu(
-                            label = "Wybierz model",
-                            options = models,
-                            selectedOption = selectedModel,
-                            onOptionSelected = { model -> selectedModel = model },
-                            modifier = Modifier.fillMaxWidth(0.5f) // Set dropdown width to half of the screen
-                        )
-                    }
-
-                    Spacer(modifier = Modifier.height(16.dp))
-
-                    // Display selected car details as Card only when model is selected
-                    selectedCar = cars.find { it.producer == selectedBrand && it.model == selectedModel }
-                    if (selectedCar != null) {
+                    viewModel.currentCarPage.value.forEach { car ->
                         CarDetailsCard(
                             car = selectedCar!!,
                             modifier = Modifier.fillMaxWidth(0.5f)
                         ) // Set Card width to half of the screen
 
                         Spacer(modifier = Modifier.height(16.dp))
-
-                        // "Wypożycz Samochód" button
-                        Button(
-                            onClick = {
-                                isValuationDialogShown = true
-                            },
-                            modifier = Modifier.fillMaxWidth(.25f) // Set button width to half of the screen
-                        ) {
-                            Text("Wyceń wypożyczenie")
-                        }
-                    } else {
-                        Text("Brak wyników", style = MaterialTheme.typography.body1)
                     }
 
-                    Spacer(modifier = Modifier.height(16.dp))
+//                    var selectedBrand by remember { mutableStateOf<String?>(null) }
+//                    var selectedModel by remember { mutableStateOf<String?>(null) }
+//                    val brands = cars.map { it.producer }.distinct().sorted()
+//                    val models = cars.filter { it.producer == selectedBrand }.map { it.model }.distinct().sorted()
+//
+//                    Spacer(modifier = Modifier.height(16.dp))
+//
+//                    // Dropdown for car brand selection
+//                    DropdownMenu(
+//                        label = "Wybierz markę",
+//                        options = brands,
+//                        selectedOption = selectedBrand,
+//                        onOptionSelected = { brand ->
+//                            selectedBrand = brand
+//                            selectedModel = null  // Reset model selection when brand changes
+//                        },
+//                        modifier = Modifier.fillMaxWidth(0.5f) // Set dropdown width to half of the screen
+//                    )
+//
+//                    Spacer(modifier = Modifier.height(8.dp))
+//
+//                    // Dropdown for car model selection
+//                    if (selectedBrand != null) {
+//                        DropdownMenu(
+//                            label = "Wybierz model",
+//                            options = models,
+//                            selectedOption = selectedModel,
+//                            onOptionSelected = { model -> selectedModel = model },
+//                            modifier = Modifier.fillMaxWidth(0.5f) // Set dropdown width to half of the screen
+//                        )
+//                    }
+//
+//                    Spacer(modifier = Modifier.height(16.dp))
+//
+//                    // Display selected car details as Card only when model is selected
+//                    selectedCar = cars.find { it.producer == selectedBrand && it.model == selectedModel }
+//                    if (selectedCar != null) {
+//                        CarDetailsCard(
+//                            car = selectedCar!!,
+//                            modifier = Modifier.fillMaxWidth(0.5f)
+//                        ) // Set Card width to half of the screen
+//
+//                        Spacer(modifier = Modifier.height(16.dp))
+//
+//                        // "Wypożycz Samochód" button
+//                        Button(
+//                            onClick = {
+//                                isValuationDialogShown = true
+//                            },
+//                            modifier = Modifier.fillMaxWidth(.25f) // Set button width to half of the screen
+//                        ) {
+//                            Text("Wyceń wypożyczenie")
+//                        }
+//                    } else {
+//                        Text("Brak wyników", style = MaterialTheme.typography.body1)
+//                    }
+//
+//                    Spacer(modifier = Modifier.height(16.dp))
 
-                    if(valuationResult != null) {
-                        OfferView(
-                            valuationResult!!,
-                            onTimerEnd = { viewModel.resetValuationResult() },
-                            onRent = { isCarRented = it },
-                            onRentClick = {
-                                if(viewModel.user != null) {
-                                    viewModel.user?.let { user ->
-                                        viewModel.requestRent(
-                                            car = selectedCar!!,
-                                            user = user,
-                                            onRent = { isCarRented = it },
-                                            startDate = "2024-12-10",
-                                            endDate = "2024-12-12"
-                                        )
-                                    }
-                                }
-                                else {
-                                    isLoginDialogShown = true
-                                }
-                            },
-                        )
-                    }
+//                    if(valuationResult != null) {
+//                        OfferView(
+//                            valuationResult!!,
+//                            onTimerEnd = { viewModel.resetValuationResult() },
+//                            onRent = { isCarRented = it },
+//                            onRentClick = {
+//                                if(viewModel.user != null) {
+//                                    viewModel.user?.let { user ->
+//                                        viewModel.requestRent(
+//                                            car = selectedCar!!,
+//                                            user = user,
+//                                            onRent = { isCarRented = it },
+//                                            startDate = "2024-12-10",
+//                                            endDate = "2024-12-12"
+//                                        )
+//                                    }
+//                                }
+//                                else {
+//                                    isLoginDialogShown = true
+//                                }
+//                            },
+//                        )
+//                    }
 
-                    if (isCarRented) {
-                        Box(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(innerPadding),
-                            contentAlignment = Alignment.Center // Centers the content within the Box
-                        ) {
-                            Card(
-                                modifier = Modifier
-                                    .fillMaxWidth(0.5f) // 50% of the screen width
-                                    .padding(16.dp),
-                                elevation = 8.dp
-                            ) {
-                                Column(
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .padding(16.dp),
-                                    horizontalAlignment = Alignment.CenterHorizontally
-                                ) {
-                                    Text(
-                                        text = "Samochód wynajęty!",
-                                        style = MaterialTheme.typography.h6,
-                                        color = MaterialTheme.colors.primary
-                                    )
-                                    Spacer(modifier = Modifier.height(8.dp))
-                                    Text(
-                                        text = "Dziękujemy za wynajęcie ${selectedCar!!.producer} ${selectedCar!!.model}.",
-                                        style = MaterialTheme.typography.body1,
-                                        color = MaterialTheme.colors.onSurface.copy(alpha = 0.8f),
-                                        textAlign = TextAlign.Center
-                                    )
-                                    Spacer(modifier = Modifier.height(16.dp))
-                                    Button(
-                                        onClick = {
-                                            // Handle additional actions, e.g., navigate to home or details
-                                        },
-                                        modifier = Modifier.fillMaxWidth()
-                                    ) {
-                                        Text("Powrót do Strony Głównej")
-                                    }
-                                }
-                            }
-                        }
-                    }
+//                    if (isCarRented) {
+//                        Box(
+//                            modifier = Modifier
+//                                .fillMaxWidth()
+//                                .padding(innerPadding),
+//                            contentAlignment = Alignment.Center // Centers the content within the Box
+//                        ) {
+//                            Card(
+//                                modifier = Modifier
+//                                    .fillMaxWidth(0.5f) // 50% of the screen width
+//                                    .padding(16.dp),
+//                                elevation = 8.dp
+//                            ) {
+//                                Column(
+//                                    modifier = Modifier
+//                                        .fillMaxWidth()
+//                                        .padding(16.dp),
+//                                    horizontalAlignment = Alignment.CenterHorizontally
+//                                ) {
+//                                    Text(
+//                                        text = "Samochód wynajęty!",
+//                                        style = MaterialTheme.typography.h6,
+//                                        color = MaterialTheme.colors.primary
+//                                    )
+//                                    Spacer(modifier = Modifier.height(8.dp))
+//                                    Text(
+//                                        text = "Dziękujemy za wynajęcie ${selectedCar!!.producer} ${selectedCar!!.model}.",
+//                                        style = MaterialTheme.typography.body1,
+//                                        color = MaterialTheme.colors.onSurface.copy(alpha = 0.8f),
+//                                        textAlign = TextAlign.Center
+//                                    )
+//                                    Spacer(modifier = Modifier.height(16.dp))
+//                                    Button(
+//                                        onClick = {
+//                                            // Handle additional actions, e.g., navigate to home or details
+//                                        },
+//                                        modifier = Modifier.fillMaxWidth()
+//                                    ) {
+//                                        Text("Powrót do Strony Głównej")
+//                                    }
+//                                }
+//                            }
+//                        }
+//                    }
 
                     // Footer at the bottom
                     Footer()

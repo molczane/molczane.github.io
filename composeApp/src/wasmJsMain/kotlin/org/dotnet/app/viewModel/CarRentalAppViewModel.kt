@@ -1,6 +1,5 @@
 package org.dotnet.app.viewModel
 
-import androidx.compose.runtime.*
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import io.ktor.client.*
@@ -12,11 +11,8 @@ import io.ktor.client.statement.*
 import io.ktor.client.plugins.auth.*
 import io.ktor.http.*
 import io.ktor.serialization.kotlinx.json.*
-import kotlinx.browser.document
 import kotlinx.browser.localStorage
-import kotlinx.browser.window
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -27,7 +23,6 @@ import org.dotnet.app.model.AuthResponse
 import org.dotnet.app.model.Car
 import org.dotnet.app.model.Offer
 import org.dotnet.app.model.User
-import org.w3c.dom.HTMLScriptElement
 
 data class CarRentalAppUiState(
     val listOfCars: List<Car> = emptyList(),
@@ -59,7 +54,7 @@ class CarRentalAppViewModel : ViewModel() {
 
     val currentPageNumber = MutableStateFlow(1)
 
-    val currentPage = MutableStateFlow(List<Car>(
+    val currentCarPage = MutableStateFlow(List<Car>(
         size = 5,
         init = TODO()
     ))
@@ -69,7 +64,9 @@ class CarRentalAppViewModel : ViewModel() {
         viewModelScope.launch {
             pagesCount.value = getPageCount()
         }
-
+        viewModelScope.launch {
+            getPage(1)
+        }
     }
 
     val rentedCar : Car? = null
@@ -96,7 +93,7 @@ class CarRentalAppViewModel : ViewModel() {
                 }
 
             if (response.status.isSuccess()) {
-                currentPage.value = response.body()
+                currentCarPage.value = response.body()
             }
         }
     }
