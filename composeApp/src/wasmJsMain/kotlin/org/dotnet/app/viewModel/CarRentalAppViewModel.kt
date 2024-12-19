@@ -69,7 +69,7 @@ class CarRentalAppViewModel : ViewModel() {
             pagesCount.value = getPageCount()
             println("Pages count: ${pagesCount.value}")
             println("fetching first page")
-            getPage(currentPageNumber.value)
+            currentCarPage.value = getPage(currentPageNumber.value)
         }
     }
 
@@ -84,7 +84,7 @@ class CarRentalAppViewModel : ViewModel() {
         }
     }
 
-    fun getPage(page: Int) {
+    fun getPage(page: Int) : List<Car> {
         viewModelScope.launch {
             val response: HttpResponse = httpClient
                 .post("https://user-api-dotnet.azurewebsites.net/api/cars/getPage") {
@@ -97,13 +97,15 @@ class CarRentalAppViewModel : ViewModel() {
                 }
 
             if (response.status.isSuccess()) {
-                currentCarPage.value = response.body()
+                // currentCarPage.value = response.body()
                 println("Fetched first car page!")
             }
             else {
                 println("Error fetching first car page: ${response.status.value}")
             }
+            return@launch response.body()
         }
+        return emptyList()
     }
 
     private suspend fun getPageCount(): Int {
