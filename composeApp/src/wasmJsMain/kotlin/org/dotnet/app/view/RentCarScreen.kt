@@ -35,7 +35,7 @@ fun RentCarScreen(viewModel: CarRentalAppViewModel) {
 
     var currentUrl by remember { mutableStateOf(window.location.href) }
 
-    var currentCarPage by remember { mutableStateOf(viewModel.currentCarPage) }
+    val currentCarPage = viewModel.currentCarPage.collectAsState()
 
     LaunchedEffect(Unit) {
         viewModel.updateCars()
@@ -55,7 +55,6 @@ fun RentCarScreen(viewModel: CarRentalAppViewModel) {
 
     // Observe changes in cars list
     LaunchedEffect(currentCarPage) {
-        cars = uiState.listOfCars
         areCarsLoaded = viewModel.currentCarPage.value.isNotEmpty()
     }
 
@@ -107,13 +106,16 @@ fun RentCarScreen(viewModel: CarRentalAppViewModel) {
                         .padding(16.dp),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    viewModel.currentCarPage.value.forEach { car ->
-                        CarDetailsCard(
-                            car = car,
-                            modifier = Modifier.fillMaxWidth(0.5f)
-                        ) // Set Card width to half of the screen
-
-                        Spacer(modifier = Modifier.height(16.dp))
+                    if (viewModel.currentCarPage.value.isNotEmpty()) {
+                        viewModel.currentCarPage.value.forEach { car ->
+                            CarDetailsCard(
+                                car = car,
+                                modifier = Modifier.fillMaxWidth(0.5f)
+                            )
+                            Spacer(modifier = Modifier.height(16.dp))
+                        }
+                    } else {
+                        Text("Brak dostępnych samochodów")
                     }
 
 //                    var selectedBrand by remember { mutableStateOf<String?>(null) }
