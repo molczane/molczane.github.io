@@ -13,8 +13,10 @@ import io.ktor.client.plugins.auth.*
 import io.ktor.http.*
 import io.ktor.serialization.kotlinx.json.*
 import kotlinx.browser.document
+import kotlinx.browser.localStorage
 import kotlinx.browser.window
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -44,9 +46,7 @@ class CarRentalAppViewModel : ViewModel() {
 
     val isDuringServerCheck = MutableStateFlow(false)
 
-    init {
-        //updateCars()
-    }
+    val pagesCount = MutableStateFlow(0)
 
     private val httpClient = HttpClient(Js) {
         install(ContentNegotiation) {
@@ -57,6 +57,21 @@ class CarRentalAppViewModel : ViewModel() {
         }
     }
 
+    val currentPageNumber = MutableStateFlow(1)
+
+    val currentPage = MutableStateFlow(List<Car>(
+        size = 5,
+        init = TODO()
+    ))
+
+    init {
+        //updateCars()
+        viewModelScope.launch {
+            pagesCount.value = getPageCount()
+        }
+
+    }
+
     val rentedCar : Car? = null
 
     fun updateCars(){
@@ -65,6 +80,39 @@ class CarRentalAppViewModel : ViewModel() {
             _uiState.update {
                 it.copy(listOfCars = cars)
             }
+        }
+    }
+
+    fun getPage(page: Int) {
+        viewModelScope.launch {
+            val response: HttpResponse = httpClient
+                .post("https://user-api-dotnet.azurewebsites.net/api/cars/getPage") {
+                    contentType(ContentType.Application.Json)
+                    setBody(
+                        mapOf(
+                            "Page" to currentPageNumber.value
+                        )
+                    )
+                }
+
+            if (response.status.isSuccess()) {
+                currentPage.value = response.body()
+            }
+        }
+    }
+
+    private suspend fun getPageCount(): Int {
+        return try {
+            println("Fetching page count...")
+
+            val pageCountResponse = httpClient
+                .get("https://user-api-dotnet.azurewebsites.net/api/cars/getCountPages")
+                .body<Int>()
+            println("Page count loaded: $pageCountResponse")
+            pageCountResponse
+        } catch (e: Exception) {
+            println("Error fetching page count: ${e.message}")
+            0
         }
     }
 
@@ -201,11 +249,11 @@ class CarRentalAppViewModel : ViewModel() {
     }
 
     fun storeAuthToken(token: String) {
-        kotlinx.browser.localStorage.setItem("auth_token", token)
+        localStorage.setItem("auth_token", token)
     }
 
     fun getStoredToken(): String? {
-        return kotlinx.browser.localStorage.getItem("auth_token")
+        return localStorage.getItem("auth_token")
     }
 
     private val _authResponse = MutableStateFlow<AuthResponse?>(null)
@@ -214,7 +262,7 @@ class CarRentalAppViewModel : ViewModel() {
     fun logout() {
         isUserLoggedIn.value = false
         user = null
-        kotlinx.browser.localStorage.removeItem("auth_token")
+        localStorage.removeItem("auth_token")
         _authResponse.value = null
 
         println("Logged out successfully")
