@@ -2,13 +2,10 @@ package org.dotnet.app.view
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import kotlinx.browser.window
 import org.dotnet.app.viewModel.CarRentalAppViewModel
 //import org.dotnet.app.dataSource.cars
@@ -121,6 +118,15 @@ fun RentCarScreen(viewModel: CarRentalAppViewModel) {
                             )
                             Spacer(modifier = Modifier.height(16.dp))
                         }
+
+                        PaginationControls(
+                            currentPage = viewModel.currentPageNumber.collectAsState().value,
+                            totalPages = viewModel.pagesCount.collectAsState().value,
+                            onPageSelected = { newPage ->
+                                viewModel.currentPageNumber.value = newPage
+                                viewModel.getPage(newPage)
+                            }
+                        )
                     } else {
                         Text("Brak dostępnych samochodów")
                     }
@@ -326,84 +332,104 @@ fun RentCarScreen(viewModel: CarRentalAppViewModel) {
 }
 
 @Composable
-fun Footer() {
-    Column(
+fun PaginationControls(
+    currentPage: Int,
+    totalPages: Int,
+    onPageSelected: (Int) -> Unit
+) {
+    if (totalPages <= 1) return
+
+    Row(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(16.dp),
-        horizontalAlignment = Alignment.CenterHorizontally
+            .padding(vertical = 16.dp),
+        horizontalArrangement = Arrangement.Center,
+        verticalAlignment = Alignment.CenterVertically
     ) {
-        Divider(thickness = 1.dp, color = MaterialTheme.colors.onSurface.copy(alpha = 0.2f))
-        Spacer(modifier = Modifier.height(8.dp))
-        Text(
-            text = "© 2024 Wypożyczalnia Samochodów by Developers in Crime",
-            fontSize = 12.sp,
-            color = MaterialTheme.colors.onSurface.copy(alpha = 0.6f)
-        )
-        Text(
-            text = "All rights reserved.",
-            fontSize = 12.sp,
-            color = MaterialTheme.colors.onSurface.copy(alpha = 0.6f)
-        )
-    }
-}
-
-@Composable
-fun CarDetailsCard(car: Car, modifier: Modifier = Modifier) {
-    Card(
-        modifier = modifier
-            .padding(8.dp),
-        elevation = 4.dp
-    ) {
-        Column(
-            Modifier
-                .fillMaxWidth()
-                .padding(16.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
+        // Previous page button
+        Button(
+            onClick = { onPageSelected(currentPage - 1) },
+            enabled = currentPage > 1,
+            modifier = Modifier.padding(horizontal = 4.dp)
         ) {
-            Text("Marka: ${car.producer}", style = MaterialTheme.typography.h6)
-            Text("Model: ${car.model}", style = MaterialTheme.typography.body1)
+            Text("←")
+        }
+
+        // Page numbers
+        Row(
+            horizontalArrangement = Arrangement.spacedBy(4.dp)
+        ) {
+            val visiblePages = calculateVisiblePages(currentPage, totalPages)
+
+            visiblePages.forEach { pageNum ->
+                if (pageNum == -1) {
+                    // Show ellipsis
+                    Text(
+                        "...",
+                        modifier = Modifier.padding(horizontal = 8.dp),
+                        style = MaterialTheme.typography.body1
+                    )
+                } else {
+                    Button(
+                        onClick = { onPageSelected(pageNum) },
+                        colors = if (pageNum == currentPage) {
+                            ButtonDefaults.buttonColors(
+                                backgroundColor = MaterialTheme.colors.primary,
+                                contentColor = MaterialTheme.colors.onPrimary
+                            )
+                        } else {
+                            ButtonDefaults.buttonColors(
+                                backgroundColor = MaterialTheme.colors.surface,
+                                contentColor = MaterialTheme.colors.onSurface
+                            )
+                        },
+                        modifier = Modifier.width(48.dp)
+                    ) {
+                        Text(pageNum.toString())
+                    }
+                }
+            }
+        }
+
+        // Next page button
+        Button(
+            onClick = { onPageSelected(currentPage + 1) },
+            enabled = currentPage < totalPages,
+            modifier = Modifier.padding(horizontal = 4.dp)
+        ) {
+            Text("→")
         }
     }
 }
 
-@Composable
-fun DropdownMenu(
-    label: String,
-    options: List<String>,
-    selectedOption: String?,
-    onOptionSelected: (String) -> Unit,
-    modifier: Modifier = Modifier
-) {
-    var expanded by remember { mutableStateOf(false) }
-
-    Box(modifier) {
-        OutlinedTextField(
-            value = selectedOption ?: "",
-            onValueChange = {},
-            label = { Text(label) },
-            modifier = Modifier.fillMaxWidth(), // Set the width of the dropdown to half of the screen
-            readOnly = true,
-            trailingIcon = {
-                IconButton(onClick = { expanded = !expanded }) {
-                    Icon(Icons.Default.ArrowDropDown, contentDescription = null)
-                }
-            }
-        )
-
-        DropdownMenu(
-            expanded = expanded,
-            onDismissRequest = { expanded = false },
-            modifier = Modifier.fillMaxWidth(0.5f) // Set width of dropdown menu to half of the screen
-        ) {
-            options.forEach { option ->
-                DropdownMenuItem(onClick = {
-                    onOptionSelected(option)
-                    expanded = false
-                }) {
-                    Text(option)
-                }
-            }
-        }
+private fun calculateVisiblePages(currentPage: Int, totalPages: Int): List<Int> {
+    if (totalPages <= 7) {
+        return (1..totalPages).toList()
     }
+
+    val visiblePages = mutableListOf<Int>()
+
+    // Always show first page
+    visiblePages.add(1)
+
+    if (currentPage > 3) {
+        visiblePages.add(-1) // Add ellipsis
+    }
+
+    // Add pages around current page
+    val start = maxOf(2, currentPage - 1)
+    val end = minOf(totalPages - 1, currentPage + 1)
+
+    for (i in start..end) {
+        visiblePages.add(i)
+    }
+
+    if (currentPage < totalPages - 2) {
+        visiblePages.add(-1) // Add ellipsis
+    }
+
+    // Always show last page
+    visiblePages.add(totalPages)
+
+    return visiblePages
 }
