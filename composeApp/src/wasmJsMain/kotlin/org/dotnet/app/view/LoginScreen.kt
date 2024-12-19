@@ -23,55 +23,55 @@ fun LoginScreen(onLoginSuccess: () -> Unit, viewModel: CarRentalAppViewModel) {
         }
     }
 
-    // Create a disposable effect that triggers once when coming back from Google
-    DisposableEffect(Unit) {
-        val currentUrl = window.location.href
-        if (currentUrl.contains("code=")) {
-            isLoading = true
-            val code = window.location.search
-                .substringAfter("code=")
-                .substringBefore("&")
-
-            // Launch in a coroutine to handle the auth code
-            MainScope().launch {
-                try {
-                    viewModel.isDuringServerCheck.value = true
-                    viewModel.sendAuthCodeToBackend(code)
-                    // Clean up URL parameters
-                    window.history.replaceState(null, "", window.location.pathname)
-                    onLoginSuccess()
-                } finally {
-                    isLoading = false
-                }
-            }
-        }
-
-        // Cleanup function
-        onDispose { }
-    }
+//    // Create a disposable effect that triggers once when coming back from Google
+//    DisposableEffect(Unit) {
+//        val currentUrl = window.location.href
+//        if (currentUrl.contains("code=")) {
+//            isLoading = true
+//            val code = window.location.search
+//                .substringAfter("code=")
+//                .substringBefore("&")
+//
+//            // Launch in a coroutine to handle the auth code
+//            MainScope().launch {
+//                try {
+//                    viewModel.isDuringServerCheck.value = true
+//                    viewModel.sendAuthCodeToBackend(code)
+//                    // Clean up URL parameters
+//                    window.history.replaceState(null, "", window.location.pathname)
+//                    onLoginSuccess()
+//                } finally {
+//                    isLoading = false
+//                }
+//            }
+//        }
+//
+//        // Cleanup function
+//        onDispose { }
+//    }
 
     // Handle initial load and subsequent navigation
-    LaunchedEffect(Unit) {
-        val searchParams = window.location.search
-        if (searchParams.contains("code=")) {
-            isLoading = true
-            try {
-                val authorizationCode = searchParams
-                    .substringAfter("code=")
-                    .substringBefore("&")
-                handleCallback(authorizationCode)
-
-                // Clean up URL after handling the code
-                window.history.replaceState(null, "", window.location.pathname)
-
-                onLoginSuccess()
-            } catch (e: Exception) {
-                loginResult = "Login failed: ${e.message}"
-            } finally {
-                isLoading = false
-            }
-        }
-    }
+//    LaunchedEffect(Unit) {
+//        val searchParams = window.location.search
+//        if (searchParams.contains("code=")) {
+//            isLoading = true
+//            try {
+//                val authorizationCode = searchParams
+//                    .substringAfter("code=")
+//                    .substringBefore("&")
+//                handleCallback(authorizationCode)
+//
+//                // Clean up URL after handling the code
+//                window.history.replaceState(null, "", window.location.pathname)
+//
+//                onLoginSuccess()
+//            } catch (e: Exception) {
+//                loginResult = "Login failed: ${e.message}"
+//            } finally {
+//                isLoading = false
+//            }
+//        }
+//    }
 
     Column(
         modifier = Modifier.padding(16.dp),
