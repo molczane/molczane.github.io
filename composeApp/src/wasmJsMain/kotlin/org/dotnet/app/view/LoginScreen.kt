@@ -17,11 +17,11 @@ fun LoginScreen(onLoginSuccess: () -> Unit, viewModel: CarRentalAppViewModel) {
     var loginResult by remember { mutableStateOf<String?>(null) }
 
     // Create a stable reference to the callback handler
-    val handleCallback = remember {
-        { code: String ->
-            viewModel.sendAuthCodeToBackend(code)
-        }
-    }
+//    val handleCallback = remember {
+//        { code: String ->
+//            viewModel.sendAuthCodeToBackend(code)
+//        }
+//    }
 
 //    // Create a disposable effect that triggers once when coming back from Google
 //    DisposableEffect(Unit) {

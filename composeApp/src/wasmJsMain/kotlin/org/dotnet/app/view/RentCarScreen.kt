@@ -62,7 +62,7 @@ fun RentCarScreen(viewModel: CarRentalAppViewModel) {
                 .substringBefore("&")
             println("code:")
             println(code)
-            viewModel.sendAuthCodeToBackend(code)
+            // viewModel.sendAuthCodeToBackend(code)
             window.history.replaceState(null, "", window.location.pathname)
         }
     }
