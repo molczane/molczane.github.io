@@ -40,9 +40,10 @@ fun RentCarScreen(viewModel: CarRentalAppViewModel) {
         viewModel.updateCars()
     }
 
+    // observe changes in user login status
     LaunchedEffect(currentUrl) {
-        viewModel.isDuringServerCheck.value = true
         if (currentUrl.contains("code=")) {
+            viewModel.isDuringServerCheck.value = true
             val code = window.location.search
                 .substringAfter("code=")
                 .substringBefore("&")
