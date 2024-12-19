@@ -59,7 +59,7 @@ class CarRentalAppViewModel : ViewModel() {
 //        init = { index -> Car(0, "RentalService", "Producer", "Model", "Type", "YearOfProduction", 5, 1, "Location") }
 //    ))
 
-    private lateinit var currentCarPage: MutableStateFlow<List<Car>>
+    lateinit var currentCarPage: MutableStateFlow<List<Car>>
 
     init {
         //updateCars()
