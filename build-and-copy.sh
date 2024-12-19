@@ -10,7 +10,7 @@
 git add .
 
 # Commit changes with a message
-git commit -m "Trying to make things work"
+git commit -m "Trying to fix signing in"
 
 # Push changes to the repository
 git push origin main

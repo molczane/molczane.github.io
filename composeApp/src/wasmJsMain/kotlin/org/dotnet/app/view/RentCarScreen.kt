@@ -54,6 +54,7 @@ fun RentCarScreen(viewModel: CarRentalAppViewModel) {
     // observe changes in user login status
     LaunchedEffect(currentUrl) {
         if (currentUrl.contains("code=")) {
+            println("sending authentication code to backend!")
             viewModel.isDuringServerCheck.value = true
             val code = window.location.search
                 .substringAfter("code=")
