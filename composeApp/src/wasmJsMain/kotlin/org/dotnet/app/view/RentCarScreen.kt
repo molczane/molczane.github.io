@@ -107,7 +107,7 @@ fun RentCarScreen(viewModel: CarRentalAppViewModel) {
                 ) {
                     viewModel.currentCarPage.value.forEach { car ->
                         CarDetailsCard(
-                            car = selectedCar!!,
+                            car = car,
                             modifier = Modifier.fillMaxWidth(0.5f)
                         ) // Set Card width to half of the screen
 
