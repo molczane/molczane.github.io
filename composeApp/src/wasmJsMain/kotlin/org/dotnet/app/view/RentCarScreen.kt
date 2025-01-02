@@ -527,9 +527,17 @@ fun PaginationControls(
         }
 
         // Next page button
+//        Button(
+//            onClick = { onPageSelected(currentPage + 1) },
+//            enabled = currentPage < totalPages,
+//            modifier = Modifier.padding(horizontal = 4.dp)
+//        ) {
+//            Text("->")
+//        }
+
         IconButton(
             onClick = { onPageSelected(currentPage - 1) },
-            enabled = currentPage > 1,
+            enabled = currentPage < totalPages,
             modifier = Modifier.padding(horizontal = 4.dp)
         ) {
             Icon(
