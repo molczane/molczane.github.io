@@ -273,7 +273,6 @@ class CarRentalAppViewModel : ViewModel() {
                 "endDate": "$endDate",
                 "car": {
                     "id": ${car.id},
-                    "rentalService": "${car.rentalService}",
                     "producer": "${car.producer}",
                     "model": "${car.model}",
                     "type": "${car.type}",
