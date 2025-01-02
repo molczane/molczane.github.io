@@ -471,12 +471,23 @@ fun PaginationControls(
         verticalAlignment = Alignment.CenterVertically
     ) {
         // Previous page button
-        Button(
+//        Button(
+//            onClick = { onPageSelected(currentPage - 1) },
+//            enabled = currentPage > 1,
+//            modifier = Modifier.padding(horizontal = 4.dp)
+//        ) {
+//            Text("<-")
+//        }
+
+        IconButton(
             onClick = { onPageSelected(currentPage - 1) },
             enabled = currentPage > 1,
             modifier = Modifier.padding(horizontal = 4.dp)
         ) {
-            Text("<-")
+            Icon(
+                painter = painterResource(Res.drawable.arrow_back),
+                contentDescription = "Poprzednia strona"
+            )
         }
 
         // Page numbers
@@ -516,12 +527,15 @@ fun PaginationControls(
         }
 
         // Next page button
-        Button(
-            onClick = { onPageSelected(currentPage + 1) },
-            enabled = currentPage < totalPages,
+        IconButton(
+            onClick = { onPageSelected(currentPage - 1) },
+            enabled = currentPage > 1,
             modifier = Modifier.padding(horizontal = 4.dp)
         ) {
-            Text("->")
+            Icon(
+                painter = painterResource(Res.drawable.arrow_forward),
+                contentDescription = "Poprzednia strona"
+            )
         }
     }
 }
