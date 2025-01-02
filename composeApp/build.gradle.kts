@@ -44,6 +44,7 @@ kotlin {
             implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.7.3")
             implementation(libs.bundles.ktor.common)
             implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.6.1")
+            implementation("org.jetbrains.compose.components:components-resources:1.5.11")
         }
     }
 }

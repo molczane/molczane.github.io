@@ -7,14 +7,17 @@ import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import dotnetwebapp.composeapp.generated.resources.*
+import dotnetwebapp.composeapp.generated.resources.Res
 import kotlinx.browser.window
 import org.dotnet.app.viewModel.CarRentalAppViewModel
 //import org.dotnet.app.dataSource.cars
 import org.dotnet.app.model.Car
+import org.jetbrains.compose.resources.*
 
+@OptIn(InternalResourceApi::class)
 @Composable
 fun RentCarScreen(viewModel: CarRentalAppViewModel) {
     val uiState by viewModel.uiState.collectAsState()
@@ -75,6 +78,27 @@ fun RentCarScreen(viewModel: CarRentalAppViewModel) {
                 title = { Text("Wypożyczalnia Samochodów") },
                 backgroundColor = MaterialTheme.colors.primaryVariant,
                 actions = {
+                    IconButton(
+                        onClick = { /* DO NOTHING */ },
+                        modifier = Modifier.padding(8.dp)
+                    ) {
+                        val carIcon = Res.drawable.directions_car
+                        Icon(
+                            painter = painterResource(carIcon),
+                            contentDescription = "Profil użytkownika"
+                        )
+                    }
+
+                    IconButton(
+                        onClick = { /* DO NOTHING */ },
+                        modifier = Modifier.padding(8.dp)
+                    ) {
+                        val userIcon = Res.drawable.account_circle
+                        Icon(
+                            painter = painterResource(userIcon),
+                            contentDescription = "Profil użytkownika"
+                        )
+                    }
                     if(!isSignedIn.value) {
                         Button(
                             onClick = { isLoginDialogShown = true },

@@ -19,10 +19,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import org.dotnet.app.model.AuthResponse
-import org.dotnet.app.model.Car
-import org.dotnet.app.model.Offer
-import org.dotnet.app.model.User
+import org.dotnet.app.model.*
 
 data class CarRentalAppUiState(
     val listOfCars: List<Car> = emptyList(),
@@ -44,6 +41,12 @@ class CarRentalAppViewModel : ViewModel() {
     val isDuringServerCheck = MutableStateFlow(false)
 
     val pagesCount = MutableStateFlow(0)
+
+    private var _config: AppConfig? = null
+    val config: AppConfig
+        get() = _config ?: throw IllegalStateException("Config not loaded")
+
+
 
     private val httpClient = HttpClient(Js) {
         install(ContentNegotiation) {
@@ -91,6 +94,14 @@ class CarRentalAppViewModel : ViewModel() {
                 areCarsLoaded.value = false
             }
         }
+        viewModelScope.launch {
+            try {
+                _config = loadConfig()
+                println("Config loaded: ${_config?.redirectUri}")
+            } catch (e: Exception) {
+                println("Error loading config: ${e.message}")
+            }
+        }
     }
 
     val rentedCar : Car? = null
@@ -123,6 +134,7 @@ class CarRentalAppViewModel : ViewModel() {
 
             if (response.status.isSuccess()) {
                 println("Fetched car page successfully!")
+                println("Response: ${response.body() as String}")
                 response.body()
             } else {
                 println("Error fetching car page: ${response.status.value}")
