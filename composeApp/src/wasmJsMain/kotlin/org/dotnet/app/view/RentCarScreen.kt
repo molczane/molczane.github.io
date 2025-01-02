@@ -536,7 +536,7 @@ fun PaginationControls(
 //        }
 
         IconButton(
-            onClick = { onPageSelected(currentPage - 1) },
+            onClick = { onPageSelected(currentPage + 1) },
             enabled = currentPage < totalPages,
             modifier = Modifier.padding(horizontal = 4.dp)
         ) {
