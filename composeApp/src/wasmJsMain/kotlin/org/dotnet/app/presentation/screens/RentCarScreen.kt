@@ -13,13 +13,11 @@ import dotnetwebapp.composeapp.generated.resources.*
 import dotnetwebapp.composeapp.generated.resources.Res
 import kotlinx.browser.window
 import org.dotnet.app.viewModel.CarRentalAppViewModel
-//import org.dotnet.app.dataSource.cars
 import org.dotnet.app.domain.Car
 import org.dotnet.app.presentation.components.CarDetailsCard
 import org.dotnet.app.presentation.components.Footer
 import org.jetbrains.compose.resources.*
 
-@OptIn(InternalResourceApi::class)
 @Composable
 fun RentCarScreen(viewModel: CarRentalAppViewModel) {
     val uiState by viewModel.uiState.collectAsState()
@@ -51,10 +49,6 @@ fun RentCarScreen(viewModel: CarRentalAppViewModel) {
     var selectedYear by remember { mutableStateOf<String?>(null) }
     var selectedType by remember { mutableStateOf<String?>(null) }
     var selectedLocation by remember { mutableStateOf<String?>(null) }
-
-//    LaunchedEffect(Unit) {
-//        viewModel.updateCars()
-//    }
 
     // observe changes in user login status
     LaunchedEffect(currentUrl) {
@@ -157,7 +151,7 @@ fun RentCarScreen(viewModel: CarRentalAppViewModel) {
                         // Brand Filter
                         FilterSection(
                             title = "Marka",
-                            options = uiState.listOfCars.map { it.producer }.distinct().sorted(),
+                            options = List(1) {"dupa"},//uiState.listOfCars.map { it.type }.distinct().sorted(),
                             selectedOption = selectedBrand,
                             onOptionSelected = {
                                 selectedBrand = it
@@ -171,11 +165,7 @@ fun RentCarScreen(viewModel: CarRentalAppViewModel) {
                         if (selectedBrand != null) {
                             FilterSection(
                                 title = "Model",
-                                options = uiState.listOfCars
-                                    .filter { it.producer == selectedBrand }
-                                    .map { it.model }
-                                    .distinct()
-                                    .sorted(),
+                                options = List(1) {"dupa"},//uiState.listOfCars.map { it.type }.distinct().sorted(),
                                 selectedOption = selectedModel,
                                 onOptionSelected = { selectedModel = it }
                             )
@@ -186,7 +176,7 @@ fun RentCarScreen(viewModel: CarRentalAppViewModel) {
                         // Type Filter
                         FilterSection(
                             title = "Typ",
-                            options = uiState.listOfCars.map { it.type }.distinct().sorted(),
+                            options = List(1) {"dupa"},//uiState.listOfCars.map { it.type }.distinct().sorted(),
                             selectedOption = selectedType,
                             onOptionSelected = { selectedType = it }
                         )
@@ -196,7 +186,7 @@ fun RentCarScreen(viewModel: CarRentalAppViewModel) {
                         // Year Filter
                         FilterSection(
                             title = "Rok produkcji",
-                            options = uiState.listOfCars.map { it.yearOfProduction }.distinct().sorted(),
+                            options = List(1) {"dupa"},//uiState.listOfCars.map { it.type }.distinct().sorted(),
                             selectedOption = selectedYear,
                             onOptionSelected = { selectedYear = it }
                         )
@@ -206,7 +196,7 @@ fun RentCarScreen(viewModel: CarRentalAppViewModel) {
                         // Location Filter
                         FilterSection(
                             title = "Lokalizacja",
-                            options = uiState.listOfCars.map { it.location }.distinct().sorted(),
+                            options = List(1) {"dupa"},//uiState.listOfCars.map { it.type }.distinct().sorted(),
                             selectedOption = selectedLocation,
                             onOptionSelected = { selectedLocation = it }
                         )
@@ -235,7 +225,7 @@ fun RentCarScreen(viewModel: CarRentalAppViewModel) {
                         .padding(16.dp),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    if (!areCarsLoaded.value) { // time
+                    if (uiState.isLoading) { // time
                         Column(Modifier.padding(innerPadding)) {
                             CircularProgressIndicator(
                                 modifier = Modifier.size(24.dp),
@@ -251,8 +241,9 @@ fun RentCarScreen(viewModel: CarRentalAppViewModel) {
                                 .padding(16.dp),
                             horizontalAlignment = Alignment.CenterHorizontally
                         ) {
-                            if (viewModel.currentCarPage.value.isNotEmpty()) {
-                                viewModel.currentCarPage.value.forEach { car ->
+                            if (uiState.currentCarPage.isNotEmpty()
+                                /*viewModel.currentCarPage.value.isNotEmpty()*/) {
+                                uiState.currentCarPage.forEach { car ->
                                     CarDetailsCard(
                                         car = car,
                                         modifier = Modifier.fillMaxWidth(0.5f)
@@ -261,8 +252,8 @@ fun RentCarScreen(viewModel: CarRentalAppViewModel) {
                                 }
 
                                 PaginationControls(
-                                    currentPage = viewModel.currentPageNumber.collectAsState().value,
-                                    totalPages = viewModel.pagesCount.collectAsState().value,
+                                    currentPage = uiState.currentPageNumber,
+                                    totalPages = uiState.totalPages,
                                     onPageSelected = { newPage ->
                                         viewModel.updatePageNumber(newPage)
                                         viewModel.getPage(newPage)
@@ -401,8 +392,8 @@ fun RentCarScreen(viewModel: CarRentalAppViewModel) {
 //                    }
 
                             // Footer at the bottom
+                            Footer()
                         }
-                        Footer()
                     }
                 }
             }
@@ -473,14 +464,6 @@ fun PaginationControls(
         verticalAlignment = Alignment.CenterVertically
     ) {
         // Previous page button
-//        Button(
-//            onClick = { onPageSelected(currentPage - 1) },
-//            enabled = currentPage > 1,
-//            modifier = Modifier.padding(horizontal = 4.dp)
-//        ) {
-//            Text("<-")
-//        }
-
         IconButton(
             onClick = { onPageSelected(currentPage - 1) },
             enabled = currentPage > 1,
@@ -529,14 +512,6 @@ fun PaginationControls(
         }
 
         // Next page button
-//        Button(
-//            onClick = { onPageSelected(currentPage + 1) },
-//            enabled = currentPage < totalPages,
-//            modifier = Modifier.padding(horizontal = 4.dp)
-//        ) {
-//            Text("->")
-//        }
-
         IconButton(
             onClick = { onPageSelected(currentPage + 1) },
             enabled = currentPage < totalPages,

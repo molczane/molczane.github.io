@@ -21,13 +21,21 @@ import org.dotnet.app.data.api.ApiServiceImpl
 import org.dotnet.app.data.repository.CarRepository
 import org.dotnet.app.domain.*
 
-data class CarRentalAppUiState(
-    val listOfCars: List<Car> = emptyList(),
+data class CarRentalUiState(
+    val currentCarPage: List<Car> = emptyList(),
+    val currentPageNumber: Int = 1,
+    val totalPages: Int = 0,
+    val isLoading: Boolean = false,
+    val errorMessage: String? = null
 ) {
-    val producers = listOfCars.map { it.model }.toSet()
+//    val producers = listOfCars.map { it.model }.toSet()
 }
 
 class CarRentalAppViewModel : ViewModel() {
+
+    // UI State
+    private val _uiState = MutableStateFlow(CarRentalUiState())
+    val uiState : StateFlow<CarRentalUiState> = _uiState.asStateFlow()
 
     // app config
     private var _config: AppConfig? = null
@@ -54,30 +62,77 @@ class CarRentalAppViewModel : ViewModel() {
                 carRepository = CarRepository(apiService)
 
                 // Fetch initial data after initialization
-                 loadInitialData()
+                loadInitialData()
             } catch (e: Exception) {
                 println("Error initializing data layer: ${e.message}")
             }
         }
     }
 
-
     private suspend fun loadInitialData() {
         try {
-            // First get the page count
-            val pageCount = carRepository.getPageCount()
-            println("Pages count: $pageCount")
+            updateUiState { it.copy(isLoading = true) }
 
-            // Then fetch the first page
+            val pageCount = carRepository.getPageCount() - 1
+            println("Pages count: $pageCount")
+            pagesCount.value = pageCount
+
             val firstPage = carRepository.getCarsPage(1)
             println("First page loaded: $firstPage")
+
+            updateUiState {
+                it.copy(
+                    currentCarPage = firstPage,
+                    currentPageNumber = 1,
+                    totalPages = pageCount,
+                    isLoading = false,
+                    errorMessage = null
+                )
+            }
+//            // **Important**: Store the result in the StateFlow that the UI reads
+//            currentCarPage.value = firstPage
+//
+//            // If you're controlling loading states in the UI:
+//            areCarsLoaded.value = true
         } catch (e: Exception) {
             println("Error loading initial data: ${e.message}")
+            // If there's an error, you might want areCarsLoaded.value = false
+            updateUiStateWithError("Error loading initial data: ${e.message}")
         }
     }
 
-    private val _uiState = MutableStateFlow(CarRentalAppUiState())
-    val uiState = _uiState.asStateFlow()
+    // Function to be called when changing pages
+    fun getPage(page: Int) {
+//        viewModelScope.launch {
+//            currentCarPage.value = carRepository.getCarsPage(page)
+//        }
+        viewModelScope.launch {
+            try {
+                updateUiState { it.copy(isLoading = true) }
+
+                val cars = carRepository.getCarsPage(page)
+                updateUiState {
+                    it.copy(
+                        currentCarPage = cars,
+                        currentPageNumber = page,
+                        isLoading = false,
+                        errorMessage = null
+                    )
+                }
+            } catch (e: Exception) {
+                updateUiStateWithError("Error fetching page $page: ${e.message}")
+            }
+        }
+    }
+
+    private fun updateUiState(update: (CarRentalUiState) -> CarRentalUiState) {
+        _uiState.value = update(_uiState.value)
+    }
+
+    private fun updateUiStateWithError(error: String) {
+        updateUiState { it.copy(isLoading = false, errorMessage = error) }
+        println(error)
+    }
 
     var user: User? = null
     val isUserLoggedIn = MutableStateFlow(false)
@@ -105,13 +160,6 @@ class CarRentalAppViewModel : ViewModel() {
 
     fun updatePageNumber(pageNumber: Int) {
         currentPageNumber.value = pageNumber
-    }
-
-    // Function to be called when changing pages
-    fun getPage(page: Int) {
-        viewModelScope.launch {
-            currentCarPage.value = carRepository.getCarsPage(page)
-        }
     }
 
     fun resetValuationResult() {
