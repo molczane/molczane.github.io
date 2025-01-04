@@ -1,4 +1,4 @@
-package org.dotnet.app.view
+package org.dotnet.app.presentation.components
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxWidth

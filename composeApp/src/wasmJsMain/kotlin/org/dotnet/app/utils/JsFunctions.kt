@@ -1,6 +1,6 @@
 package org.dotnet.app.utils
 
-import org.dotnet.app.model.CredentialResponse
+import org.dotnet.app.domain.CredentialResponse
 import kotlin.js.JsExport
 
 @JsExport

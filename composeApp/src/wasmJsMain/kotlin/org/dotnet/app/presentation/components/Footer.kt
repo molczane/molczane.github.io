@@ -1,4 +1,4 @@
-package org.dotnet.app.view
+package org.dotnet.app.presentation.components
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.Divider

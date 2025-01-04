@@ -1,4 +1,4 @@
-package org.dotnet.app.view
+package org.dotnet.app.presentation.components
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
@@ -7,7 +7,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.delay
-import org.dotnet.app.model.Offer
+import org.dotnet.app.domain.Offer
 
 @Composable
 fun OfferView(

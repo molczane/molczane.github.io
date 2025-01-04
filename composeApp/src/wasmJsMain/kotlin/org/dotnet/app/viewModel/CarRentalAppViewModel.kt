@@ -19,14 +19,13 @@ import kotlinx.coroutines.launch
 import org.dotnet.app.data.api.ApiService
 import org.dotnet.app.data.api.ApiServiceImpl
 import org.dotnet.app.data.repository.CarRepository
-import org.dotnet.app.model.*
+import org.dotnet.app.domain.*
 
 data class CarRentalAppUiState(
     val listOfCars: List<Car> = emptyList(),
 ) {
     val producers = listOfCars.map { it.model }.toSet()
 }
-
 
 class CarRentalAppViewModel : ViewModel() {
 

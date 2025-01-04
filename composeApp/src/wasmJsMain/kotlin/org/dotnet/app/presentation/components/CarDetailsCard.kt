@@ -1,4 +1,4 @@
-package org.dotnet.app.view
+package org.dotnet.app.presentation.components
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -10,7 +10,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import org.dotnet.app.model.Car
+import org.dotnet.app.domain.Car
 
 @Composable
 fun CarDetailsCard(car: Car, modifier: Modifier = Modifier) {

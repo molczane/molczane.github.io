@@ -1,6 +1,4 @@
-package org.dotnet.app.model
-
-import androidx.compose.runtime.CompositionServices
+package org.dotnet.app.domain
 
 data class RegisterCredential(
     val firstname: String,

@@ -1,4 +1,4 @@
-package org.dotnet.app.view
+package org.dotnet.app.presentation.screens
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
@@ -14,7 +14,9 @@ import dotnetwebapp.composeapp.generated.resources.Res
 import kotlinx.browser.window
 import org.dotnet.app.viewModel.CarRentalAppViewModel
 //import org.dotnet.app.dataSource.cars
-import org.dotnet.app.model.Car
+import org.dotnet.app.domain.Car
+import org.dotnet.app.presentation.components.CarDetailsCard
+import org.dotnet.app.presentation.components.Footer
 import org.jetbrains.compose.resources.*
 
 @OptIn(InternalResourceApi::class)

@@ -4,8 +4,8 @@ import io.ktor.client.call.*
 import io.ktor.client.request.*
 import io.ktor.client.statement.*
 import io.ktor.http.*
-import org.dotnet.app.model.AppConfig
-import org.dotnet.app.model.Car
+import org.dotnet.app.domain.AppConfig
+import org.dotnet.app.domain.Car
 
 class ApiServiceImpl(private val appConfig: AppConfig) : ApiService {
     private val httpClient = HttpClientProvider.httpClient

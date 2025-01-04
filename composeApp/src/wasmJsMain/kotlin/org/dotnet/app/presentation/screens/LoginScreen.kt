@@ -1,4 +1,4 @@
-package org.dotnet.app.view
+package org.dotnet.app.presentation.screens
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
@@ -28,7 +28,8 @@ fun LoginScreen(onLoginSuccess: () -> Unit, viewModel: CarRentalAppViewModel) {
                 clientId = "248107412465-i64fdf66a6f4nrj7232ghdmvbsg91pp3.apps.googleusercontent.com",
                 //redirectUri = "https://molczane.github.io/"
                 redirectUri = "http://localhost:8081/"
-            )},
+            )
+            },
             modifier = Modifier.fillMaxWidth(),
             enabled = !isLoading
         ) {

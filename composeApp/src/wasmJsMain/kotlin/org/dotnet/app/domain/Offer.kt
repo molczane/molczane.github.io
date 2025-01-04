@@ -1,6 +1,5 @@
-package org.dotnet.app.model
+package org.dotnet.app.domain
 
-import kotlinx.datetime.internal.JSJoda.LocalDate
 import kotlinx.serialization.Serializable
 
 

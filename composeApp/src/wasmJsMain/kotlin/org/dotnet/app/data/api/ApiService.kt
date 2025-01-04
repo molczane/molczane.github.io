@@ -1,6 +1,6 @@
 package org.dotnet.app.data.api
 
-import org.dotnet.app.model.Car
+import org.dotnet.app.domain.Car
 
 interface ApiService {
     suspend fun fetchPage(page: Int): List<Car>

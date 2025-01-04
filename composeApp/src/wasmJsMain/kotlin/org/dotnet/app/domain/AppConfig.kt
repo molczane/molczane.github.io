@@ -1,4 +1,4 @@
-package org.dotnet.app.model
+package org.dotnet.app.domain
 
 import io.ktor.client.fetch.*
 import kotlinx.browser.window

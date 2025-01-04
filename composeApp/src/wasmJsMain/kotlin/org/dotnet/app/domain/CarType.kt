@@ -1,4 +1,4 @@
-package org.dotnet.app.model
+package org.dotnet.app.domain
 
 enum class CarType {
     Compact,
