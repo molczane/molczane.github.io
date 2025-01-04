@@ -23,7 +23,7 @@ fun DropdownMenu(
             value = selectedOption ?: "",
             onValueChange = {},
             label = { Text(label) },
-            modifier = Modifier.fillMaxWidth(), // Set the width of the dropdown to half of the screen
+            modifier = Modifier.fillMaxWidth(.3f), // Set the width of the dropdown to half of the screen
             readOnly = true,
             trailingIcon = {
                 IconButton(onClick = { expanded = !expanded }) {

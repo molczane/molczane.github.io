@@ -25,8 +25,18 @@ data class CarRentalUiState(
     val currentCarPage: List<Car> = emptyList(),
     val currentPageNumber: Int = 1,
     val totalPages: Int = 0,
-    val isLoading: Boolean = false,
-    val errorMessage: String? = null
+    val isLoading: Boolean = true,
+    val errorMessage: String? = null,
+    val selectedBrand: String? = null,
+    val selectedModel: String? = null,
+    val selectedYear: String? = null,
+    val selectedType: String? = null,
+    val selectedLocation: String? = null,
+    val selectedCar: Car? = null,
+    val isLoginDialogShown: Boolean = false,
+    val loginResult: String? = null,
+    val isUserLoggedIn: Boolean = false,
+    val isValuationDialogShown: Boolean = false
 ) {
 //    val producers = listOfCars.map { it.model }.toSet()
 }
@@ -70,9 +80,9 @@ class CarRentalAppViewModel : ViewModel() {
     }
 
     private suspend fun loadInitialData() {
-        try {
-            updateUiState { it.copy(isLoading = true) }
+        updateUiState { it.copy(isLoading = true) }
 
+        try {
             val pageCount = carRepository.getPageCount() - 1
             println("Pages count: $pageCount")
             pagesCount.value = pageCount
@@ -89,11 +99,6 @@ class CarRentalAppViewModel : ViewModel() {
                     errorMessage = null
                 )
             }
-//            // **Important**: Store the result in the StateFlow that the UI reads
-//            currentCarPage.value = firstPage
-//
-//            // If you're controlling loading states in the UI:
-//            areCarsLoaded.value = true
         } catch (e: Exception) {
             println("Error loading initial data: ${e.message}")
             // If there's an error, you might want areCarsLoaded.value = false
@@ -103,9 +108,6 @@ class CarRentalAppViewModel : ViewModel() {
 
     // Function to be called when changing pages
     fun getPage(page: Int) {
-//        viewModelScope.launch {
-//            currentCarPage.value = carRepository.getCarsPage(page)
-//        }
         viewModelScope.launch {
             try {
                 updateUiState { it.copy(isLoading = true) }
@@ -125,6 +127,7 @@ class CarRentalAppViewModel : ViewModel() {
         }
     }
 
+    /* =================================== Updating UI State functions =================================== */
     private fun updateUiState(update: (CarRentalUiState) -> CarRentalUiState) {
         _uiState.value = update(_uiState.value)
     }
@@ -133,6 +136,82 @@ class CarRentalAppViewModel : ViewModel() {
         updateUiState { it.copy(isLoading = false, errorMessage = error) }
         println(error)
     }
+
+    fun updateFilter(
+        brand: String? = uiState.value.selectedBrand,
+        model: String? = uiState.value.selectedModel,
+        year: String? = uiState.value.selectedYear,
+        type: String? = uiState.value.selectedType,
+        location: String? = uiState.value.selectedLocation
+    ) {
+        _uiState.value = uiState.value.copy(
+            selectedBrand = brand,
+            selectedModel = model,
+            selectedYear = year,
+            selectedType = type,
+            selectedLocation = location
+        )
+    }
+
+    fun updatePageNumber(pageNumber: Int) {
+        currentPageNumber.value = pageNumber
+        _uiState.value = uiState.value.copy(
+            currentPageNumber = pageNumber
+        )
+    }
+    /* ================================================================================================== */
+
+    /* ================================== Google Sign In related stuff ================================== */
+    fun initiateGoogleSignIn() {
+        val scope = "openid%20email%20profile"
+        val googleOAuthUrl = buildString {
+            append("https://accounts.google.com/o/oauth2/v2/auth")
+            append("?client_id=${config.clientId}")
+            append("&redirect_uri=${config.redirectUri}")
+            append("&response_type=code")
+            append("&scope=$scope")
+            append("&state=${generateRandomState()}")
+        }
+        kotlinx.browser.window.location.href = googleOAuthUrl
+    }
+
+    fun handleLoginResult(authCode: String, onLoginSuccess: () -> Unit) {
+        viewModelScope.launch {
+            updateUiState { it.copy(isLoading = true, loginResult = null) }
+            try {
+                val response = apiService.authenticate(authCode)
+                updateUiState {
+                    it.copy(
+                        isLoading = false,
+                        isUserLoggedIn = true,
+                        isLoginDialogShown = false,
+                        loginResult = null // Clear any previous errors
+                    )
+                }
+                onLoginSuccess()
+            } catch (e: Exception) {
+                updateUiState {
+                    it.copy(
+                        isLoading = false,
+                        loginResult = "Login error: ${e.message}"
+                    )
+                }
+            }
+        }
+    }
+
+    private fun generateRandomState(): String {
+        return (1..32)
+            .map { ('a'..'z') + ('A'..'Z') + ('0'..'9') }
+            .map { it.random() }
+            .joinToString("")
+    }
+
+    fun toggleLoginDialog(show: Boolean) {
+        updateUiState { it.copy(isLoginDialogShown = show) }
+    }
+    /* ================================================================================================== */
+
 
     var user: User? = null
     val isUserLoggedIn = MutableStateFlow(false)
@@ -157,10 +236,6 @@ class CarRentalAppViewModel : ViewModel() {
     val currentCarPage = MutableStateFlow(emptyList<Car>())
 
     val rentedCar : Car? = null
-
-    fun updatePageNumber(pageNumber: Int) {
-        currentPageNumber.value = pageNumber
-    }
 
     fun resetValuationResult() {
         _valuationResult.value = null

@@ -7,7 +7,6 @@ import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import dotnetwebapp.composeapp.generated.resources.*
 import dotnetwebapp.composeapp.generated.resources.Res
@@ -15,6 +14,7 @@ import kotlinx.browser.window
 import org.dotnet.app.viewModel.CarRentalAppViewModel
 import org.dotnet.app.domain.Car
 import org.dotnet.app.presentation.components.CarDetailsCard
+import org.dotnet.app.presentation.components.FilterSection
 import org.dotnet.app.presentation.components.Footer
 import org.jetbrains.compose.resources.*
 
@@ -23,13 +23,7 @@ fun RentCarScreen(viewModel: CarRentalAppViewModel) {
     val uiState by viewModel.uiState.collectAsState()
     val isSignedIn = viewModel.isUserLoggedIn.collectAsState()
 
-    var cars by remember { mutableStateOf<List<Car>>(emptyList()) }
-
-    var isLoginDialogShown by remember { mutableStateOf(false) }
-
     var isValuationDialogShown by remember { mutableStateOf(false) }
-
-    //var areCarsLoaded by remember { mutableStateOf(false) }
 
     var selectedCar : Car? by remember { mutableStateOf(null) }
 
@@ -37,11 +31,7 @@ fun RentCarScreen(viewModel: CarRentalAppViewModel) {
 
     var isCarRented by remember { mutableStateOf(false) }
 
-    var currentUrl by remember { mutableStateOf(window.location.href) }
-
-    val currentCarPage = viewModel.currentCarPage.collectAsState()
-
-    val areCarsLoaded = viewModel.areCarsLoaded.collectAsState()
+    val currentUrl by remember { mutableStateOf(window.location.href) }
 
     // Filter states
     var selectedBrand by remember { mutableStateOf<String?>(null) }
@@ -50,7 +40,7 @@ fun RentCarScreen(viewModel: CarRentalAppViewModel) {
     var selectedType by remember { mutableStateOf<String?>(null) }
     var selectedLocation by remember { mutableStateOf<String?>(null) }
 
-    // observe changes in user login status
+    // observe changes in user login status - TODO() - I think this should be moved out of this composable
     LaunchedEffect(currentUrl) {
         if (currentUrl.contains("code=")) {
             println("sending authentication code to backend!")
@@ -65,8 +55,6 @@ fun RentCarScreen(viewModel: CarRentalAppViewModel) {
             window.history.replaceState(null, "", window.location.pathname)
         }
     }
-
-    // Observe changes in cars list
 
     Scaffold(
         topBar = {
@@ -95,9 +83,9 @@ fun RentCarScreen(viewModel: CarRentalAppViewModel) {
                             contentDescription = "Profil użytkownika"
                         )
                     }
-                    if(!isSignedIn.value) {
+                    if(!uiState.isUserLoggedIn) {
                         Button(
-                            onClick = { isLoginDialogShown = true },
+                            onClick = { viewModel.toggleLoginDialog(true) },
                             elevation = ButtonDefaults.elevation(defaultElevation = 15.dp),
                             modifier = Modifier.padding(12.dp)
                         ) {
@@ -151,7 +139,7 @@ fun RentCarScreen(viewModel: CarRentalAppViewModel) {
                         // Brand Filter
                         FilterSection(
                             title = "Marka",
-                            options = List(1) {"dupa"},//uiState.listOfCars.map { it.type }.distinct().sorted(),
+                            options = listOf("dupa", "dupa 2"),//uiState.listOfCars.map { it.type }.distinct().sorted(),
                             selectedOption = selectedBrand,
                             onOptionSelected = {
                                 selectedBrand = it
@@ -165,7 +153,7 @@ fun RentCarScreen(viewModel: CarRentalAppViewModel) {
                         if (selectedBrand != null) {
                             FilterSection(
                                 title = "Model",
-                                options = List(1) {"dupa"},//uiState.listOfCars.map { it.type }.distinct().sorted(),
+                                options = listOf("dupa", "dupa 2"),//uiState.listOfCars.map { it.type }.distinct().sorted(),
                                 selectedOption = selectedModel,
                                 onOptionSelected = { selectedModel = it }
                             )
@@ -176,7 +164,7 @@ fun RentCarScreen(viewModel: CarRentalAppViewModel) {
                         // Type Filter
                         FilterSection(
                             title = "Typ",
-                            options = List(1) {"dupa"},//uiState.listOfCars.map { it.type }.distinct().sorted(),
+                            options = listOf("dupa", "dupa 2"),//uiState.listOfCars.map { it.type }.distinct().sorted(),
                             selectedOption = selectedType,
                             onOptionSelected = { selectedType = it }
                         )
@@ -186,7 +174,7 @@ fun RentCarScreen(viewModel: CarRentalAppViewModel) {
                         // Year Filter
                         FilterSection(
                             title = "Rok produkcji",
-                            options = List(1) {"dupa"},//uiState.listOfCars.map { it.type }.distinct().sorted(),
+                            options = listOf("dupa", "dupa 2"),//uiState.listOfCars.map { it.type }.distinct().sorted(),
                             selectedOption = selectedYear,
                             onOptionSelected = { selectedYear = it }
                         )
@@ -196,7 +184,7 @@ fun RentCarScreen(viewModel: CarRentalAppViewModel) {
                         // Location Filter
                         FilterSection(
                             title = "Lokalizacja",
-                            options = List(1) {"dupa"},//uiState.listOfCars.map { it.type }.distinct().sorted(),
+                            options = listOf("dupa", "dupa 2"),//uiState.listOfCars.map { it.type }.distinct().sorted(),
                             selectedOption = selectedLocation,
                             onOptionSelected = { selectedLocation = it }
                         )
@@ -238,11 +226,12 @@ fun RentCarScreen(viewModel: CarRentalAppViewModel) {
                             Modifier
                                 .fillMaxSize()
                                 .padding(innerPadding)
-                                .padding(16.dp),
+                                .padding(16.dp)
+                                .verticalScroll(rememberScrollState()),
                             horizontalAlignment = Alignment.CenterHorizontally
+
                         ) {
-                            if (uiState.currentCarPage.isNotEmpty()
-                                /*viewModel.currentCarPage.value.isNotEmpty()*/) {
+                            if (uiState.currentCarPage.isNotEmpty()) {
                                 uiState.currentCarPage.forEach { car ->
                                     CarDetailsCard(
                                         car = car,
@@ -399,23 +388,16 @@ fun RentCarScreen(viewModel: CarRentalAppViewModel) {
             }
         }
     )
-    if(isLoginDialogShown) {
+    if(uiState.isLoginDialogShown) {
         AlertDialog(
-            onDismissRequest = { isLoginDialogShown = false },
-            title = {
-            },
+            onDismissRequest = { viewModel.toggleLoginDialog(false) },
+            title = { Text("Login") },
             text = {
-                LoginScreen(
-                    onLoginSuccess = {},
-                    viewModel = viewModel
-                )
+                LoginScreen(viewModel = viewModel)
             },
             confirmButton = {
-                // Optional: Add a custom confirm button if needed
-            },
-            dismissButton = {
-                Button(onClick = { isLoginDialogShown = false }) {
-                    Text("Anuluj")
+                Button(onClick = { viewModel.toggleLoginDialog(false) }) {
+                    Text("Close")
                 }
             }
         )
@@ -555,50 +537,4 @@ private fun calculateVisiblePages(currentPage: Int, totalPages: Int): List<Int> 
     visiblePages.add(totalPages)
 
     return visiblePages
-}
-
-@Composable
-private fun FilterSection(
-    title: String,
-    options: List<String>,
-    selectedOption: String?,
-    onOptionSelected: (String) -> Unit
-) {
-    Column {
-        Text(
-            text = title,
-            style = MaterialTheme.typography.subtitle1,
-            modifier = Modifier.padding(bottom = 8.dp)
-        )
-
-        var expanded by remember { mutableStateOf(false) }
-
-        OutlinedButton(
-            onClick = { expanded = true },
-            modifier = Modifier.fillMaxWidth()
-        ) {
-            Text(
-                text = selectedOption ?: "Wybierz $title",
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis
-            )
-        }
-
-        DropdownMenu(
-            expanded = expanded,
-            onDismissRequest = { expanded = false },
-            modifier = Modifier.fillMaxWidth(0.9f)
-        ) {
-            options.forEach { option ->
-                DropdownMenuItem(
-                    onClick = {
-                        onOptionSelected(option)
-                        expanded = false
-                    }
-                ) {
-                    Text(option)
-                }
-            }
-        }
-    }
 }

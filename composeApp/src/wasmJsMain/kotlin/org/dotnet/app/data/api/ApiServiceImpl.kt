@@ -5,6 +5,7 @@ import io.ktor.client.request.*
 import io.ktor.client.statement.*
 import io.ktor.http.*
 import org.dotnet.app.domain.AppConfig
+import org.dotnet.app.domain.AuthResponse
 import org.dotnet.app.domain.Car
 
 class ApiServiceImpl(private val appConfig: AppConfig) : ApiService {
@@ -53,5 +54,13 @@ class ApiServiceImpl(private val appConfig: AppConfig) : ApiService {
             println("Error fetching page count: ${e.message}")
             0
         }
+    }
+
+    override suspend fun authenticate(authCode: String): AuthResponse {
+        val response: HttpResponse = httpClient.post(appConfig.googleAuthUrl) {
+            contentType(ContentType.Application.Json)
+            setBody(mapOf("Code" to authCode, "RedirectUri" to appConfig.redirectUri))
+        }
+        return response.body()
     }
 }
