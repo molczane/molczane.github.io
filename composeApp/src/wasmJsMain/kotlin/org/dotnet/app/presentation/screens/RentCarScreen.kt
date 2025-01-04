@@ -16,6 +16,7 @@ import org.dotnet.app.domain.Car
 import org.dotnet.app.presentation.components.CarDetailsCard
 import org.dotnet.app.presentation.components.FilterSection
 import org.dotnet.app.presentation.components.Footer
+import org.dotnet.app.presentation.components.PaginationControls
 import org.jetbrains.compose.resources.*
 
 @Composable
@@ -25,20 +26,13 @@ fun RentCarScreen(viewModel: CarRentalAppViewModel) {
 
     var isValuationDialogShown by remember { mutableStateOf(false) }
 
-    var selectedCar : Car? by remember { mutableStateOf(null) }
+    val selectedCar : Car? by remember { mutableStateOf(null) }
 
     val valuationResult by viewModel.valuationResult.collectAsState()
 
     var isCarRented by remember { mutableStateOf(false) }
 
     val currentUrl by remember { mutableStateOf(window.location.href) }
-
-    // Filter states
-    var selectedBrand by remember { mutableStateOf<String?>(null) }
-    var selectedModel by remember { mutableStateOf<String?>(null) }
-    var selectedYear by remember { mutableStateOf<String?>(null) }
-    var selectedType by remember { mutableStateOf<String?>(null) }
-    var selectedLocation by remember { mutableStateOf<String?>(null) }
 
     // observe changes in user login status - TODO() - I think this should be moved out of this composable
     LaunchedEffect(currentUrl) {
@@ -125,86 +119,15 @@ fun RentCarScreen(viewModel: CarRentalAppViewModel) {
                         .padding(8.dp),
                     elevation = 4.dp
                 ) {
-                    Column(
-                        modifier = Modifier
-                            .padding(16.dp)
-                            .verticalScroll(rememberScrollState())
-                    ) {
-                        Text(
-                            "Filtry",
-                            style = MaterialTheme.typography.h6,
-                            modifier = Modifier.padding(bottom = 16.dp)
-                        )
-
-                        // Brand Filter
-                        FilterSection(
-                            title = "Marka",
-                            options = listOf("dupa", "dupa 2"),//uiState.listOfCars.map { it.type }.distinct().sorted(),
-                            selectedOption = selectedBrand,
-                            onOptionSelected = {
-                                selectedBrand = it
-                                selectedModel = null // Reset model when brand changes
-                            }
-                        )
-
-                        Spacer(modifier = Modifier.height(16.dp))
-
-                        // Model Filter (dependent on selected brand)
-                        if (selectedBrand != null) {
-                            FilterSection(
-                                title = "Model",
-                                options = listOf("dupa", "dupa 2"),//uiState.listOfCars.map { it.type }.distinct().sorted(),
-                                selectedOption = selectedModel,
-                                onOptionSelected = { selectedModel = it }
-                            )
-
-                            Spacer(modifier = Modifier.height(16.dp))
-                        }
-
-                        // Type Filter
-                        FilterSection(
-                            title = "Typ",
-                            options = listOf("dupa", "dupa 2"),//uiState.listOfCars.map { it.type }.distinct().sorted(),
-                            selectedOption = selectedType,
-                            onOptionSelected = { selectedType = it }
-                        )
-
-                        Spacer(modifier = Modifier.height(16.dp))
-
-                        // Year Filter
-                        FilterSection(
-                            title = "Rok produkcji",
-                            options = listOf("dupa", "dupa 2"),//uiState.listOfCars.map { it.type }.distinct().sorted(),
-                            selectedOption = selectedYear,
-                            onOptionSelected = { selectedYear = it }
-                        )
-
-                        Spacer(modifier = Modifier.height(16.dp))
-
-                        // Location Filter
-                        FilterSection(
-                            title = "Lokalizacja",
-                            options = listOf("dupa", "dupa 2"),//uiState.listOfCars.map { it.type }.distinct().sorted(),
-                            selectedOption = selectedLocation,
-                            onOptionSelected = { selectedLocation = it }
-                        )
-
-                        Spacer(modifier = Modifier.height(16.dp))
-
-                        // Reset Filters Button
-                        Button(
-                            onClick = {
-                                selectedBrand = null
-                                selectedModel = null
-                                selectedYear = null
-                                selectedType = null
-                                selectedLocation = null
-                            },
-                            modifier = Modifier.fillMaxWidth()
-                        ) {
-                            Text("Resetuj filtry")
-                        }
-                    }
+                    FilterSection(
+                        uiState = uiState,
+                        onBrandSelected = { viewModel.updateSelectedBrand(it) },
+                        onModelSelected = { viewModel.updateSelectedModel(it) },
+                        onYearSelected = { viewModel.updateSelectedYear(it) },
+                        onTypeSelected = { viewModel.updateSelectedType(it) },
+                        onLocationSelected = { viewModel.updateSelectedLocation(it) },
+                        onResetFilters = { viewModel.resetFilters() }
+                    )
                 }
 
                 Column (
@@ -214,10 +137,22 @@ fun RentCarScreen(viewModel: CarRentalAppViewModel) {
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
                     if (uiState.isLoading) { // time
-                        Column(Modifier.padding(innerPadding)) {
+                        Column(
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .padding(innerPadding),
+                            horizontalAlignment = Alignment.CenterHorizontally
+                        ) {
                             CircularProgressIndicator(
                                 modifier = Modifier.size(24.dp),
-                                color = MaterialTheme.colors.onPrimary
+                                color = MaterialTheme.colors.primary
+                            )
+                            PaginationControls(
+                                currentPage = uiState.currentPageNumber,
+                                totalPages = uiState.totalPages,
+                                onPageSelected = {
+                                    /* DO NOTHING */
+                                }
                             )
                             Footer()
                         }
@@ -388,6 +323,8 @@ fun RentCarScreen(viewModel: CarRentalAppViewModel) {
             }
         }
     )
+
+    // Login dialog window
     if(uiState.isLoginDialogShown) {
         AlertDialog(
             onDismissRequest = { viewModel.toggleLoginDialog(false) },
@@ -402,7 +339,9 @@ fun RentCarScreen(viewModel: CarRentalAppViewModel) {
             }
         )
     }
-    if(isValuationDialogShown) {
+
+    // Valuation Dialog Window
+    if(uiState.isValuationDialogShown) {
         AlertDialog(
             onDismissRequest = { isValuationDialogShown = false },
             title = {
@@ -428,113 +367,4 @@ fun RentCarScreen(viewModel: CarRentalAppViewModel) {
             }
         )
     }
-}
-
-@Composable
-fun PaginationControls(
-    currentPage: Int,
-    totalPages: Int,
-    onPageSelected: (Int) -> Unit
-) {
-    if (totalPages <= 1) return
-
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(vertical = 16.dp),
-        horizontalArrangement = Arrangement.Center,
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        // Previous page button
-        IconButton(
-            onClick = { onPageSelected(currentPage - 1) },
-            enabled = currentPage > 1,
-            modifier = Modifier.padding(horizontal = 4.dp)
-        ) {
-            Icon(
-                painter = painterResource(Res.drawable.arrow_back),
-                contentDescription = "Poprzednia strona"
-            )
-        }
-
-        // Page numbers
-        Row(
-            horizontalArrangement = Arrangement.spacedBy(4.dp)
-        ) {
-            val visiblePages = calculateVisiblePages(currentPage, totalPages)
-
-            visiblePages.forEach { pageNum ->
-                if (pageNum == -1) {
-                    // Show ellipsis
-                    Text(
-                        "...",
-                        modifier = Modifier.padding(horizontal = 8.dp),
-                        style = MaterialTheme.typography.body1
-                    )
-                } else {
-                    Button(
-                        onClick = { onPageSelected(pageNum) },
-                        colors = if (pageNum == currentPage) {
-                            ButtonDefaults.buttonColors(
-                                backgroundColor = MaterialTheme.colors.primary,
-                                contentColor = MaterialTheme.colors.onPrimary
-                            )
-                        } else {
-                            ButtonDefaults.buttonColors(
-                                backgroundColor = MaterialTheme.colors.surface,
-                                contentColor = MaterialTheme.colors.onSurface
-                            )
-                        },
-                        modifier = Modifier.width(48.dp)
-                    ) {
-                        Text(pageNum.toString())
-                    }
-                }
-            }
-        }
-
-        // Next page button
-        IconButton(
-            onClick = { onPageSelected(currentPage + 1) },
-            enabled = currentPage < totalPages,
-            modifier = Modifier.padding(horizontal = 4.dp)
-        ) {
-            Icon(
-                painter = painterResource(Res.drawable.arrow_forward),
-                contentDescription = "Poprzednia strona"
-            )
-        }
-    }
-}
-
-private fun calculateVisiblePages(currentPage: Int, totalPages: Int): List<Int> {
-    if (totalPages <= 7) {
-        return (1..totalPages).toList()
-    }
-
-    val visiblePages = mutableListOf<Int>()
-
-    // Always show first page
-    visiblePages.add(1)
-
-    if (currentPage > 3) {
-        visiblePages.add(-1) // Add ellipsis
-    }
-
-    // Add pages around current page
-    val start = maxOf(2, currentPage - 1)
-    val end = minOf(totalPages - 1, currentPage + 1)
-
-    for (i in start..end) {
-        visiblePages.add(i)
-    }
-
-    if (currentPage < totalPages - 2) {
-        visiblePages.add(-1) // Add ellipsis
-    }
-
-    // Always show last page
-    visiblePages.add(totalPages)
-
-    return visiblePages
 }

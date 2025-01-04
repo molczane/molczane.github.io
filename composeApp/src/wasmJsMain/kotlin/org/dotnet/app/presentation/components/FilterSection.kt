@@ -1,59 +1,93 @@
 package org.dotnet.app.presentation.components
 
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material.DropdownMenuItem
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.OutlinedButton
-import androidx.compose.material.Text
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import org.dotnet.app.viewModel.CarRentalUiState
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.*
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 
 @Composable
 fun FilterSection(
-    title: String,
-    options: List<String>,
-    selectedOption: String?,
-    onOptionSelected: (String) -> Unit
+    uiState: CarRentalUiState,
+    onBrandSelected: (String?) -> Unit,
+    onModelSelected: (String?) -> Unit,
+    onYearSelected: (String?) -> Unit,
+    onTypeSelected: (String?) -> Unit,
+    onLocationSelected: (String?) -> Unit,
+    onResetFilters: () -> Unit
 ) {
-    Column {
+    Column(
+        modifier = Modifier
+            .padding(16.dp)
+            .verticalScroll(rememberScrollState())
+    ) {
         Text(
-            text = title,
-            style = MaterialTheme.typography.subtitle1,
-            modifier = Modifier.padding(bottom = 8.dp)
+            "Filtry",
+            style = MaterialTheme.typography.h6,
+            modifier = Modifier.padding(bottom = 16.dp)
         )
 
-        var expanded by remember { mutableStateOf(false) }
+        // Brand Filter
+        FilterItem(
+            title = "Marka",
+            options = uiState.distinctBrands, // Replace with dynamic data
+            selectedOption = uiState.selectedBrand,
+            onOptionSelected = onBrandSelected
+        )
 
-        OutlinedButton(
-            onClick = { expanded = true },
-            modifier = Modifier.fillMaxWidth()
-        ) {
-            Text(
-                text = selectedOption ?: "Wybierz $title",
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis
+        Spacer(modifier = Modifier.height(16.dp))
+
+        // Model Filter
+        if (uiState.selectedBrand != null) {
+            FilterItem(
+                title = "Model",
+                options = listOf("Model 1", "Model 2"), // Replace with dynamic data
+                selectedOption = uiState.selectedModel,
+                onOptionSelected = onModelSelected
             )
+
+            Spacer(modifier = Modifier.height(16.dp))
         }
 
-        androidx.compose.material.DropdownMenu(
-            expanded = expanded,
-            onDismissRequest = { expanded = false },
-            modifier = Modifier.fillMaxWidth(.2f)
+        // Type Filter
+        FilterItem(
+            title = "Typ",
+            options = uiState.distinctTypes, // Replace with dynamic data
+            selectedOption = uiState.selectedType,
+            onOptionSelected = onTypeSelected
+        )
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        // Year Filter
+        FilterItem(
+            title = "Rok produkcji",
+            options = listOf("Year 1", "Year 2"), // Replace with dynamic data
+            selectedOption = uiState.selectedYear,
+            onOptionSelected = onYearSelected
+        )
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        // Location Filter
+        FilterItem(
+            title = "Lokalizacja",
+            options = uiState.distinctLocations, // Replace with dynamic data
+            selectedOption = uiState.selectedLocation,
+            onOptionSelected = onLocationSelected
+        )
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        // Reset Filters Button
+        Button(
+            onClick = onResetFilters,
+            modifier = Modifier.fillMaxWidth()
         ) {
-            options.forEach { option ->
-                DropdownMenuItem(
-                    onClick = {
-                        onOptionSelected(option)
-                        expanded = false
-                    }
-                ) {
-                    Text(option)
-                }
-            }
+            Text("Resetuj filtry")
         }
     }
 }

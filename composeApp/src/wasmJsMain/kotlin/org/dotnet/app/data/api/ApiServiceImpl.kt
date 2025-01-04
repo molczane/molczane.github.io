@@ -63,4 +63,42 @@ class ApiServiceImpl(private val appConfig: AppConfig) : ApiService {
         }
         return response.body()
     }
+
+    override suspend fun getDistinctBrands(): List<String> {
+        return try {
+            val response = httpClient.get(appConfig.distinctBrandsUrl)
+            println("Raw Response: ${response.bodyAsText()}")
+            response.body()
+        } catch (e: Exception) {
+            println("Error fetching distinct brands: ${e.message}")
+            emptyList()
+        }
+    }
+
+    override suspend fun getDistinctYears(): List<Int> {
+        return try {
+            httpClient.get(appConfig.distinctYearsUrl).body()
+        } catch (e: Exception) {
+            println("Error fetching distinct years: ${e.message}")
+            emptyList()
+        }
+    }
+
+    override suspend fun getDistinctTypes(): List<String> {
+        return try {
+            httpClient.get(appConfig.distinctTypesUrl).body()
+        } catch (e: Exception) {
+            println("Error fetching distinct types: ${e.message}")
+            emptyList()
+        }
+    }
+
+    override suspend fun getDistinctLocations(): List<String> {
+        return try {
+            httpClient.get(appConfig.distinctLocationsUrl).body()
+        } catch (e: Exception) {
+            println("Error fetching distinct locations: ${e.message}")
+            emptyList()
+        }
+    }
 }

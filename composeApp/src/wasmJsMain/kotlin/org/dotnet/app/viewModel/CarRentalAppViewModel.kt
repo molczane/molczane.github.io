@@ -27,19 +27,26 @@ data class CarRentalUiState(
     val totalPages: Int = 0,
     val isLoading: Boolean = true,
     val errorMessage: String? = null,
+    val selectedCar: Car? = null,
+    val isLoginDialogShown: Boolean = false,
+    val loginResult: String? = null,
+    val isUserLoggedIn: Boolean = false,
+    val isValuationDialogShown: Boolean = false,
+
+    /* DATA FOR FILTERING */
+    val distinctBrands: List<String> = emptyList(),
+    val modelsByBrand: List<String> = emptyList(),
+    val distinctYears: List<Int> = emptyList(),
+    val distinctTypes: List<String> = emptyList(),
+    val distinctLocations: List<String> = emptyList(),
+
+    /* FILTERING STATE */
     val selectedBrand: String? = null,
     val selectedModel: String? = null,
     val selectedYear: String? = null,
     val selectedType: String? = null,
     val selectedLocation: String? = null,
-    val selectedCar: Car? = null,
-    val isLoginDialogShown: Boolean = false,
-    val loginResult: String? = null,
-    val isUserLoggedIn: Boolean = false,
-    val isValuationDialogShown: Boolean = false
-) {
-//    val producers = listOfCars.map { it.model }.toSet()
-}
+)
 
 class CarRentalAppViewModel : ViewModel() {
 
@@ -73,6 +80,9 @@ class CarRentalAppViewModel : ViewModel() {
 
                 // Fetch initial data after initialization
                 loadInitialData()
+
+                // Fetch data for filtering
+                loadFilterData()
             } catch (e: Exception) {
                 println("Error initializing data layer: ${e.message}")
             }
@@ -127,6 +137,35 @@ class CarRentalAppViewModel : ViewModel() {
         }
     }
 
+    fun loadFilterData() {
+        viewModelScope.launch {
+            try {
+                updateUiState { it.copy(isLoading = true) }
+
+                val brands = apiService.getDistinctBrands()
+                val years = apiService.getDistinctYears()
+                val types = apiService.getDistinctTypes()
+                val locations = apiService.getDistinctLocations()
+
+                updateUiState {
+                    it.copy(
+                        distinctBrands = brands,
+                        distinctYears = years,
+                        distinctTypes = types,
+                        distinctLocations = locations,
+                        isLoading = false
+                    )
+                }
+            } catch (e: Exception) {
+                updateUiState {
+                    it.copy(
+                        isLoading = false,
+                        errorMessage = "Error loading filter data: ${e.message}"
+                    )
+                }
+            }
+        }
+    }
     /* =================================== Updating UI State functions =================================== */
     private fun updateUiState(update: (CarRentalUiState) -> CarRentalUiState) {
         _uiState.value = update(_uiState.value)
@@ -158,6 +197,43 @@ class CarRentalAppViewModel : ViewModel() {
         _uiState.value = uiState.value.copy(
             currentPageNumber = pageNumber
         )
+    }
+
+    fun updateSelectedBrand(brand: String?) {
+        updateUiState {
+            it.copy(
+                selectedBrand = brand,
+                selectedModel = null // Reset model when brand changes
+            )
+        }
+    }
+
+    fun updateSelectedModel(model: String?) {
+        updateUiState { it.copy(selectedModel = model) }
+    }
+
+    fun updateSelectedYear(year: String?) {
+        updateUiState { it.copy(selectedYear = year) }
+    }
+
+    fun updateSelectedType(type: String?) {
+        updateUiState { it.copy(selectedType = type) }
+    }
+
+    fun updateSelectedLocation(location: String?) {
+        updateUiState { it.copy(selectedLocation = location) }
+    }
+
+    fun resetFilters() {
+        updateUiState {
+            it.copy(
+                selectedBrand = null,
+                selectedModel = null,
+                selectedYear = null,
+                selectedType = null,
+                selectedLocation = null
+            )
+        }
     }
     /* ================================================================================================== */
 

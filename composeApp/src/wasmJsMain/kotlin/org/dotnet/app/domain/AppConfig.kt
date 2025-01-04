@@ -5,7 +5,6 @@ import kotlinx.browser.window
 import kotlinx.coroutines.await
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
-import org.jetbrains.compose.resources.ExperimentalResourceApi
 
 @Serializable
 data class AppConfig(
@@ -14,10 +13,14 @@ data class AppConfig(
     val getNumberOfPagesUrl: String,
     val getCarsFromPageUrl: String,
     val googleAuthUrl: String,
-    val authWithServerUrl: String
+    val authWithServerUrl: String,
+    val distinctBrandsUrl: String,
+    val modelsByBrandUrl: String,
+    val distinctYearsUrl: String,
+    val distinctTypesUrl: String,
+    val distinctLocationsUrl: String
 )
 
-@OptIn(ExperimentalResourceApi::class)
 suspend fun loadConfig(): AppConfig {
     try {
         // Wczytaj plik konfiguracyjny używając fetch API
