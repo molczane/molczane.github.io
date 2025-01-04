@@ -1,6 +1,5 @@
 package org.dotnet.app.model
 
-import dotnetwebapp.composeapp.generated.resources.Res
 import io.ktor.client.fetch.*
 import kotlinx.browser.window
 import kotlinx.coroutines.await
@@ -23,10 +22,13 @@ suspend fun loadConfig(): AppConfig {
     try {
         // Wczytaj plik konfiguracyjny używając fetch API
         val response: Response = window
-            .fetch("/config.prod.json")
+            .fetch("/config.dev.json")
             .await()
 
-        val sth = Res.getUri("config.prod.json")
+        // PROD
+//        val response: Response = window
+//            .fetch("/config.prod.json")
+//            .await()
 
         if (!response.ok) {
             throw Exception("Nie udało się załadować pliku konfiguracyjnego: ${response.statusText}")

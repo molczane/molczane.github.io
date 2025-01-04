@@ -38,6 +38,20 @@ class ApiServiceImpl(private val appConfig: AppConfig) : ApiService {
     }
 
     override suspend fun getPageCount(): Int {
-        TODO("Not yet implemented")
+        return try {
+            println("Fetching page count...")
+
+            val url = appConfig.getNumberOfPagesUrl
+
+            val pageCountResponse = httpClient
+                .get(url)
+                .body<Int>()
+            println("Page count loaded: $pageCountResponse")
+
+            pageCountResponse
+        } catch (e: Exception) {
+            println("Error fetching page count: ${e.message}")
+            0
+        }
     }
 }
