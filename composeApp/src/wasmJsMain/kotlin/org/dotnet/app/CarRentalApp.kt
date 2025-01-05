@@ -2,7 +2,7 @@ package org.dotnet.app
 
 import androidx.compose.runtime.*
 import org.dotnet.app.presentation.screens.RentCarScreen
-import org.dotnet.app.viewModel.CarRentalAppViewModel
+import org.dotnet.app.presentation.viewModels.CarRentalAppViewModel
 
 @Composable
 fun CarRentalApp() {

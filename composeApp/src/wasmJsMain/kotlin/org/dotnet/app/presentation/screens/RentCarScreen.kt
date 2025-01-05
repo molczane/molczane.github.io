@@ -11,7 +11,7 @@ import androidx.compose.ui.unit.dp
 import dotnetwebapp.composeapp.generated.resources.*
 import dotnetwebapp.composeapp.generated.resources.Res
 import kotlinx.browser.window
-import org.dotnet.app.viewModel.CarRentalAppViewModel
+import org.dotnet.app.presentation.viewModels.CarRentalAppViewModel
 import org.dotnet.app.domain.Car
 import org.dotnet.app.presentation.components.CarDetailsCard
 import org.dotnet.app.presentation.components.FilterSection
@@ -326,18 +326,7 @@ fun RentCarScreen(viewModel: CarRentalAppViewModel) {
 
     // Login dialog window
     if(uiState.isLoginDialogShown) {
-        AlertDialog(
-            onDismissRequest = { viewModel.toggleLoginDialog(false) },
-            title = { Text("Login") },
-            text = {
-                LoginScreen(viewModel = viewModel)
-            },
-            confirmButton = {
-                Button(onClick = { viewModel.toggleLoginDialog(false) }) {
-                    Text("Close")
-                }
-            }
-        )
+        LoginScreen(viewModel)
     }
 
     // Valuation Dialog Window

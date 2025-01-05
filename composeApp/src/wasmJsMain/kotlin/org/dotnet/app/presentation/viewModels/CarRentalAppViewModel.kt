@@ -1,4 +1,4 @@
-package org.dotnet.app.viewModel
+package org.dotnet.app.presentation.viewModels
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope

@@ -1,7 +1,7 @@
 package org.dotnet.app.presentation.components
 
 import androidx.compose.runtime.Composable
-import org.dotnet.app.viewModel.CarRentalUiState
+import org.dotnet.app.presentation.viewModels.CarRentalUiState
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
