@@ -25,8 +25,10 @@ fun CarDetailsCard(car: Car, modifier: Modifier = Modifier) {
                 .padding(16.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Text("Marka: ${car.producer}", style = MaterialTheme.typography.h6)
-            Text("Model: ${car.model}", style = MaterialTheme.typography.body1)
+            Text("${car.producer} ${car.model}", style = MaterialTheme.typography.h6)
+            Text(car.location, style = MaterialTheme.typography.body1)
+            Text(car.type, style = MaterialTheme.typography.body1)
+            Text(car.yearOfProduction, style = MaterialTheme.typography.body1)
         }
     }
 }

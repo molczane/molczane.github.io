@@ -101,4 +101,31 @@ class ApiServiceImpl(private val appConfig: AppConfig) : ApiService {
             emptyList()
         }
     }
+
+    override suspend fun getFilteredCars(
+        producer: String?,
+        model: String?,
+        yearOfProduction: String?,
+        type: String?,
+        location: String?
+    ): List<Car> {
+        return try {
+            val params = mapOf(
+                "producer" to producer,
+                "model" to model,
+                "yearOfProduction" to yearOfProduction,
+                "type" to type,
+                "location" to location
+            ).filterValues { it != null }
+
+            httpClient.get(appConfig.getFilteredCarsUrl) {
+                params.forEach { (key, value) ->
+                    parameter(key, value)
+                }
+            }.body()
+        } catch (e: Exception) {
+            println("Error fetching filtered cars: ${e.message}")
+            emptyList()
+        }
+    }
 }

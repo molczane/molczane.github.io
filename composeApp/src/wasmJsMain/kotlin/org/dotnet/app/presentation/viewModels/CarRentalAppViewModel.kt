@@ -46,6 +46,10 @@ data class CarRentalUiState(
     val selectedYear: String? = null,
     val selectedType: String? = null,
     val selectedLocation: String? = null,
+
+    /* FILTERING RESULTS */
+    val areCarsFiltered: Boolean = false,
+    val filteredCars: List<Car> = emptyList()
 )
 
 class CarRentalAppViewModel : ViewModel() {
@@ -235,8 +239,33 @@ class CarRentalAppViewModel : ViewModel() {
                 selectedModel = null,
                 selectedYear = null,
                 selectedType = null,
-                selectedLocation = null
+                selectedLocation = null,
+                areCarsFiltered = false,
+                filteredCars = emptyList()
             )
+        }
+    }
+
+    // Function to be called when fetching filtered cars
+    fun getFilteredCars(carFilters: CarFilters) {
+        viewModelScope.launch {
+            try {
+                updateUiState { it.copy(isLoading = true) }
+
+                val filteredCars = carRepository.getCarsFiltered(carFilters)
+
+                if(uiState.value.errorMessage == null) {
+                    println("Successfully fetched filtered cars!")
+                    updateUiState { it.copy(
+                        isLoading = false,
+                        areCarsFiltered = true,
+                        filteredCars = filteredCars
+                    ) }
+                    println("Filtered cars: $filteredCars")
+                }
+            } catch (e: Exception) {
+                updateUiStateWithError("Error fetching filtered cars: ${e.message}")
+            }
         }
     }
     /* ================================================================================================== */

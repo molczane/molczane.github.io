@@ -18,7 +18,8 @@ data class AppConfig(
     val modelsByBrandUrl: String,
     val distinctYearsUrl: String,
     val distinctTypesUrl: String,
-    val distinctLocationsUrl: String
+    val distinctLocationsUrl: String,
+    val getFilteredCarsUrl: String
 )
 
 suspend fun loadConfig(): AppConfig {

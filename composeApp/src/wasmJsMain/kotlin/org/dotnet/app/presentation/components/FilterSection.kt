@@ -8,6 +8,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import org.dotnet.app.domain.CarFilters
 
 @Composable
 fun FilterSection(
@@ -17,7 +18,8 @@ fun FilterSection(
     onYearSelected: (String?) -> Unit,
     onTypeSelected: (String?) -> Unit,
     onLocationSelected: (String?) -> Unit,
-    onResetFilters: () -> Unit
+    onResetFilters: () -> Unit,
+    onFilter: (CarFilters) -> Unit
 ) {
     Column(
         modifier = Modifier
@@ -33,7 +35,7 @@ fun FilterSection(
         // Brand Filter
         FilterItem(
             title = "Marka",
-            options = uiState.distinctBrands, // Replace with dynamic data
+            options = uiState.distinctBrands, // Replace it with dynamic data
             selectedOption = uiState.selectedBrand,
             onOptionSelected = onBrandSelected
         )
@@ -44,7 +46,7 @@ fun FilterSection(
         if (uiState.selectedBrand != null) {
             FilterItem(
                 title = "Model",
-                options = listOf("Model 1", "Model 2"), // Replace with dynamic data
+                options = listOf("Model 1", "Model 2"), // Replace it with dynamic data
                 selectedOption = uiState.selectedModel,
                 onOptionSelected = onModelSelected
             )
@@ -55,7 +57,7 @@ fun FilterSection(
         // Type Filter
         FilterItem(
             title = "Typ",
-            options = uiState.distinctTypes, // Replace with dynamic data
+            options = uiState.distinctTypes, // Replace it with dynamic data
             selectedOption = uiState.selectedType,
             onOptionSelected = onTypeSelected
         )
@@ -75,7 +77,7 @@ fun FilterSection(
         // Location Filter
         FilterItem(
             title = "Lokalizacja",
-            options = uiState.distinctLocations, // Replace with dynamic data
+            options = uiState.distinctLocations, // Replace it with dynamic data
             selectedOption = uiState.selectedLocation,
             onOptionSelected = onLocationSelected
         )
@@ -88,6 +90,24 @@ fun FilterSection(
             modifier = Modifier.fillMaxWidth()
         ) {
             Text("Resetuj filtry")
+        }
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        // Reset Filters Button
+        Button(
+            onClick = { onFilter(
+                CarFilters(
+                    producer = uiState.selectedBrand,
+                    model = uiState.selectedModel,
+                    yearOfProduction = uiState.selectedYear,
+                    type = uiState.selectedType,
+                    location = uiState.selectedLocation
+                )
+            ) },
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Text("Filtruj")
         }
     }
 }

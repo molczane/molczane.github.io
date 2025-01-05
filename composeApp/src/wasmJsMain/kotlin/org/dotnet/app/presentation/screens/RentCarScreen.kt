@@ -1,8 +1,6 @@
 package org.dotnet.app.presentation.screens
 
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -13,10 +11,7 @@ import dotnetwebapp.composeapp.generated.resources.Res
 import kotlinx.browser.window
 import org.dotnet.app.presentation.viewModels.CarRentalAppViewModel
 import org.dotnet.app.domain.Car
-import org.dotnet.app.presentation.components.CarDetailsCard
-import org.dotnet.app.presentation.components.FilterSection
-import org.dotnet.app.presentation.components.Footer
-import org.dotnet.app.presentation.components.PaginationControls
+import org.dotnet.app.presentation.components.*
 import org.jetbrains.compose.resources.*
 
 @Composable
@@ -31,6 +26,7 @@ fun RentCarScreen(viewModel: CarRentalAppViewModel) {
 
     var isCarRented by remember { mutableStateOf(false) }
 
+    /* ============== THIS NEEDS TO BE REFACTORED AND MOVED OUT OF HERE =============== */
     val currentUrl by remember { mutableStateOf(window.location.href) }
 
     val isConfigLoaded by viewModel.isConfigLoaded.collectAsState()
@@ -48,6 +44,7 @@ fun RentCarScreen(viewModel: CarRentalAppViewModel) {
             window.history.replaceState(null, "", window.location.pathname)
         }
     }
+    /* ================================================================================ */
 
     Scaffold(
         topBar = {
@@ -114,7 +111,7 @@ fun RentCarScreen(viewModel: CarRentalAppViewModel) {
                 Card(
                     modifier = Modifier
                         .fillMaxHeight()
-                        .fillMaxWidth(0.2f)  // Changed to use fillMaxWidth with fraction
+                        .fillMaxWidth(0.2f)  // Changed to use fillMaxWidth with a fraction
                         .padding(8.dp),
                     elevation = 4.dp
                 ) {
@@ -125,7 +122,8 @@ fun RentCarScreen(viewModel: CarRentalAppViewModel) {
                         onYearSelected = { viewModel.updateSelectedYear(it) },
                         onTypeSelected = { viewModel.updateSelectedType(it) },
                         onLocationSelected = { viewModel.updateSelectedLocation(it) },
-                        onResetFilters = { viewModel.resetFilters() }
+                        onResetFilters = { viewModel.resetFilters() },
+                        onFilter = { viewModel.getFilteredCars(it) }
                     )
                 }
 
@@ -135,56 +133,58 @@ fun RentCarScreen(viewModel: CarRentalAppViewModel) {
                         .padding(16.dp),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
+                    /* LOADING SCREEN */
                     if (uiState.isLoading) { // time
-                        Column(
-                            modifier = Modifier
-                                .fillMaxSize()
-                                .padding(innerPadding),
-                            horizontalAlignment = Alignment.CenterHorizontally
-                        ) {
-                            CircularProgressIndicator(
-                                modifier = Modifier.size(24.dp),
-                                color = MaterialTheme.colors.primary
-                            )
-                            PaginationControls(
-                                currentPage = uiState.currentPageNumber,
-                                totalPages = uiState.totalPages,
-                                onPageSelected = {
-                                    /* DO NOTHING */
-                                }
-                            )
-                            Footer()
-                        }
-                    } else {
-                        Column(
-                            Modifier
-                                .fillMaxSize()
-                                .padding(innerPadding)
-                                .padding(16.dp)
-                                .verticalScroll(rememberScrollState()),
-                            horizontalAlignment = Alignment.CenterHorizontally
+                        LoadingView(uiState, innerPadding)
+                    }
+                    /* DISPLAYING FILTERED CARS */
+                    else if(uiState.areCarsFiltered) {
+                        FilteredCarsView(uiState, innerPadding)
+                    }
+                    /* STANDARD DISPLAYING OF CARS */
+                    else if(!uiState.isLoading && !uiState.areCarsFiltered) {
+                        StandardCarsView(viewModel, uiState, innerPadding)
+                    }
+                }
+            }
+        }
+    )
 
-                        ) {
-                            if (uiState.currentCarPage.isNotEmpty()) {
-                                uiState.currentCarPage.forEach { car ->
-                                    CarDetailsCard(
-                                        car = car,
-                                        modifier = Modifier.fillMaxWidth(0.5f)
-                                    )
-                                    Spacer(modifier = Modifier.height(16.dp))
-                                }
+    // Login dialog window
+    if(uiState.isLoginDialogShown) {
+        LoginScreen(viewModel)
+    }
 
-                                PaginationControls(
-                                    currentPage = uiState.currentPageNumber,
-                                    totalPages = uiState.totalPages,
-                                    onPageSelected = { newPage ->
-                                        viewModel.updatePageNumber(newPage)
-                                        viewModel.getPage(newPage)
-                                    }
-                                )
-                            } else {
-                                Text("Brak dostępnych samochodów")
-                            }
+    // Valuation Dialog Window TODO(move to different composable)
+    if(uiState.isValuationDialogShown) {
+        AlertDialog(
+            onDismissRequest = { isValuationDialogShown = false },
+            title = {
+            },
+            text = {
+                selectedCar?.let { car ->
+                    ValuationScreen(
+                        {   startDate, endDate, carB ->
+                            selectedCar?.let { viewModel.requestValuation(startDate, endDate, it) }
+                        },
+                        valuationResult = "",
+                        car = car
+                    )
+                }
+            },
+            confirmButton = {
+                // Optional: Add a custom confirmation button if needed
+            },
+            dismissButton = {
+                Button(onClick = { isValuationDialogShown = false }) {
+                    Text("Anuluj")
+                }
+            }
+        )
+    }
+}
+
+/* ============================ CODE FOR VALUATION AND REQUESTING VALUATION ================================= */
 
 //                    var selectedBrand by remember { mutableStateOf<String?>(null) }
 //                    var selectedModel by remember { mutableStateOf<String?>(null) }
@@ -313,46 +313,3 @@ fun RentCarScreen(viewModel: CarRentalAppViewModel) {
 //                            }
 //                        }
 //                    }
-
-                            // Footer at the bottom
-                            Footer()
-                        }
-                    }
-                }
-            }
-        }
-    )
-
-    // Login dialog window
-    if(uiState.isLoginDialogShown) {
-        LoginScreen(viewModel)
-    }
-
-    // Valuation Dialog Window
-    if(uiState.isValuationDialogShown) {
-        AlertDialog(
-            onDismissRequest = { isValuationDialogShown = false },
-            title = {
-            },
-            text = {
-                selectedCar?.let { car ->
-                    ValuationScreen(
-                        {   startDate, endDate, carB ->
-                            selectedCar?.let { viewModel.requestValuation(startDate, endDate, it) }
-                        },
-                        valuationResult = "",
-                        car = car
-                    )
-                }
-            },
-            confirmButton = {
-                // Optional: Add a custom confirmation button if needed
-            },
-            dismissButton = {
-                Button(onClick = { isValuationDialogShown = false }) {
-                    Text("Anuluj")
-                }
-            }
-        )
-    }
-}

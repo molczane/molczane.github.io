@@ -11,4 +11,11 @@ interface ApiService {
     suspend fun getDistinctYears(): List<Int>
     suspend fun getDistinctTypes(): List<String>
     suspend fun getDistinctLocations(): List<String>
+    suspend fun getFilteredCars(
+        producer: String? = null,
+        model: String? = null,
+        yearOfProduction: String? = null,
+        type: String? = null,
+        location: String? = null
+    ): List<Car>
 }

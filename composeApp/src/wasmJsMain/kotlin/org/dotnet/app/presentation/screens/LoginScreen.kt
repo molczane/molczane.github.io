@@ -6,7 +6,10 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import dotnetwebapp.composeapp.generated.resources.Res
+import dotnetwebapp.composeapp.generated.resources.google_icon
 import org.dotnet.app.presentation.viewModels.CarRentalAppViewModel
+import org.jetbrains.compose.resources.painterResource
 
 @Composable
 fun LoginScreen(viewModel: CarRentalAppViewModel) {
@@ -39,7 +42,16 @@ fun LoginScreen(viewModel: CarRentalAppViewModel) {
                             color = MaterialTheme.colors.onPrimary
                         )
                     } else {
-                        Text("Sign in with Google")
+                        Row(
+                            horizontalArrangement = Arrangement.Center
+                        ) {
+                            val googleIcon = Res.drawable.google_icon
+                            Text("Sign in with Google")
+                            Icon(
+                                painter = painterResource(googleIcon),
+                                contentDescription = "Google Icon"
+                            )
+                        }
                     }
                 }
 

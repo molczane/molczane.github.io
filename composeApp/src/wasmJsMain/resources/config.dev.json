@@ -9,5 +9,6 @@
   "modelsByBrandUrl": "http://localhost:5109/api/cars/modelsByBrand/",
   "distinctYearsUrl": "http://localhost:5109/api/cars/distinctYears",
   "distinctTypesUrl": "http://localhost:5109/api/cars/distinctTypes",
-  "distinctLocationsUrl": "http://localhost:5109/api/cars/distinctLocations"
+  "distinctLocationsUrl": "http://localhost:5109/api/cars/distinctLocations",
+  "getFilteredCarsUrl": "http://localhost:5109/api/cars/filteredCars"
 }
