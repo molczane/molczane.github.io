@@ -22,7 +22,6 @@ import org.jetbrains.compose.resources.*
 @Composable
 fun RentCarScreen(viewModel: CarRentalAppViewModel) {
     val uiState by viewModel.uiState.collectAsState()
-    val isSignedIn = viewModel.isUserLoggedIn.collectAsState()
 
     var isValuationDialogShown by remember { mutableStateOf(false) }
 
@@ -34,17 +33,17 @@ fun RentCarScreen(viewModel: CarRentalAppViewModel) {
 
     val currentUrl by remember { mutableStateOf(window.location.href) }
 
-    // observe changes in user login status - TODO() - I think this should be moved out of this composable
-    LaunchedEffect(currentUrl) {
-        if (currentUrl.contains("code=")) {
-            println("sending authentication code to backend!")
+    val isConfigLoaded by viewModel.isConfigLoaded.collectAsState()
 
-            viewModel.isDuringServerCheck.value = true
+    // observe changes in user login status - TODO() - I think this should be moved out of this composable
+    LaunchedEffect(isConfigLoaded, currentUrl) {
+        if (isConfigLoaded && currentUrl.contains("code=")) {
+            println("Config loaded, sending authentication code to backend.")
+
             val code = window.location.search
                 .substringAfter("code=")
                 .substringBefore("&")
-            println("code:")
-            println(code)
+            println("code: ${code}")
             viewModel.sendAuthCodeToBackend(code)
             window.history.replaceState(null, "", window.location.pathname)
         }
@@ -86,7 +85,7 @@ fun RentCarScreen(viewModel: CarRentalAppViewModel) {
                             Text("Zaloguj się")
                         }
                     }
-                    if(isSignedIn.value) {
+                    if(uiState.isUserLoggedIn) {
                         Button(
                             onClick = { viewModel.logout() },
                             elevation = ButtonDefaults.elevation(defaultElevation = 15.dp),
@@ -347,7 +346,7 @@ fun RentCarScreen(viewModel: CarRentalAppViewModel) {
                 }
             },
             confirmButton = {
-                // Optional: Add a custom confirm button if needed
+                // Optional: Add a custom confirmation button if needed
             },
             dismissButton = {
                 Button(onClick = { isValuationDialogShown = false }) {

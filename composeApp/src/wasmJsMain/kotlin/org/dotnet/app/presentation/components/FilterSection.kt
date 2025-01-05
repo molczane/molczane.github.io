@@ -65,7 +65,7 @@ fun FilterSection(
         // Year Filter
         FilterItem(
             title = "Rok produkcji",
-            options = listOf("Year 1", "Year 2"), // Replace with dynamic data
+            optionsNumbers = uiState.distinctYears, // Replace it with dynamic data
             selectedOption = uiState.selectedYear,
             onOptionSelected = onYearSelected
         )

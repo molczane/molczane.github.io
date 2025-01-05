@@ -59,6 +59,10 @@ class CarRentalAppViewModel : ViewModel() {
     private val config: AppConfig
         get() = _config ?: throw IllegalStateException("Config not loaded")
 
+    // if app config is loaded
+    private val _isConfigLoaded = MutableStateFlow(false)
+    val isConfigLoaded: StateFlow<Boolean> = _isConfigLoaded.asStateFlow()
+
     // data layer
     private lateinit var apiService : ApiService
     private lateinit var carRepository : CarRepository
@@ -73,7 +77,7 @@ class CarRentalAppViewModel : ViewModel() {
                 // Load configuration first
                 _config = loadConfig()
                 println("Config loaded: ${_config?.redirectUri}")
-
+                _isConfigLoaded.value = true
                 // Initialize ApiService and CarRepository
                 apiService = ApiServiceImpl(config)
                 carRepository = CarRepository(apiService)
@@ -95,7 +99,7 @@ class CarRentalAppViewModel : ViewModel() {
         try {
             val pageCount = carRepository.getPageCount() - 1
             println("Pages count: $pageCount")
-            pagesCount.value = pageCount
+            //pagesCount.value = pageCount
 
             val firstPage = carRepository.getCarsPage(1)
             println("First page loaded: $firstPage")
@@ -193,7 +197,7 @@ class CarRentalAppViewModel : ViewModel() {
     }
 
     fun updatePageNumber(pageNumber: Int) {
-        currentPageNumber.value = pageNumber
+        // currentPageNumber.value = pageNumber
         _uiState.value = uiState.value.copy(
             currentPageNumber = pageNumber
         )
@@ -286,17 +290,84 @@ class CarRentalAppViewModel : ViewModel() {
     fun toggleLoginDialog(show: Boolean) {
         updateUiState { it.copy(isLoginDialogShown = show) }
     }
+
+
+    private val _authResponse = MutableStateFlow<AuthResponse?>(null)
+    val authResponse: StateFlow<AuthResponse?> = _authResponse
+
+    fun sendAuthCodeToBackend(authCode: String) {
+        if (!_isConfigLoaded.value) {
+            println("Config not loaded, delaying authentication.")
+            return
+        }
+
+        viewModelScope.launch {
+            try {
+                val response: HttpResponse = httpClient
+                    .post(config.authWithServerUrl) {
+                        contentType(ContentType.Application.Json)
+                        setBody(
+                            mapOf(
+                                "Code" to authCode,
+                                "RedirectUri" to config.redirectUri
+                            )
+                        )
+                    }
+
+                if (response.status.isSuccess()) {
+                    _authResponse.value = response.body() // Zakładamy, że serwer zwraca wycenę jako json
+
+                    updateUiState {
+                        it.copy(
+                            isUserLoggedIn = true
+                        )
+                    }
+
+                    // Store the token after successful login
+                    _authResponse.value?.token?.let { token ->
+                        storeAuthToken(token)
+                    }
+                }
+
+                println("Auth response: ${_authResponse.value?.user!!.name}")
+                println("Auth response: ${_authResponse.value?.user!!.email}")
+                // Zapisanie tokenu sesji
+
+                // Zapisanie informacji o użytkowniku
+
+                // Przekierowanie lub zmiana stanu aplikacji
+
+            } catch (e: Exception) {
+                // Obsługa błędów logowania
+                throw e
+            }
+        }
+    }
+
+    fun logout() {
+        updateUiState {
+            it.copy(
+                isUserLoggedIn = false
+            )
+        }
+        user = null
+        localStorage.removeItem("auth_token")
+        _authResponse.value = null
+
+        println("Logged out successfully")
+    }
+
+    fun storeAuthToken(token: String) {
+        localStorage.setItem("auth_token", token)
+    }
+
+    fun getStoredToken(): String? {
+        return localStorage.getItem("auth_token")
+    }
     /* ================================================================================================== */
 
-
+    /* ==================================== Code to be refactored ======================================= */
     var user: User? = null
-    val isUserLoggedIn = MutableStateFlow(false)
-
-    val areCarsLoaded = MutableStateFlow(false)
-
-    val isDuringServerCheck = MutableStateFlow(false)
-
-    val pagesCount = MutableStateFlow(0)
 
     private val httpClient = HttpClient(Js) {
         install(ContentNegotiation) {
@@ -306,10 +377,6 @@ class CarRentalAppViewModel : ViewModel() {
             // Configure authentication
         }
     }
-
-    val currentPageNumber = MutableStateFlow(1)
-
-    val currentCarPage = MutableStateFlow(emptyList<Car>())
 
     val rentedCar : Car? = null
 
@@ -388,65 +455,5 @@ class CarRentalAppViewModel : ViewModel() {
             }
         }
     }
-
-    fun storeAuthToken(token: String) {
-        localStorage.setItem("auth_token", token)
-    }
-
-    fun getStoredToken(): String? {
-        return localStorage.getItem("auth_token")
-    }
-
-    private val _authResponse = MutableStateFlow<AuthResponse?>(null)
-    val authResponse: StateFlow<AuthResponse?> = _authResponse
-
-    fun logout() {
-        isUserLoggedIn.value = false
-        user = null
-        localStorage.removeItem("auth_token")
-        _authResponse.value = null
-
-        println("Logged out successfully")
-    }
-
-    fun sendAuthCodeToBackend(authCode: String) {
-        viewModelScope.launch {
-            try {
-                val response: HttpResponse = httpClient
-                    .post("https://user-api-dotnet.azurewebsites.net/api/users/google") {
-                        contentType(ContentType.Application.Json)
-                        setBody(
-                            mapOf(
-                                "Code" to authCode,
-                                "RedirectUri" to "https://molczane.github.io/"
-                            )
-                        )
-                    }
-
-                if (response.status.isSuccess()) {
-                    _authResponse.value = response.body() // Zakładamy, że serwer zwraca wycenę jako json
-                    isUserLoggedIn.value = true
-
-                    // Store the token after successful login
-                    _authResponse.value?.token?.let { token ->
-                        storeAuthToken(token)
-                    }
-
-                    isDuringServerCheck.value = false
-                }
-
-                println("Auth response: ${_authResponse.value?.user!!.name}")
-                println("Auth response: ${_authResponse.value?.user!!.email}")
-                // Zapisanie tokenu sesji
-
-                // Zapisanie informacji o użytkowniku
-
-                // Przekierowanie lub zmiana stanu aplikacji
-
-            } catch (e: Exception) {
-                // Obsługa błędów logowania
-                throw e
-            }
-        }
-    }
+    /* ================================================================================================== */
 }

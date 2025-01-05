@@ -16,9 +16,10 @@ import androidx.compose.material.DropdownMenu
 @Composable
 fun FilterItem(
     title: String,
-    options: List<String>,
+    options: List<String>? = null,
     selectedOption: String?,
-    onOptionSelected: (String) -> Unit
+    onOptionSelected: (String) -> Unit,
+    optionsNumbers: List<Int>? = null
 ) {
     Column {
         Text(
@@ -45,7 +46,7 @@ fun FilterItem(
             onDismissRequest = { expanded = false },
             modifier = Modifier.fillMaxWidth(.2f)
         ) {
-            options.forEach { option ->
+            options?.forEach { option ->
                 DropdownMenuItem(
                     onClick = {
                         onOptionSelected(option)
@@ -53,6 +54,16 @@ fun FilterItem(
                     }
                 ) {
                     Text(option)
+                }
+            }
+            optionsNumbers?.forEach { option ->
+                DropdownMenuItem(
+                    onClick = {
+                        onOptionSelected("$option")
+                        expanded = false
+                    }
+                ) {
+                    Text("$option")
                 }
             }
         }
