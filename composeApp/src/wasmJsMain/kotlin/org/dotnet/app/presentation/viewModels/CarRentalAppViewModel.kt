@@ -30,7 +30,6 @@ data class CarRentalUiState(
     val selectedCar: Car? = null,
     val isLoginDialogShown: Boolean = false,
     val loginResult: String? = null,
-    val isUserLoggedIn: Boolean = false,
     val isValuationDialogShown: Boolean = false,
 
     /* DATA FOR FILTERING */
@@ -49,7 +48,11 @@ data class CarRentalUiState(
 
     /* FILTERING RESULTS */
     val areCarsFiltered: Boolean = false,
-    val filteredCars: List<Car> = emptyList()
+    val filteredCars: List<Car> = emptyList(),
+
+    /* USER RELATED STUFF */
+    val isUserScreenShown: Boolean = false,
+    val isUserLoggedIn: Boolean = false
 )
 
 class CarRentalAppViewModel : ViewModel() {
@@ -320,6 +323,9 @@ class CarRentalAppViewModel : ViewModel() {
         updateUiState { it.copy(isLoginDialogShown = show) }
     }
 
+    fun toggleUserScreen(show: Boolean) {
+        updateUiState { it.copy(isUserScreenShown = show) }
+    }
 
     private val _authResponse = MutableStateFlow<AuthResponse?>(null)
     val authResponse: StateFlow<AuthResponse?> = _authResponse

@@ -3,7 +3,6 @@ package org.dotnet.app.presentation.screens
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
 import androidx.compose.runtime.*
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import dotnetwebapp.composeapp.generated.resources.*
@@ -11,7 +10,6 @@ import dotnetwebapp.composeapp.generated.resources.Res
 import kotlinx.browser.window
 import org.dotnet.app.presentation.viewModels.CarRentalAppViewModel
 import org.dotnet.app.domain.Car
-import org.dotnet.app.presentation.components.*
 import org.jetbrains.compose.resources.*
 
 @Composable
@@ -59,13 +57,14 @@ fun RentCarScreen(viewModel: CarRentalAppViewModel) {
                         val carIcon = Res.drawable.directions_car
                         Icon(
                             painter = painterResource(carIcon),
-                            contentDescription = "Profil użytkownika"
+                            contentDescription = "Auto"
                         )
                     }
 
                     IconButton(
                         onClick = { /* DO NOTHING */ },
-                        modifier = Modifier.padding(8.dp)
+                        modifier = Modifier.padding(8.dp),
+                        enabled = uiState.isUserLoggedIn
                     ) {
                         val userIcon = Res.drawable.account_circle
                         Icon(
@@ -102,51 +101,7 @@ fun RentCarScreen(viewModel: CarRentalAppViewModel) {
             )
         },
         content = { innerPadding ->
-            Row (
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(innerPadding)
-            ) {
-                // Filtering Sidebar (20% width)
-                Card(
-                    modifier = Modifier
-                        .fillMaxHeight()
-                        .fillMaxWidth(0.2f)  // Changed to use fillMaxWidth with a fraction
-                        .padding(8.dp),
-                    elevation = 4.dp
-                ) {
-                    FilterSection(
-                        uiState = uiState,
-                        onBrandSelected = { viewModel.updateSelectedBrand(it) },
-                        onModelSelected = { viewModel.updateSelectedModel(it) },
-                        onYearSelected = { viewModel.updateSelectedYear(it) },
-                        onTypeSelected = { viewModel.updateSelectedType(it) },
-                        onLocationSelected = { viewModel.updateSelectedLocation(it) },
-                        onResetFilters = { viewModel.resetFilters() },
-                        onFilter = { viewModel.getFilteredCars(it) }
-                    )
-                }
-
-                Column (
-                    modifier = Modifier
-                        .weight(1f)  // This will take up the remaining space
-                        .padding(16.dp),
-                    horizontalAlignment = Alignment.CenterHorizontally
-                ) {
-                    /* LOADING SCREEN */
-                    if (uiState.isLoading) { // time
-                        LoadingView(uiState, innerPadding)
-                    }
-                    /* DISPLAYING FILTERED CARS */
-                    else if(uiState.areCarsFiltered) {
-                        FilteredCarsView(uiState, innerPadding)
-                    }
-                    /* STANDARD DISPLAYING OF CARS */
-                    else if(!uiState.isLoading && !uiState.areCarsFiltered) {
-                        StandardCarsView(viewModel, uiState, innerPadding)
-                    }
-                }
-            }
+            DefaultScreen(uiState, viewModel, innerPadding)
         }
     )
 
