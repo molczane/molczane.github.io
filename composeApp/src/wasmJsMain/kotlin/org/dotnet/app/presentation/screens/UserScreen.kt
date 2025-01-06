@@ -1,6 +1,5 @@
 package org.dotnet.app.presentation.screens
 
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -31,7 +30,7 @@ fun UserScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("User Profile") },
+                title = { Text("Profil użytkownika") },
                 navigationIcon = {
                     IconButton(onClick = onClose) {
                         Icon(
@@ -58,7 +57,7 @@ fun UserScreen(
             Spacer(modifier = Modifier.height(16.dp))
 
             Text(
-                text = "Rental History",
+                text = "Historia wypożyczeń",
                 style = MaterialTheme.typography.h6,
                 modifier = Modifier.padding(bottom = 8.dp)
             )
@@ -67,7 +66,7 @@ fun UserScreen(
             Spacer(modifier = Modifier.height(16.dp))
 
             Text(
-                text = "Current Rental",
+                text = "Aktywne wypożyczenia",
                 style = MaterialTheme.typography.h6,
                 modifier = Modifier.padding(bottom = 8.dp)
             )
@@ -82,7 +81,11 @@ fun ProfileSection(user: User, onUpdateUser: (User) -> Unit) {
     var lastname by remember { mutableStateOf(user.lastname ?: "") }
     var email by remember { mutableStateOf(user.email ?: "") }
     var birthday by remember { mutableStateOf(user.birthday ?: "") }
+    var birthdayError by remember { mutableStateOf<String?>(null) }
     var driverLicenseReceiveDate by remember { mutableStateOf(user.driverLicenseReceiveDate ?: "") }
+    var driverLicenseError by remember { mutableStateOf<String?>(null) }
+
+    val datePattern = Regex("\\d{4}-\\d{2}-\\d{2}") // Format: YYYY-MM-DD
 
     Column(
         modifier = Modifier.fillMaxWidth(.5f)
@@ -90,7 +93,7 @@ fun ProfileSection(user: User, onUpdateUser: (User) -> Unit) {
         TextField(
             value = firstname,
             onValueChange = { firstname = it },
-            label = { Text("First Name") },
+            label = { Text("Imię") },
             modifier = Modifier.fillMaxWidth()
         )
 
@@ -99,7 +102,7 @@ fun ProfileSection(user: User, onUpdateUser: (User) -> Unit) {
         TextField(
             value = lastname,
             onValueChange = { lastname = it },
-            label = { Text("Last Name") },
+            label = { Text("Nazwisko") },
             modifier = Modifier.fillMaxWidth()
         )
 
@@ -108,47 +111,37 @@ fun ProfileSection(user: User, onUpdateUser: (User) -> Unit) {
         TextField(
             value = email,
             onValueChange = { email = it },
-            label = { Text("Email") },
+            label = { Text("Mail") },
             modifier = Modifier.fillMaxWidth()
         )
 
         Spacer(modifier = Modifier.height(8.dp))
 
-//        // Birthday DatePicker
-//        DatePickerField(
-//            label = "Birthday",
-//            selectedDate = birthday,
-//            onDateSelected = { birthday = it }
-//        )
-//
-//        Spacer(modifier = Modifier.height(8.dp))
-//
-//        // Driver License Receive DatePicker
-//        DatePickerField(
-//            label = "Driver License Receive Date",
-//            selectedDate = driverLicenseReceiveDate,
-//            onDateSelected = { driverLicenseReceiveDate = it }
-//        )
+        // ValidatedTextField()
 
-        Spacer(modifier = Modifier.height(16.dp))
-
-        TextField(
+        ValidatedTextFieldItem(
             value = birthday,
-            onValueChange = { birthday = it },
-            label = { Text("Birthday") },
-            modifier = Modifier.fillMaxWidth()
-        )
-
-        Spacer(modifier = Modifier.height(8.dp))
-
-        TextField(
-            value = driverLicenseReceiveDate,
-            onValueChange = { driverLicenseReceiveDate = it },
-            label = { Text("Driver License Receive Date") },
-            modifier = Modifier.fillMaxWidth()
+            onValueChange = { newValue ->
+                birthday = newValue
+                birthdayError = validateDate(newValue, datePattern)
+            },
+            label = "Birthday (YYYY-MM-DD)",
+            error = birthdayError
         )
 
         Spacer(modifier = Modifier.height(16.dp))
+
+        ValidatedTextFieldItem(
+            value = driverLicenseReceiveDate,
+            onValueChange = { newValue ->
+                driverLicenseReceiveDate = newValue
+                driverLicenseError = validateDate(newValue, datePattern)
+            },
+            label = "Driver License Receive Date (YYYY-MM-DD)",
+            error = driverLicenseError
+        )
+
+        Spacer(modifier = Modifier.height(8.dp))
 
         Button(
             onClick = {
@@ -168,73 +161,36 @@ fun ProfileSection(user: User, onUpdateUser: (User) -> Unit) {
     }
 }
 
-//@Composable
-//fun DatePickerField(
-//    label: String,
-//    selectedDate: String,
-//    onDateSelected: (String) -> Unit
-//) {
-//    var isDatePickerVisible by remember { mutableStateOf(false) }
-//
-//    Column {
-//        TextField(
-//            value = selectedDate,
-//            onValueChange = {},
-//            label = { Text(label) },
-//            modifier = Modifier
-//                .fillMaxWidth()
-//                .clickable { isDatePickerVisible = true },
-//            readOnly = true
-//        )
-//
-//        if (isDatePickerVisible) {
-//            DatePickerDialog(
-//                onDismissRequest = { isDatePickerVisible = false },
-//                onDateSelected = { date ->
-//                    onDateSelected(date)
-//                    isDatePickerVisible = false
-//                }
-//            )
-//        }
-//    }
-//}
-//
-//@Composable
-//fun DatePickerDialog(
-//    onDismissRequest: () -> Unit,
-//    onDateSelected: (String) -> Unit
-//) {
-//    var tempDate by remember { mutableStateOf("") }
-//
-//    Div(
-//        attrs = {
-//            addClass("date-picker-overlay")
-//        }
-//    ) {
-//        Input(
-//            type = InputType.date,
-//            attrs = {
-//                addClass("date-picker-input")
-//                onInputFunction = {
-//                    val target = it.target as? org.w3c.dom.HTMLInputElement
-//                    tempDate = target?.value ?: ""
-//                }
-//            }
-//        )
-//        Button(
-//            attrs = {
-//                onClick { onDateSelected(tempDate) }
-//            }
-//        ) {
-//            Text("Confirm")
-//        }
-//        Button(
-//            attrs = {
-//                onClick { onDismissRequest() }
-//            }
-//        ) {
-//            Text("Cancel")
-//        }
-//    }
-//}
+@Composable
+fun ValidatedTextFieldItem(
+    value: String,
+    onValueChange: (String) -> Unit,
+    label: String,
+    error: String?
+) {
+    Column {
+        TextField(
+            value = value,
+            onValueChange = onValueChange,
+            label = { Text(label) },
+            modifier = Modifier.fillMaxWidth(),
+            isError = error != null
+        )
+        error?.let {
+            Text(
+                text = it,
+                color = MaterialTheme.colors.error,
+                style = MaterialTheme.typography.caption,
+                modifier = Modifier.padding(start = 8.dp)
+            )
+        }
+    }
+}
 
+fun validateDate(value: String, pattern: Regex): String? {
+    return if (!pattern.matches(value)) {
+        "Date must be in YYYY-MM-DD format"
+    } else {
+        null
+    }
+}
