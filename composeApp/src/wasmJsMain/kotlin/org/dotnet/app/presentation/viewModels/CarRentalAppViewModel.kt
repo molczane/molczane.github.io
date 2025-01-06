@@ -19,7 +19,13 @@ import kotlinx.coroutines.launch
 import org.dotnet.app.data.api.ApiService
 import org.dotnet.app.data.api.ApiServiceImpl
 import org.dotnet.app.data.repository.CarRepository
-import org.dotnet.app.domain.*
+import org.dotnet.app.domain.authentication.AuthResponse
+import org.dotnet.app.domain.cars.Car
+import org.dotnet.app.domain.cars.CarFilters
+import org.dotnet.app.domain.config.AppConfig
+import org.dotnet.app.domain.config.loadConfig
+import org.dotnet.app.domain.offer.Offer
+import org.dotnet.app.domain.user.User
 import org.dotnet.app.utils.AppState
 
 data class CarRentalUiState(
@@ -55,6 +61,7 @@ data class CarRentalUiState(
     val isUserScreenShown: Boolean = false,
     val isUserLoggedIn: Boolean = false,
     val user: User? = null,
+    val isUserFullyRegistered: Boolean = false,
 
     /* APP STATE */
     val appState: AppState = AppState.Default
@@ -357,6 +364,8 @@ class CarRentalAppViewModel : ViewModel() {
                         )
                     }
 
+                //val response :  = apiService.authenticate(authCode)
+
                 if (response.status.isSuccess()) {
                     _authResponse.value = response.body() // Zakładamy, że serwer zwraca wycenę jako json
 
@@ -371,6 +380,7 @@ class CarRentalAppViewModel : ViewModel() {
                         it.copy(
                             isUserLoggedIn = true,
                             user = newUser,
+                            isUserFullyRegistered = !(_authResponse.value?.isNewUser ?: false)
                         )
                     }
 
@@ -432,7 +442,7 @@ class CarRentalAppViewModel : ViewModel() {
         _valuationResult.value = null
     }
 
-    fun requestRent( car: Car, user: User, startDate: String, endDate: String, onRent: (Boolean) -> Unit ) {
+    fun requestRent(car: Car, user: User, startDate: String, endDate: String, onRent: (Boolean) -> Unit ) {
         viewModelScope.launch {
             println("Sending rent request...")
 

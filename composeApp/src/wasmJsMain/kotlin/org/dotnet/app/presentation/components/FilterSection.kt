@@ -8,7 +8,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import org.dotnet.app.domain.CarFilters
+import org.dotnet.app.domain.cars.CarFilters
 
 @Composable
 fun FilterSection(

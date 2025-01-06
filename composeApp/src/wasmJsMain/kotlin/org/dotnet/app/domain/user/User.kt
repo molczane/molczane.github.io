@@ -1,4 +1,4 @@
-package org.dotnet.app.domain
+package org.dotnet.app.domain.user
 
 import kotlinx.serialization.Serializable
 

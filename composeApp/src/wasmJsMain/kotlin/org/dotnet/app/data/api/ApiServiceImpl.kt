@@ -4,9 +4,10 @@ import io.ktor.client.call.*
 import io.ktor.client.request.*
 import io.ktor.client.statement.*
 import io.ktor.http.*
-import org.dotnet.app.domain.AppConfig
-import org.dotnet.app.domain.AuthResponse
-import org.dotnet.app.domain.Car
+import org.dotnet.app.domain.config.AppConfig
+import org.dotnet.app.domain.authentication.AuthResponse
+import org.dotnet.app.domain.cars.Car
+import org.dotnet.app.domain.user.User
 
 class ApiServiceImpl(private val appConfig: AppConfig) : ApiService {
     private val httpClient = HttpClientProvider.httpClient
@@ -60,6 +61,30 @@ class ApiServiceImpl(private val appConfig: AppConfig) : ApiService {
         val response: HttpResponse = httpClient.post(appConfig.googleAuthUrl) {
             contentType(ContentType.Application.Json)
             setBody(mapOf("Code" to authCode, "RedirectUri" to appConfig.redirectUri))
+        }
+        if (response.status.isSuccess()) {
+            println("Authenticated user successfully!")
+            return response.body()
+        }
+        else {
+            println("Error authenticating user: ${response.status.value}")
+            return AuthResponse()
+        }
+    }
+
+    override suspend fun authenticateAndSignUp(authCode: String, user: User): AuthResponse {
+        val response: HttpResponse = httpClient.post(appConfig.registerAndAuthWithServerUrl) {
+            contentType(ContentType.Application.Json)
+            setBody(mapOf(
+                "Code" to authCode,
+                "RedirectUri" to appConfig.redirectUri,
+                "login" to user.login,
+                "Email" to user.email,
+                "firstname" to user.firstname,
+                "lastname" to user.lastname,
+                "birthday" to user.birthday,
+                "driverLicenseReceiveDate" to user.driverLicenseReceiveDate,
+            ))
         }
         return response.body()
     }

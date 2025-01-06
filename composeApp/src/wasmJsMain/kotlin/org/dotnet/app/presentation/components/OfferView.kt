@@ -7,7 +7,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.delay
-import org.dotnet.app.domain.Offer
+import org.dotnet.app.domain.offer.Offer
 
 @Composable
 fun OfferView(

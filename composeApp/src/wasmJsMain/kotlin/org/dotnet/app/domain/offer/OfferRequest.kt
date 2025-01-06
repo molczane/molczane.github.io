@@ -1,6 +1,7 @@
-package org.dotnet.app.domain
+package org.dotnet.app.domain.offer
 
 import kotlinx.serialization.Serializable
+import org.dotnet.app.domain.cars.Car
 
 @Serializable
 data class OfferRequest(

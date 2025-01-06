@@ -10,7 +10,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import org.dotnet.app.domain.Car
+import org.dotnet.app.domain.cars.Car
 
 @Composable
 fun CarDetailsCard(car: Car, modifier: Modifier = Modifier) {

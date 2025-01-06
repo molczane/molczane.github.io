@@ -6,12 +6,11 @@ import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.viewModelFactory
 import dotnetwebapp.composeapp.generated.resources.*
 import dotnetwebapp.composeapp.generated.resources.Res
 import kotlinx.browser.window
 import org.dotnet.app.presentation.viewModels.CarRentalAppViewModel
-import org.dotnet.app.domain.Car
+import org.dotnet.app.domain.cars.Car
 import org.dotnet.app.utils.AppState
 import org.jetbrains.compose.resources.*
 

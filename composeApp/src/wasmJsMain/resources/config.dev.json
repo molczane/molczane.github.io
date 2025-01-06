@@ -1,10 +1,14 @@
 {
   "clientId": "248107412465-i64fdf66a6f4nrj7232ghdmvbsg91pp3.apps.googleusercontent.com",
   "redirectUri": "http://localhost:8080/",
+
   "getNumberOfPagesUrl": "http://localhost:5109/api/cars/getCountPages",
   "getCarsFromPageUrl": "http://localhost:5109/api/cars/getPage",
+
   "googleAuthUrl": "https://accounts.google.com/o/oauth2/v2/auth",
   "authWithServerUrl": "http://localhost:5109/api/users/google",
+  "registerAndAuthWithServerUrl": "http://localhost:5109/api/users/google/signUp",
+
   "distinctBrandsUrl": "http://localhost:5109/api/cars/distinctBrands",
   "modelsByBrandUrl": "http://localhost:5109/api/cars/modelsByBrand/",
   "distinctYearsUrl": "http://localhost:5109/api/cars/distinctYears",

@@ -1,4 +1,4 @@
-package org.dotnet.app.domain
+package org.dotnet.app.domain.config
 
 import io.ktor.client.fetch.*
 import kotlinx.browser.window
@@ -8,12 +8,20 @@ import kotlinx.serialization.json.Json
 
 @Serializable
 data class AppConfig(
+    /* OAUTH RELATED STUFF */
     val clientId: String,
     val redirectUri: String,
+
+    /* BASIC CAR INFORMATION */
     val getNumberOfPagesUrl: String,
     val getCarsFromPageUrl: String,
+
+    /* AUTHENTICATE WITH SERVER STUFF */
     val googleAuthUrl: String,
     val authWithServerUrl: String,
+    val registerAndAuthWithServerUrl: String,
+
+    /* FILTERING RELATED STUFF */
     val distinctBrandsUrl: String,
     val modelsByBrandUrl: String,
     val distinctYearsUrl: String,

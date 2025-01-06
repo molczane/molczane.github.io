@@ -10,7 +10,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import dotnetwebapp.composeapp.generated.resources.Res
 import dotnetwebapp.composeapp.generated.resources.arrow_back
-import org.dotnet.app.domain.User
+import org.dotnet.app.domain.user.User
 import org.dotnet.app.presentation.viewModels.CarRentalAppViewModel
 import org.jetbrains.compose.resources.painterResource
 

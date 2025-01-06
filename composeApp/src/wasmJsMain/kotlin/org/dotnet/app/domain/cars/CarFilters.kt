@@ -1,4 +1,4 @@
-package org.dotnet.app.domain
+package org.dotnet.app.domain.cars
 
 data class CarFilters(
     val producer: String? = null,

@@ -15,7 +15,7 @@ import androidx.compose.ui.Alignment
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
-import org.dotnet.app.domain.Car
+import org.dotnet.app.domain.cars.Car
 
 
 @Composable
