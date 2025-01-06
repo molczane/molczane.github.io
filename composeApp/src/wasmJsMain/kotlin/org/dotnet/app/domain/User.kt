@@ -4,13 +4,13 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class User(
-    val id: Int,
-    val firstname: String,
-    val email: String,
-    val lastname: String,
-    val login: String,
-    val password: String,
-    val rentalService: String?,
-    val birthday: String?,
-    val driverLicenseReceiveDate: String?
+    val id: Int? = null,
+    val firstname: String? = null,
+    val email: String? = null,
+    val lastname: String? = null,
+    val login: String? = null,
+    val password: String? = null,
+    val rentalService: String? = null,
+    val birthday: String? = null,
+    val driverLicenseReceiveDate: String? = null
 )

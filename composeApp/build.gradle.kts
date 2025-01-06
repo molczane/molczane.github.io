@@ -45,6 +45,14 @@ kotlin {
             implementation(libs.bundles.ktor.common)
             implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.6.1")
             implementation("org.jetbrains.compose.components:components-resources:1.5.11")
+
+            //implementation(kotlin("stdlib-js"))
+            //implementation("org.jetbrains.kotlinx:kotlinx-html-js:0.11.0")
+        }
+
+        wasmJsMain.dependencies {
+//            implementation(kotlin("stdlib-js"))
+//            implementation("org.jetbrains.kotlinx:kotlinx-html-js:0.11.0")
         }
     }
 }

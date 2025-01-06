@@ -20,6 +20,7 @@ import org.dotnet.app.data.api.ApiService
 import org.dotnet.app.data.api.ApiServiceImpl
 import org.dotnet.app.data.repository.CarRepository
 import org.dotnet.app.domain.*
+import org.dotnet.app.utils.AppState
 
 data class CarRentalUiState(
     val currentCarPage: List<Car> = emptyList(),
@@ -52,11 +53,14 @@ data class CarRentalUiState(
 
     /* USER RELATED STUFF */
     val isUserScreenShown: Boolean = false,
-    val isUserLoggedIn: Boolean = false
+    val isUserLoggedIn: Boolean = false,
+    val user: User? = null,
+
+    /* APP STATE */
+    val appState: AppState = AppState.Default
 )
 
 class CarRentalAppViewModel : ViewModel() {
-
     // UI State
     private val _uiState = MutableStateFlow(CarRentalUiState())
     val uiState : StateFlow<CarRentalUiState> = _uiState.asStateFlow()
@@ -148,7 +152,7 @@ class CarRentalAppViewModel : ViewModel() {
         }
     }
 
-    fun loadFilterData() {
+    private fun loadFilterData() {
         viewModelScope.launch {
             try {
                 updateUiState { it.copy(isLoading = true) }
@@ -271,6 +275,10 @@ class CarRentalAppViewModel : ViewModel() {
             }
         }
     }
+
+    fun changeAppState(appState: AppState) {
+        updateUiState { it.copy(appState = appState) }
+    }
     /* ================================================================================================== */
 
     /* ================================== Google Sign In related stuff ================================== */
@@ -352,26 +360,30 @@ class CarRentalAppViewModel : ViewModel() {
                 if (response.status.isSuccess()) {
                     _authResponse.value = response.body() // Zakładamy, że serwer zwraca wycenę jako json
 
+                    val newUserDTO = _authResponse.value?.user
+                    val newUser = User(
+                        id = newUserDTO?.id ?: 0,
+                        firstname = newUserDTO?.name.orEmpty(),
+                        email = newUserDTO?.email.orEmpty()
+                    )
+
                     updateUiState {
                         it.copy(
-                            isUserLoggedIn = true
+                            isUserLoggedIn = true,
+                            user = newUser,
                         )
                     }
 
                     // Store the token after successful login
                     _authResponse.value?.token?.let { token ->
                         storeAuthToken(token)
+                        println("Stored token: $token")
                     }
                 }
 
-                println("Auth response: ${_authResponse.value?.user!!.name}")
-                println("Auth response: ${_authResponse.value?.user!!.email}")
-                // Zapisanie tokenu sesji
-
-                // Zapisanie informacji o użytkowniku
-
-                // Przekierowanie lub zmiana stanu aplikacji
-
+                println("Auth response (name): ${_authResponse.value?.user!!.name}")
+                println("Auth response (email): ${_authResponse.value?.user!!.email}")
+                println("Auth response: ${_authResponse.value}")
             } catch (e: Exception) {
                 // Obsługa błędów logowania
                 throw e
@@ -382,7 +394,8 @@ class CarRentalAppViewModel : ViewModel() {
     fun logout() {
         updateUiState {
             it.copy(
-                isUserLoggedIn = false
+                isUserLoggedIn = false,
+                user = null
             )
         }
         user = null
@@ -488,6 +501,14 @@ class CarRentalAppViewModel : ViewModel() {
             } catch (e: Exception) {
                 throw e
             }
+        }
+    }
+
+    fun updateUser(updatedUser: User) {
+        updateUiState {
+            it.copy(
+                user = updatedUser
+            )
         }
     }
     /* ================================================================================================== */

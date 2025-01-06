@@ -1,19 +1,22 @@
 package org.dotnet.app.presentation.screens
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.viewModelFactory
 import dotnetwebapp.composeapp.generated.resources.*
 import dotnetwebapp.composeapp.generated.resources.Res
 import kotlinx.browser.window
 import org.dotnet.app.presentation.viewModels.CarRentalAppViewModel
 import org.dotnet.app.domain.Car
+import org.dotnet.app.utils.AppState
 import org.jetbrains.compose.resources.*
 
 @Composable
-fun RentCarScreen(viewModel: CarRentalAppViewModel) {
+fun MainAppScreen(viewModel: CarRentalAppViewModel) {
     val uiState by viewModel.uiState.collectAsState()
 
     var isValuationDialogShown by remember { mutableStateOf(false) }
@@ -47,7 +50,11 @@ fun RentCarScreen(viewModel: CarRentalAppViewModel) {
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Wypożyczalnia Samochodów") },
+                title = { Text(
+                    text = "Wypożyczalnia Samochodów",
+                    modifier = Modifier.clickable {
+                        viewModel.changeAppState(AppState.Default)
+                    }) },
                 backgroundColor = MaterialTheme.colors.primaryVariant,
                 actions = {
                     IconButton(
@@ -62,7 +69,7 @@ fun RentCarScreen(viewModel: CarRentalAppViewModel) {
                     }
 
                     IconButton(
-                        onClick = { /* DO NOTHING */ },
+                        onClick = {  viewModel.changeAppState(AppState.User) },
                         modifier = Modifier.padding(8.dp),
                         enabled = uiState.isUserLoggedIn
                     ) {
@@ -101,7 +108,15 @@ fun RentCarScreen(viewModel: CarRentalAppViewModel) {
             )
         },
         content = { innerPadding ->
-            DefaultScreen(uiState, viewModel, innerPadding)
+            when(uiState.appState) {
+                AppState.Default -> {
+                    DefaultScreen(uiState, viewModel, innerPadding)
+                }
+                AppState.User -> {
+                    UserScreen(viewModel) { viewModel.changeAppState(AppState.Default) }
+                }
+                AppState.Rental -> {}
+            }
         }
     )
 
