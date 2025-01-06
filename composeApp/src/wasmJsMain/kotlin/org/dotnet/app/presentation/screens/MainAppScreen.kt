@@ -57,7 +57,7 @@ fun MainAppScreen(viewModel: CarRentalAppViewModel) {
                 backgroundColor = MaterialTheme.colors.primaryVariant,
                 actions = {
                     IconButton(
-                        onClick = { /* DO NOTHING */ },
+                        onClick = { viewModel.sendTokenToBackend() },
                         modifier = Modifier.padding(8.dp)
                     ) {
                         val carIcon = Res.drawable.directions_car
@@ -114,7 +114,12 @@ fun MainAppScreen(viewModel: CarRentalAppViewModel) {
                 AppState.User -> {
                     UserScreen(viewModel) { viewModel.changeAppState(AppState.Default) }
                 }
-                AppState.Rental -> {}
+                AppState.Rental -> {
+                    /* NOTHING FOR NOW */
+                }
+                AppState.CarDetails -> {
+                    CarDetailsScreen(viewModel) { viewModel.changeAppState(AppState.Default) }
+                }
             }
         }
     )

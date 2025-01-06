@@ -12,6 +12,7 @@ import dotnetwebapp.composeapp.generated.resources.Res
 import dotnetwebapp.composeapp.generated.resources.arrow_back
 import org.dotnet.app.domain.user.User
 import org.dotnet.app.presentation.viewModels.CarRentalAppViewModel
+import org.dotnet.app.presentation.viewModels.CarRentalUiState
 import org.jetbrains.compose.resources.painterResource
 
 @Composable
@@ -52,7 +53,7 @@ fun UserScreen(
                 .verticalScroll(rememberScrollState()),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            ProfileSection(user = user, onUpdateUser = { updatedUser -> viewModel.updateUser(updatedUser) })
+            ProfileSection(user = user, onUpdateUser = { updatedUser -> viewModel.updateUser(updatedUser) }, uiState = uiState)
 
             Spacer(modifier = Modifier.height(16.dp))
 
@@ -76,7 +77,7 @@ fun UserScreen(
 }
 
 @Composable
-fun ProfileSection(user: User, onUpdateUser: (User) -> Unit) {
+fun ProfileSection(user: User, onUpdateUser: (User) -> Unit, uiState: CarRentalUiState) {
     var firstname by remember { mutableStateOf(user.firstname ?: "") }
     var lastname by remember { mutableStateOf(user.lastname ?: "") }
     var email by remember { mutableStateOf(user.email ?: "") }
@@ -154,9 +155,19 @@ fun ProfileSection(user: User, onUpdateUser: (User) -> Unit) {
                 )
                 onUpdateUser(updatedUser)
             },
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier.fillMaxWidth(),
+            enabled = !uiState.isLoading
         ) {
-            Text("Save Changes")
+
+            if (uiState.isLoading) {
+                CircularProgressIndicator(
+                    modifier = Modifier.size(24.dp),
+                    color = MaterialTheme.colors.onPrimary
+                )
+            }
+            else {
+                Text("Save Changes")
+            }
         }
     }
 }

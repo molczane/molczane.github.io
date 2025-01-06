@@ -20,6 +20,8 @@ data class AppConfig(
     val googleAuthUrl: String,
     val authWithServerUrl: String,
     val registerAndAuthWithServerUrl: String,
+    val checkTokenUrl: String,
+    val sendMissingDataUrl: String,
 
     /* FILTERING RELATED STUFF */
     val distinctBrandsUrl: String,

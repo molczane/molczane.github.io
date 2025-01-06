@@ -26,6 +26,7 @@ import org.dotnet.app.domain.config.AppConfig
 import org.dotnet.app.domain.config.loadConfig
 import org.dotnet.app.domain.offer.Offer
 import org.dotnet.app.domain.user.User
+import org.dotnet.app.domain.utils.ExampleTokenResponse
 import org.dotnet.app.utils.AppState
 
 data class CarRentalUiState(
@@ -34,7 +35,6 @@ data class CarRentalUiState(
     val totalPages: Int = 0,
     val isLoading: Boolean = true,
     val errorMessage: String? = null,
-    val selectedCar: Car? = null,
     val isLoginDialogShown: Boolean = false,
     val loginResult: String? = null,
     val isValuationDialogShown: Boolean = false,
@@ -64,7 +64,10 @@ data class CarRentalUiState(
     val isUserFullyRegistered: Boolean = false,
 
     /* APP STATE */
-    val appState: AppState = AppState.Default
+    val appState: AppState = AppState.Default,
+
+    /* REQUESTING VALUATION AND THIS TYPE OF STUFF */
+    val selectedCar: Car? = null
 )
 
 class CarRentalAppViewModel : ViewModel() {
@@ -246,6 +249,11 @@ class CarRentalAppViewModel : ViewModel() {
         updateUiState { it.copy(selectedLocation = location) }
     }
 
+    fun updatedSelectedCar(car: Car) {
+        updateUiState { it.copy(selectedCar = car) }
+        println("Car updated: $car")
+    }
+
     fun resetFilters() {
         updateUiState {
             it.copy(
@@ -353,23 +361,11 @@ class CarRentalAppViewModel : ViewModel() {
 
         viewModelScope.launch {
             try {
-                val response: HttpResponse = httpClient
-                    .post(config.authWithServerUrl) {
-                        contentType(ContentType.Application.Json)
-                        setBody(
-                            mapOf(
-                                "Code" to authCode,
-                                "RedirectUri" to config.redirectUri
-                            )
-                        )
-                    }
+                val response : AuthResponse  = apiService.authenticate(authCode)
 
-                //val response :  = apiService.authenticate(authCode)
-
-                if (response.status.isSuccess()) {
-                    _authResponse.value = response.body() // Zakładamy, że serwer zwraca wycenę jako json
-
-                    val newUserDTO = _authResponse.value?.user
+                if (response.user != null) {
+                    //_authResponse.value = response // Zakładamy, że serwer zwraca wycenę jako json
+                    val newUserDTO = response.user
                     val newUser = User(
                         id = newUserDTO?.id ?: 0,
                         firstname = newUserDTO?.name.orEmpty(),
@@ -380,20 +376,20 @@ class CarRentalAppViewModel : ViewModel() {
                         it.copy(
                             isUserLoggedIn = true,
                             user = newUser,
-                            isUserFullyRegistered = !(_authResponse.value?.isNewUser ?: false)
+                            isUserFullyRegistered = !(response.isNewUser ?: false)
                         )
                     }
 
                     // Store the token after successful login
-                    _authResponse.value?.token?.let { token ->
+                   response.token?.let { token ->
                         storeAuthToken(token)
                         println("Stored token: $token")
-                    }
+                   }
                 }
 
-                println("Auth response (name): ${_authResponse.value?.user!!.name}")
-                println("Auth response (email): ${_authResponse.value?.user!!.email}")
-                println("Auth response: ${_authResponse.value}")
+                println("Auth response (name): ${response.user!!.name}")
+                println("Auth response (email): ${response.user!!.email}")
+                println("Auth response: $response")
             } catch (e: Exception) {
                 // Obsługa błędów logowania
                 throw e
@@ -415,12 +411,26 @@ class CarRentalAppViewModel : ViewModel() {
         println("Logged out successfully")
     }
 
-    fun storeAuthToken(token: String) {
+    private fun storeAuthToken(token: String) {
         localStorage.setItem("auth_token", token)
     }
 
     fun getStoredToken(): String? {
         return localStorage.getItem("auth_token")
+    }
+
+    fun sendTokenToBackend() {
+        viewModelScope.launch {
+            try {
+                val response : HttpResponse = apiService.validateToken()
+                val responseBody = response.body<ExampleTokenResponse>()
+                println("Response body: ${responseBody.message}")
+            }
+            catch (e: Exception) {
+                println("Error validating token: ${e.message}")
+            }
+        }
+
     }
     /* ================================================================================================== */
 
@@ -514,12 +524,29 @@ class CarRentalAppViewModel : ViewModel() {
         }
     }
 
+    /* WE UPDATE USER PROFILE */
     fun updateUser(updatedUser: User) {
-        updateUiState {
-            it.copy(
-                user = updatedUser
-            )
+        viewModelScope.launch {
+            updateUiState {
+                it.copy(
+                    isLoading = true
+                )
+            }
+
+            val result = apiService.sendMissingData(updatedUser)
+
+            println(result)
+
+            updateUiState {
+                it.copy(
+                    user = updatedUser,
+                    isUserFullyRegistered = result.isProfileComplete,
+                    isLoading = false
+                )
+            }
         }
     }
+
+
     /* ================================================================================================== */
 }

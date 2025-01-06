@@ -25,7 +25,10 @@ fun FilteredCarsView(uiState: CarRentalUiState, innerPadding: PaddingValues) {
             uiState.filteredCars.forEach { car ->
                 CarDetailsCard(
                     car = car,
-                    modifier = Modifier.fillMaxWidth(0.5f)
+                    modifier = Modifier.fillMaxWidth(0.5f),
+                    onClick = {
+
+                    }
                 )
                 Spacer(modifier = Modifier.height(16.dp))
             }

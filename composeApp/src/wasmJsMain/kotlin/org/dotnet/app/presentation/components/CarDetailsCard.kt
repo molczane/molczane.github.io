@@ -1,5 +1,6 @@
 package org.dotnet.app.presentation.components
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -13,10 +14,14 @@ import androidx.compose.ui.unit.dp
 import org.dotnet.app.domain.cars.Car
 
 @Composable
-fun CarDetailsCard(car: Car, modifier: Modifier = Modifier) {
+fun CarDetailsCard(car: Car, modifier: Modifier = Modifier, onClick: () -> Unit) {
     Card(
         modifier = modifier
-            .padding(8.dp),
+            .padding(8.dp)
+            .clickable {
+                println("Car clicked")
+                onClick()
+            },
         elevation = 4.dp
     ) {
         Column(

@@ -4,6 +4,8 @@ import io.ktor.client.call.*
 import io.ktor.client.request.*
 import io.ktor.client.statement.*
 import io.ktor.http.*
+import kotlinx.browser.localStorage
+import org.dotnet.app.domain.authentication.AfterRegisterResponse
 import org.dotnet.app.domain.config.AppConfig
 import org.dotnet.app.domain.authentication.AuthResponse
 import org.dotnet.app.domain.cars.Car
@@ -58,7 +60,7 @@ class ApiServiceImpl(private val appConfig: AppConfig) : ApiService {
     }
 
     override suspend fun authenticate(authCode: String): AuthResponse {
-        val response: HttpResponse = httpClient.post(appConfig.googleAuthUrl) {
+        val response: HttpResponse = httpClient.post(appConfig.authWithServerUrl) {
             contentType(ContentType.Application.Json)
             setBody(mapOf("Code" to authCode, "RedirectUri" to appConfig.redirectUri))
         }
@@ -72,12 +74,12 @@ class ApiServiceImpl(private val appConfig: AppConfig) : ApiService {
         }
     }
 
-    override suspend fun authenticateAndSignUp(authCode: String, user: User): AuthResponse {
-        val response: HttpResponse = httpClient.post(appConfig.registerAndAuthWithServerUrl) {
+    override suspend fun sendMissingData(user: User): AfterRegisterResponse {
+        val token = localStorage.getItem("auth_token")
+
+        val response: HttpResponse = httpClient.post(appConfig.sendMissingDataUrl) {
             contentType(ContentType.Application.Json)
             setBody(mapOf(
-                "Code" to authCode,
-                "RedirectUri" to appConfig.redirectUri,
                 "login" to user.login,
                 "Email" to user.email,
                 "firstname" to user.firstname,
@@ -85,9 +87,38 @@ class ApiServiceImpl(private val appConfig: AppConfig) : ApiService {
                 "birthday" to user.birthday,
                 "driverLicenseReceiveDate" to user.driverLicenseReceiveDate,
             ))
+            headers {
+                append(HttpHeaders.Authorization, "Bearer $token")
+            }
         }
+
         return response.body()
     }
+
+     override suspend fun validateToken(): HttpResponse {
+         val token = localStorage.getItem("auth_token") // Retrieve token from localStorage
+
+         println("Token: $token")
+
+         return try {
+             if (token.isNullOrBlank()) {
+                 throw IllegalStateException("No token found. Please log in first.")
+             }
+
+             val response: HttpResponse = httpClient.get(appConfig.checkTokenUrl) {
+                 headers {
+                     append(HttpHeaders.Authorization, "Bearer $token")
+                 }
+             }
+
+             response
+             // Result.success(response)
+         } catch (e: Exception) {
+             println("Error validating token: ${e.message}")
+             throw e
+         }
+
+     }
 
     override suspend fun getDistinctBrands(): List<String> {
         return try {

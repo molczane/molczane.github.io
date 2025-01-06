@@ -10,6 +10,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import org.dotnet.app.presentation.viewModels.CarRentalAppViewModel
 import org.dotnet.app.presentation.viewModels.CarRentalUiState
+import org.dotnet.app.utils.AppState
 
 @Composable
 fun StandardCarsView(viewModel: CarRentalAppViewModel , uiState: CarRentalUiState, innerPadding: PaddingValues) {
@@ -26,7 +27,11 @@ fun StandardCarsView(viewModel: CarRentalAppViewModel , uiState: CarRentalUiStat
             uiState.currentCarPage.forEach { car ->
                 CarDetailsCard(
                     car = car,
-                    modifier = Modifier.fillMaxWidth(0.5f)
+                    modifier = Modifier.fillMaxWidth(0.5f),
+                    onClick = {
+                        viewModel.changeAppState(AppState.CarDetails)
+                        viewModel.updatedSelectedCar(car)
+                    }
                 )
                 Spacer(modifier = Modifier.height(16.dp))
             }
