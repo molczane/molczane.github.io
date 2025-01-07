@@ -5,7 +5,8 @@ import org.dotnet.app.domain.cars.Car
 
 @Serializable
 data class OfferRequest(
-    val startDate: String,
-    val endDate: String,
-    val car: Car
+    val CarId: Int,
+    val CustomerId: Int,
+    val PlannedStartDate: String,
+    val PlannedEndDate: String
 )

@@ -1,10 +1,9 @@
 package org.dotnet.app.presentation.screens
 
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
@@ -12,6 +11,9 @@ import dotnetwebapp.composeapp.generated.resources.Res
 import dotnetwebapp.composeapp.generated.resources.arrow_back
 import org.dotnet.app.domain.cars.Car
 import org.dotnet.app.presentation.viewModels.CarRentalAppViewModel
+import org.dotnet.app.presentation.viewModels.CarRentalUiState
+import org.dotnet.app.utils.ValidatedTextFieldItem
+import org.dotnet.app.utils.validateDate
 import org.jetbrains.compose.resources.painterResource
 
 @Composable
@@ -21,6 +23,8 @@ fun CarDetailsScreen(
 ) {
     val uiState by viewModel.uiState.collectAsState()
     val car = uiState.selectedCar
+
+    var showValuationDialog by remember { mutableStateOf(false) }
 
     if (car == null) {
         Text("No car selected")
@@ -57,10 +61,22 @@ fun CarDetailsScreen(
                 CarDetailsContent(car = car)
                 Spacer(modifier = Modifier.height(16.dp))
                 Button(
-                    onClick = { /* DO NOTHING FOR NOW */ },
+                    onClick = { showValuationDialog = !showValuationDialog },
                     modifier = Modifier.fillMaxWidth(.5f),
                 ) {
                     Text("Proceed to valuation")
+                }
+                Spacer(modifier = Modifier.height(16.dp))
+
+                // Animated Valuation Dialog
+                AnimatedVisibility(
+                    visible = showValuationDialog
+                ) {
+                    ValuationDialog(
+                        car = car,
+                        onClose = { showValuationDialog = false },
+                        uiState = uiState
+                    )
                 }
             }
         }
@@ -106,6 +122,74 @@ fun CarDetailsContent(car: Car, modifier: Modifier = Modifier) {
                 style = MaterialTheme.typography.body1,
                 modifier = Modifier.padding(vertical = 2.dp)
             )
+        }
+    }
+}
+
+@Composable
+fun ValuationDialog(car: Car, onClose: () -> Unit, uiState: CarRentalUiState) {
+    var plannedStartDate by remember { mutableStateOf("") }
+    var plannedStartDateError by remember { mutableStateOf<String?>(null) }
+    var plannedEndDate by remember { mutableStateOf("") }
+    var plannedEndDateError by remember { mutableStateOf<String?>(null) }
+
+    val datePattern = Regex("\\d{4}-\\d{2}-\\d{2}") // Format: YYYY-MM-DD
+
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(16.dp),
+        elevation = 8.dp,
+        backgroundColor = MaterialTheme.colors.surface
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            ValidatedTextFieldItem(
+                value = plannedStartDate,
+                onValueChange = { newValue ->
+                    plannedStartDate = newValue
+                    plannedStartDateError = validateDate(newValue, datePattern)
+                },
+                label = "Planned start date (YYYY-MM-DD)",
+                error = plannedStartDateError
+            )
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            ValidatedTextFieldItem(
+                value = plannedEndDate,
+                onValueChange = { newValue ->
+                    plannedEndDate = newValue
+                    plannedEndDateError = validateDate(newValue, datePattern)
+                },
+                label = "Planned end date (YYYY-MM-DD)",
+                error = plannedEndDateError
+            )
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+            Button(
+                onClick = {
+                    /* DO NOTHING FOR NOW - TODO() */
+                },
+                modifier = Modifier.fillMaxWidth(),
+                enabled = !uiState.isLoading
+            ) {
+
+                if (uiState.isLoading) {
+                    CircularProgressIndicator(
+                        modifier = Modifier.size(24.dp),
+                        color = MaterialTheme.colors.onPrimary
+                    )
+                }
+                else {
+                    Text("Zapytaj o ofertę")
+                }
+            }
         }
     }
 }

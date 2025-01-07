@@ -25,6 +25,7 @@ import org.dotnet.app.domain.cars.CarFilters
 import org.dotnet.app.domain.config.AppConfig
 import org.dotnet.app.domain.config.loadConfig
 import org.dotnet.app.domain.offer.Offer
+import org.dotnet.app.domain.offer.OfferRequest
 import org.dotnet.app.domain.user.User
 import org.dotnet.app.domain.utils.ExampleTokenResponse
 import org.dotnet.app.utils.AppState
@@ -404,7 +405,6 @@ class CarRentalAppViewModel : ViewModel() {
                 user = null
             )
         }
-        user = null
         localStorage.removeItem("auth_token")
         _authResponse.value = null
 
@@ -432,97 +432,6 @@ class CarRentalAppViewModel : ViewModel() {
         }
 
     }
-    /* ================================================================================================== */
-
-    /* ==================================== Code to be refactored ======================================= */
-    var user: User? = null
-
-    private val httpClient = HttpClient(Js) {
-        install(ContentNegotiation) {
-            json()
-        }
-        install(Auth) {
-            // Configure authentication
-        }
-    }
-
-    val rentedCar : Car? = null
-
-    fun resetValuationResult() {
-        _valuationResult.value = null
-    }
-
-    fun requestRent(car: Car, user: User, startDate: String, endDate: String, onRent: (Boolean) -> Unit ) {
-        viewModelScope.launch {
-            println("Sending rent request...")
-
-            val jsonBody = """
-            {
-                "startDate": "$startDate",
-                "endDate": "$endDate",
-                "car": {
-                    "id": ${car.id}
-                },
-                "user": {
-                    "id": ${user.id}
-                }
-            }
-            """.trimIndent()
-
-            try {
-                val response: HttpResponse = httpClient.post("http://webapplication2-dev.eba-sstwvfur.us-east-1.elasticbeanstalk.com/api/cars/rent") {
-                    contentType(ContentType.Application.Json)
-                    setBody(jsonBody)
-                }
-
-                if (response.status.isSuccess()) {
-                    onRent(true)
-                }
-            } catch (e: Exception) {
-                throw e
-            }
-
-        }
-    }
-
-    private val _valuationResult = MutableStateFlow<Offer?>(null)
-    val valuationResult: StateFlow<Offer?> = _valuationResult
-
-    fun requestValuation(startDate: String, endDate: String, car: Car) {
-        viewModelScope.launch {
-            println("Sending valuation request...")
-
-            val jsonBody = """
-            {
-                "startDate": "$startDate",
-                "endDate": "$endDate",
-                "car": {
-                    "id": ${car.id},
-                    "producer": "${car.producer}",
-                    "model": "${car.model}",
-                    "type": "${car.type}",
-                    "yearOfProduction": "${car.yearOfProduction}",
-                    "numberOfSeats": ${car.numberOfSeats},
-                    "isAvailable": ${car.isAvailable},
-                    "location": "${car.location}"
-                }
-            }
-            """.trimIndent()
-
-            try {
-                val response: HttpResponse = httpClient.post("http://webapplication2-dev.eba-sstwvfur.us-east-1.elasticbeanstalk.com/api/cars/getOffer") {
-                    contentType(ContentType.Application.Json)
-                    setBody(jsonBody)
-                }
-
-                if (response.status.isSuccess()) {
-                    _valuationResult.value = response.body() // Zakładamy, że serwer zwraca wycenę jako json
-                }
-            } catch (e: Exception) {
-                throw e
-            }
-        }
-    }
 
     /* WE UPDATE USER PROFILE */
     fun updateUser(updatedUser: User) {
@@ -546,7 +455,19 @@ class CarRentalAppViewModel : ViewModel() {
             }
         }
     }
-
-
     /* ================================================================================================== */
+
+    /* ===================================== VALUATION REQUESTS AND RENTING ======================================== */
+
+    /* GETTING OFFER FROM SERVER */
+    fun getOffer(offerRequest: OfferRequest) {
+        updateUiState { it.copy(isLoading = true) }
+        viewModelScope.launch {
+            val offer = apiService.getOffer(offerRequest)
+            println(offer)
+        }
+    }
+
+    /* ============================================================================================================= */
+
 }

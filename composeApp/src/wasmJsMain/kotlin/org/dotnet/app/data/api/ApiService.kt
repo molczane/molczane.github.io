@@ -4,6 +4,8 @@ import io.ktor.client.statement.*
 import org.dotnet.app.domain.authentication.AfterRegisterResponse
 import org.dotnet.app.domain.authentication.AuthResponse
 import org.dotnet.app.domain.cars.Car
+import org.dotnet.app.domain.offer.Offer
+import org.dotnet.app.domain.offer.OfferRequest
 import org.dotnet.app.domain.user.User
 
 interface ApiService {
@@ -23,4 +25,5 @@ interface ApiService {
         type: String? = null,
         location: String? = null
     ): List<Car>
+    suspend fun getOffer(offerRequest: OfferRequest): Offer
 }

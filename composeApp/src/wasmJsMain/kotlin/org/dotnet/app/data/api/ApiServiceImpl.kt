@@ -9,6 +9,8 @@ import org.dotnet.app.domain.authentication.AfterRegisterResponse
 import org.dotnet.app.domain.config.AppConfig
 import org.dotnet.app.domain.authentication.AuthResponse
 import org.dotnet.app.domain.cars.Car
+import org.dotnet.app.domain.offer.Offer
+import org.dotnet.app.domain.offer.OfferRequest
 import org.dotnet.app.domain.user.User
 
 class ApiServiceImpl(private val appConfig: AppConfig) : ApiService {
@@ -183,5 +185,24 @@ class ApiServiceImpl(private val appConfig: AppConfig) : ApiService {
             println("Error fetching filtered cars: ${e.message}")
             emptyList()
         }
+    }
+
+    override suspend fun getOffer(offerRequest: OfferRequest): Offer {
+        val token = localStorage.getItem("auth_token")
+
+        val response: HttpResponse = httpClient.post(appConfig.getOfferUrl) {
+            contentType(ContentType.Application.Json)
+            setBody(mapOf(
+                "CarId" to offerRequest.CarId,
+                "CustomerId" to offerRequest.CustomerId,
+                "PlannedStartDate" to offerRequest.PlannedStartDate,
+                "PlannedEndDate" to offerRequest.PlannedEndDate,
+            ))
+            headers {
+                append(HttpHeaders.Authorization, "Bearer $token")
+            }
+        }
+
+        return response.body()
     }
 }

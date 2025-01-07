@@ -13,6 +13,8 @@ import dotnetwebapp.composeapp.generated.resources.arrow_back
 import org.dotnet.app.domain.user.User
 import org.dotnet.app.presentation.viewModels.CarRentalAppViewModel
 import org.dotnet.app.presentation.viewModels.CarRentalUiState
+import org.dotnet.app.utils.ValidatedTextFieldItem
+import org.dotnet.app.utils.validateDate
 import org.jetbrains.compose.resources.painterResource
 
 @Composable
@@ -169,39 +171,5 @@ fun ProfileSection(user: User, onUpdateUser: (User) -> Unit, uiState: CarRentalU
                 Text("Save Changes")
             }
         }
-    }
-}
-
-@Composable
-fun ValidatedTextFieldItem(
-    value: String,
-    onValueChange: (String) -> Unit,
-    label: String,
-    error: String?
-) {
-    Column {
-        TextField(
-            value = value,
-            onValueChange = onValueChange,
-            label = { Text(label) },
-            modifier = Modifier.fillMaxWidth(),
-            isError = error != null
-        )
-        error?.let {
-            Text(
-                text = it,
-                color = MaterialTheme.colors.error,
-                style = MaterialTheme.typography.caption,
-                modifier = Modifier.padding(start = 8.dp)
-            )
-        }
-    }
-}
-
-fun validateDate(value: String, pattern: Regex): String? {
-    return if (!pattern.matches(value)) {
-        "Date must be in YYYY-MM-DD format"
-    } else {
-        null
     }
 }

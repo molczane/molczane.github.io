@@ -29,7 +29,10 @@ data class AppConfig(
     val distinctYearsUrl: String,
     val distinctTypesUrl: String,
     val distinctLocationsUrl: String,
-    val getFilteredCarsUrl: String
+    val getFilteredCarsUrl: String,
+
+    /* GETTING OFFER AND RENTING RELATED STUFF */
+    val getOfferUrl: String
 )
 
 suspend fun loadConfig(): AppConfig {

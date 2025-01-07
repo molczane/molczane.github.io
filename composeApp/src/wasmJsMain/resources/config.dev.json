@@ -16,5 +16,7 @@
   "distinctYearsUrl": "http://localhost:5109/api/cars/distinctYears",
   "distinctTypesUrl": "http://localhost:5109/api/cars/distinctTypes",
   "distinctLocationsUrl": "http://localhost:5109/api/cars/distinctLocations",
-  "getFilteredCarsUrl": "http://localhost:5109/api/cars/filteredCars"
+  "getFilteredCarsUrl": "http://localhost:5109/api/cars/filteredCars",
+
+  "getOfferUrl": "http://localhost:5109/api/cars/getOffer"
 }
