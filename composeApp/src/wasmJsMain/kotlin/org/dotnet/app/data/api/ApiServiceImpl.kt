@@ -190,6 +190,14 @@ class ApiServiceImpl(private val appConfig: AppConfig) : ApiService {
     override suspend fun getOffer(offerRequest: OfferRequest): Offer {
         val token = localStorage.getItem("auth_token")
 
+        println("[API SERVICE] Sending offer request: $offerRequest")
+        println("[API SERVICE] Token: $token")
+        println(mapOf(
+            "CarId" to offerRequest.CarId.toString(),
+            "CustomerId" to offerRequest.CustomerId.toString(),
+            "PlannedStartDate" to offerRequest.PlannedStartDate,
+            "PlannedEndDate" to offerRequest.PlannedEndDate,
+        ))
         val response: HttpResponse = httpClient.post(appConfig.getOfferUrl) {
             contentType(ContentType.Application.Json)
             setBody(mapOf(
