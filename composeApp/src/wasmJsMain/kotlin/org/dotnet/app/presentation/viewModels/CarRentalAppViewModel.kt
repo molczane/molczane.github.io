@@ -83,18 +83,17 @@ class CarRentalAppViewModel : ViewModel() {
 
     init {
         viewModelScope.launch {
-
+            initializeDataLayer()
+            initializeAuthState()
         }
-        initializeDataLayer()
-        initializeAuthState()
     }
 
-    private fun initializeAuthState() {
+    private suspend fun initializeAuthState() {
         val token = localStorage.getItem("auth_token")
         if (!token.isNullOrEmpty()) {
             // Optionally validate token with your backend
             println("Found token: $token")
-            viewModelScope.launch {
+            //viewModelScope.launch {
                 updateUiState {
                     it.copy(
                         isLoading = true
@@ -111,7 +110,7 @@ class CarRentalAppViewModel : ViewModel() {
                         )
                     }
                 }
-            }
+            //}
         }
         else {
             println("No token provided")
@@ -119,8 +118,8 @@ class CarRentalAppViewModel : ViewModel() {
     }
 
 
-    private fun initializeDataLayer() {
-        viewModelScope.launch {
+    private suspend fun initializeDataLayer() {
+        //viewModelScope.launch {
             try {
                 // Load configuration first
                 _config = loadConfig()
@@ -138,7 +137,7 @@ class CarRentalAppViewModel : ViewModel() {
             } catch (e: Exception) {
                 println("Error initializing data layer: ${e.message}")
             }
-        }
+        //}
     }
 
     private suspend fun loadInitialData() {
