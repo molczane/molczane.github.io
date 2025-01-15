@@ -82,6 +82,9 @@ class CarRentalAppViewModel : ViewModel() {
     private lateinit var carRepository : CarRepository
 
     init {
+        viewModelScope.launch {
+
+        }
         initializeDataLayer()
         initializeAuthState()
     }
@@ -91,7 +94,24 @@ class CarRentalAppViewModel : ViewModel() {
         if (!token.isNullOrEmpty()) {
             // Optionally validate token with your backend
             println("Found token: $token")
-            // Token should be now validated
+            viewModelScope.launch {
+                updateUiState {
+                    it.copy(
+                        isLoading = true
+                    )
+                }
+                val userId = localStorage.getItem("userId")?.toIntOrNull()
+                val user = userId?.let { apiService.getUserDetails(it) }
+                if (user != null) {
+                    updateUiState {
+                        it.copy(
+                            isUserLoggedIn = true,
+                            user = user,
+                            isLoading = false
+                        )
+                    }
+                }
+            }
         }
         else {
             println("No token provided")
@@ -397,10 +417,16 @@ class CarRentalAppViewModel : ViewModel() {
                     }
 
                     // Store the token after successful login
-                   response.token?.let { token ->
+                    response.token?.let { token ->
                         storeAuthToken(token)
                         println("Stored token: $token")
-                   }
+                    }
+
+                    /* STORING USER ID FOR REFRESHING */
+                    response.user?.id?.let { id ->
+                        localStorage.setItem("userId", "$id" )
+                    }
+                    println("Stored userID: ${response.user?.id}")
                 }
 
                 println("Auth response (name): ${response.user!!.name}")
