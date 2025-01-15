@@ -1,4 +1,3 @@
-import org.jetbrains.compose.desktop.application.dsl.TargetFormat
 import org.jetbrains.kotlin.gradle.ExperimentalWasmDsl
 import org.jetbrains.kotlin.gradle.targets.js.webpack.KotlinWebpackConfig
 
@@ -24,6 +23,8 @@ kotlin {
                         add(rootDirPath)
                         add(projectDirPath)
                     }
+                    port = 8080 // Set the desired port
+                    open = true // Automatically open the browser (optional)
                 }
             }
         }
@@ -45,6 +46,14 @@ kotlin {
             implementation(libs.bundles.ktor.common)
             implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.6.1")
             implementation("org.jetbrains.compose.components:components-resources:1.5.11")
+
+            //implementation(kotlin("stdlib-js"))
+            //implementation("org.jetbrains.kotlinx:kotlinx-html-js:0.11.0")
+        }
+
+        wasmJsMain.dependencies {
+//            implementation(kotlin("stdlib-js"))
+//            implementation("org.jetbrains.kotlinx:kotlinx-html-js:0.11.0")
         }
     }
 }

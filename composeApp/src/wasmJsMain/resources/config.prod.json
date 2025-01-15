@@ -1,8 +1,25 @@
 {
   "clientId": "248107412465-i64fdf66a6f4nrj7232ghdmvbsg91pp3.apps.googleusercontent.com",
-  "redirectUri": "https://molczane.github.io/",
-  "getNumberOfPagesUrl": "https://user-api-dotnet.azurewebsites.net/api/users/google",
-  "getCarsFromPageUrl": "https://user-api-dotnet.azurewebsites.net/api/users/google",
+  "redirectUri": "http://localhost:8080/",
+
+  "getNumberOfPagesUrl": "https://user-api-dotnet.azurewebsites.net/api/cars/getCountPages",
+  "getCarsFromPageUrl": "https://user-api-dotnet.azurewebsites.net/api/cars/getPage",
+
   "googleAuthUrl": "https://accounts.google.com/o/oauth2/v2/auth",
-  "authWithServerUrl": "https://user-api-dotnet.azurewebsites.net/api/users/google"
+  "authWithServerUrl": "https://user-api-dotnet.azurewebsites.net/api/users/google",
+  "registerAndAuthWithServerUrl": "https://user-api-dotnet.azurewebsites.net/api/users/google/signUp",
+  "checkTokenUrl": "https://user-api-dotnet.azurewebsites.net/api/users/validateToken",
+  "sendMissingDataUrl": "https://user-api-dotnet.azurewebsites.net/api/users/google/moreData",
+  "userInfoByIdUrl": "https://user-api-dotnet.azurewebsites.net/api/users/",
+
+  "distinctBrandsUrl": "https://user-api-dotnet.azurewebsites.net/api/cars/distinctBrands",
+  "modelsByBrandUrl": "https://user-api-dotnet.azurewebsites.net/api/cars/modelsByBrand/",
+  "distinctYearsUrl": "https://user-api-dotnet.azurewebsites.net/api/cars/distinctYears",
+  "distinctTypesUrl": "https://user-api-dotnet.azurewebsites.net/api/cars/distinctTypes",
+  "distinctLocationsUrl": "https://user-api-dotnet.azurewebsites.net/api/cars/distinctLocations",
+  "getFilteredCarsUrl": "https://user-api-dotnet.azurewebsites.net/api/cars/filteredCars",
+
+  "getOfferUrl": "https://user-api-dotnet.azurewebsites.net/api/cars/getOffer",
+
+  "getRentedCarsUrl": "https://user-api-dotnet.azurewebsites.net/api/cars/rentedCars"
 }

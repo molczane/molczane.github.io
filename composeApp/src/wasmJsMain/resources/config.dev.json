@@ -1,8 +1,25 @@
 {
   "clientId": "248107412465-i64fdf66a6f4nrj7232ghdmvbsg91pp3.apps.googleusercontent.com",
-  "redirectUri": "https://molczane.github.io/",
-  "getNumberOfPagesUrl": "https://user-api-dotnet.azurewebsites.net/api/cars/getCountPages",
-  "getCarsFromPageUrl": "https://user-api-dotnet.azurewebsites.net/api/cars/getPage",
+  "redirectUri": "http://localhost:8080/",
+
+  "getNumberOfPagesUrl": "http://localhost:5109/api/cars/getCountPages",
+  "getCarsFromPageUrl": "http://localhost:5109/api/cars/getPage",
+
   "googleAuthUrl": "https://accounts.google.com/o/oauth2/v2/auth",
-  "authWithServerUrl": "https://user-api-dotnet.azurewebsites.net/api/users/google"
+  "authWithServerUrl": "http://localhost:5109/api/users/google",
+  "registerAndAuthWithServerUrl": "http://localhost:5109/api/users/google/signUp",
+  "checkTokenUrl": "http://localhost:5109/api/users/validateToken",
+  "sendMissingDataUrl": "http://localhost:5109/api/users/google/moreData",
+  "userInfoByIdUrl": "http://localhost:5109/api/users/",
+
+  "distinctBrandsUrl": "http://localhost:5109/api/cars/distinctBrands",
+  "modelsByBrandUrl": "http://localhost:5109/api/cars/modelsByBrand/",
+  "distinctYearsUrl": "http://localhost:5109/api/cars/distinctYears",
+  "distinctTypesUrl": "http://localhost:5109/api/cars/distinctTypes",
+  "distinctLocationsUrl": "http://localhost:5109/api/cars/distinctLocations",
+  "getFilteredCarsUrl": "http://localhost:5109/api/cars/filteredCars",
+
+  "getOfferUrl": "http://localhost:5109/api/cars/getOffer",
+
+  "getRentedCarsUrl": "http://localhost:5109/api/cars/rentedCars"
 }
