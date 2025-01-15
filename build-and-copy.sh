@@ -10,7 +10,7 @@
 git add .
 
 # Commit changes with a message
-git commit -m "Trying to fix signing in"
+git commit -m "Only changed redirectUri"
 
 # Push changes to the repository
 git push origin main
