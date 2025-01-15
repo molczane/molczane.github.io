@@ -1,6 +1,6 @@
 {
   "clientId": "248107412465-i64fdf66a6f4nrj7232ghdmvbsg91pp3.apps.googleusercontent.com",
-  "redirectUri": "http://localhost:8080/",
+  "redirectUri": "https://molczane.github.io/",
 
   "getNumberOfPagesUrl": "https://user-api-dotnet.azurewebsites.net/api/cars/getCountPages",
   "getCarsFromPageUrl": "https://user-api-dotnet.azurewebsites.net/api/cars/getPage",
