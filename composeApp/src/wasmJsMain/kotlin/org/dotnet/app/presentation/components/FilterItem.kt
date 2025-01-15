@@ -45,6 +45,7 @@ fun FilterItem(
             expanded = expanded,
             onDismissRequest = { expanded = false },
             modifier = Modifier.fillMaxWidth(.25f)
+
         ) {
             options?.forEach { option ->
                 DropdownMenuItem(
