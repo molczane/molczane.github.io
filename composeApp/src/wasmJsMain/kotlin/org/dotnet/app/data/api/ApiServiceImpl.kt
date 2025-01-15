@@ -201,8 +201,8 @@ class ApiServiceImpl(private val appConfig: AppConfig) : ApiService {
         val response: HttpResponse = httpClient.post(appConfig.getOfferUrl) {
             contentType(ContentType.Application.Json)
             setBody(mapOf(
-                "CarId" to offerRequest.CarId,
-                "CustomerId" to offerRequest.CustomerId,
+                "CarId" to offerRequest.CarId.toString(),
+                "CustomerId" to offerRequest.CustomerId.toString(),
                 "PlannedStartDate" to offerRequest.PlannedStartDate,
                 "PlannedEndDate" to offerRequest.PlannedEndDate,
             ))
@@ -210,7 +210,24 @@ class ApiServiceImpl(private val appConfig: AppConfig) : ApiService {
                 append(HttpHeaders.Authorization, "Bearer $token")
             }
         }
+        println("[API SERVICE] Response: $response]")
 
         return response.body()
     }
+
+    override suspend fun getUserDetails(id: Int): User {
+        val token = localStorage.getItem("auth_token")
+
+        val response: HttpResponse = httpClient.get(appConfig.userInfoByIdUrl + "$id") {
+            headers {
+                append(HttpHeaders.Authorization, "Bearer $token")
+            }
+        }
+
+        println("[API SERVICE] Response: ${response.bodyAsText()}")
+
+        return response.body()
+    }
+
+
 }

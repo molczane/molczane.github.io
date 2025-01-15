@@ -2,15 +2,8 @@ package org.dotnet.app.presentation.viewModels
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import io.ktor.client.*
 import io.ktor.client.call.*
-import io.ktor.client.engine.js.*
-import io.ktor.client.plugins.contentnegotiation.*
-import io.ktor.client.request.*
 import io.ktor.client.statement.*
-import io.ktor.client.plugins.auth.*
-import io.ktor.http.*
-import io.ktor.serialization.kotlinx.json.*
 import kotlinx.browser.localStorage
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -24,7 +17,6 @@ import org.dotnet.app.domain.cars.Car
 import org.dotnet.app.domain.cars.CarFilters
 import org.dotnet.app.domain.config.AppConfig
 import org.dotnet.app.domain.config.loadConfig
-import org.dotnet.app.domain.offer.Offer
 import org.dotnet.app.domain.offer.OfferRequest
 import org.dotnet.app.domain.user.User
 import org.dotnet.app.domain.utils.ExampleTokenResponse
@@ -91,7 +83,21 @@ class CarRentalAppViewModel : ViewModel() {
 
     init {
         initializeDataLayer()
+        initializeAuthState()
     }
+
+    private fun initializeAuthState() {
+        val token = localStorage.getItem("auth_token")
+        if (!token.isNullOrEmpty()) {
+            // Optionally validate token with your backend
+            println("Found token: $token")
+            // Token should be now validated
+        }
+        else {
+            println("No token provided")
+        }
+    }
+
 
     private fun initializeDataLayer() {
         viewModelScope.launch {
@@ -373,6 +379,8 @@ class CarRentalAppViewModel : ViewModel() {
                         email = newUserDTO?.email.orEmpty()
                     )
 
+                    println("User: $newUser")
+
                     updateUiState {
                         it.copy(
                             isUserLoggedIn = true,
@@ -455,6 +463,19 @@ class CarRentalAppViewModel : ViewModel() {
             }
         }
     }
+
+    fun getUserDetails(id: Int) {
+        var user : User? = null
+
+        viewModelScope.launch {
+            updateUiState { it.copy(isLoading = true) }
+            user = apiService.getUserDetails(id)
+            updateUiState { it.copy(user = user) }
+            if(user != null) {
+                updateUiState { it.copy(isLoading = false) }
+            }
+        }
+    }
     /* ================================================================================================== */
 
     /* ===================================== VALUATION REQUESTS AND RENTING ======================================== */
@@ -464,6 +485,7 @@ class CarRentalAppViewModel : ViewModel() {
         updateUiState { it.copy(isLoading = true) }
         viewModelScope.launch {
             val offer = apiService.getOffer(offerRequest)
+            updateUiState { it.copy(isLoading = false) }
             println(offer)
         }
     }

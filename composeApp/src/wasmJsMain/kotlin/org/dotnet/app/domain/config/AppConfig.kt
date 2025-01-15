@@ -23,6 +23,9 @@ data class AppConfig(
     val checkTokenUrl: String,
     val sendMissingDataUrl: String,
 
+    /* GET USER INFO BY ID */
+    val userInfoByIdUrl: String,
+
     /* FILTERING RELATED STUFF */
     val distinctBrandsUrl: String,
     val modelsByBrandUrl: String,

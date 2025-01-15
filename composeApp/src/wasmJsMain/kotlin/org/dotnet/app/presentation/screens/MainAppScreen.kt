@@ -10,7 +10,6 @@ import dotnetwebapp.composeapp.generated.resources.*
 import dotnetwebapp.composeapp.generated.resources.Res
 import kotlinx.browser.window
 import org.dotnet.app.presentation.viewModels.CarRentalAppViewModel
-import org.dotnet.app.domain.cars.Car
 import org.dotnet.app.utils.AppState
 import org.jetbrains.compose.resources.*
 
@@ -60,7 +59,10 @@ fun MainAppScreen(viewModel: CarRentalAppViewModel) {
                     }
 
                     IconButton(
-                        onClick = {  viewModel.changeAppState(AppState.User) },
+                        onClick = {
+                            uiState.user?.id?.let { viewModel.getUserDetails(it) }
+                            viewModel.changeAppState(AppState.User)
+                                  },
                         modifier = Modifier.padding(8.dp),
                         enabled = uiState.isUserLoggedIn
                     ) {

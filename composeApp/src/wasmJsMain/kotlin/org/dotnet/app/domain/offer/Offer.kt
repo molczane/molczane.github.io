@@ -5,9 +5,10 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class Offer(
-    val id: Int,
-    val carID: Int,
-    val dayRate: Long,
-    val insuranceRate: Long,
-    val validUntil: String
+    val userId: Int,
+    val carId: Int,
+    val dailyRate: Float,
+    val insuranceRate: Float,
+    val validUntil: String,
+    val isActive: Boolean
 )

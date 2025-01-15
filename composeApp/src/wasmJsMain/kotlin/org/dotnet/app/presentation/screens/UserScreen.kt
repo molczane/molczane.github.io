@@ -55,7 +55,15 @@ fun UserScreen(
                 .verticalScroll(rememberScrollState()),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            ProfileSection(user = user, onUpdateUser = { updatedUser -> viewModel.updateUser(updatedUser) }, uiState = uiState)
+            if(!uiState.isLoading) {
+                ProfileSection(user = user, onUpdateUser = { updatedUser -> viewModel.updateUser(updatedUser) }, uiState = uiState)
+            }
+            else {
+                CircularProgressIndicator(
+                    modifier = Modifier.size(24.dp),
+                    color = MaterialTheme.colors.onPrimary
+                )
+            }
 
             Spacer(modifier = Modifier.height(16.dp))
 
@@ -80,6 +88,7 @@ fun UserScreen(
 
 @Composable
 fun ProfileSection(user: User, onUpdateUser: (User) -> Unit, uiState: CarRentalUiState) {
+    var login by remember { mutableStateOf(user.login ?: "") }
     var firstname by remember { mutableStateOf(user.firstname ?: "") }
     var lastname by remember { mutableStateOf(user.lastname ?: "") }
     var email by remember { mutableStateOf(user.email ?: "") }
@@ -93,6 +102,15 @@ fun ProfileSection(user: User, onUpdateUser: (User) -> Unit, uiState: CarRentalU
     Column(
         modifier = Modifier.fillMaxWidth(.5f)
     ) {
+        TextField(
+            value = login,
+            onValueChange = { login = it },
+            label = { Text("Login") },
+            modifier = Modifier.fillMaxWidth()
+        )
+
+        Spacer(modifier = Modifier.height(8.dp))
+
         TextField(
             value = firstname,
             onValueChange = { firstname = it },
@@ -119,8 +137,6 @@ fun ProfileSection(user: User, onUpdateUser: (User) -> Unit, uiState: CarRentalU
         )
 
         Spacer(modifier = Modifier.height(8.dp))
-
-        // ValidatedTextField()
 
         ValidatedTextFieldItem(
             value = birthday,
@@ -149,6 +165,7 @@ fun ProfileSection(user: User, onUpdateUser: (User) -> Unit, uiState: CarRentalU
         Button(
             onClick = {
                 val updatedUser = user.copy(
+                    login = login,
                     firstname = firstname,
                     lastname = lastname,
                     email = email,

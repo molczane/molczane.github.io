@@ -10,6 +10,7 @@ import androidx.compose.ui.unit.dp
 import dotnetwebapp.composeapp.generated.resources.Res
 import dotnetwebapp.composeapp.generated.resources.arrow_back
 import org.dotnet.app.domain.cars.Car
+import org.dotnet.app.domain.offer.OfferRequest
 import org.dotnet.app.presentation.viewModels.CarRentalAppViewModel
 import org.dotnet.app.presentation.viewModels.CarRentalUiState
 import org.dotnet.app.utils.ValidatedTextFieldItem
@@ -75,7 +76,8 @@ fun CarDetailsScreen(
                     ValuationDialog(
                         car = car,
                         onClose = { showValuationDialog = false },
-                        uiState = uiState
+                        uiState = uiState,
+                        onRequestValuation = { viewModel.getOffer(it) }
                     )
                 }
             }
@@ -127,7 +129,7 @@ fun CarDetailsContent(car: Car, modifier: Modifier = Modifier) {
 }
 
 @Composable
-fun ValuationDialog(car: Car, onClose: () -> Unit, uiState: CarRentalUiState) {
+fun ValuationDialog(car: Car, onClose: () -> Unit, uiState: CarRentalUiState, onRequestValuation: ( OfferRequest ) -> Unit) {
     var plannedStartDate by remember { mutableStateOf("") }
     var plannedStartDateError by remember { mutableStateOf<String?>(null) }
     var plannedEndDate by remember { mutableStateOf("") }
@@ -174,7 +176,21 @@ fun ValuationDialog(car: Car, onClose: () -> Unit, uiState: CarRentalUiState) {
 
             Button(
                 onClick = {
-                    /* DO NOTHING FOR NOW - TODO() */
+                    println("Parsing offer request")
+                    println("User: ${uiState.user}")
+                    val offerRequest = uiState.user?.id?.let {
+                        OfferRequest(
+                            CarId = car.id,
+                            CustomerId = uiState.user.id,
+                            PlannedStartDate = plannedStartDate,
+                            PlannedEndDate = plannedEndDate
+                        )
+                    }
+                    println("Offer request: $offerRequest")
+                    println("Sending offer request")
+                    if (offerRequest != null) {
+                        onRequestValuation(offerRequest)
+                    }
                 },
                 modifier = Modifier.fillMaxWidth(),
                 enabled = !uiState.isLoading

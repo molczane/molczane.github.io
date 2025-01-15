@@ -26,4 +26,5 @@ interface ApiService {
         location: String? = null
     ): List<Car>
     suspend fun getOffer(offerRequest: OfferRequest): Offer
+    suspend fun getUserDetails(id: Int): User
 }

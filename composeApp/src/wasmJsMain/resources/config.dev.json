@@ -10,6 +10,7 @@
   "registerAndAuthWithServerUrl": "http://localhost:5109/api/users/google/signUp",
   "checkTokenUrl": "http://localhost:5109/api/users/validateToken",
   "sendMissingDataUrl": "http://localhost:5109/api/users/google/moreData",
+  "userInfoByIdUrl": "http://localhost:5109/api/users/",
 
   "distinctBrandsUrl": "http://localhost:5109/api/cars/distinctBrands",
   "modelsByBrandUrl": "http://localhost:5109/api/cars/modelsByBrand/",
