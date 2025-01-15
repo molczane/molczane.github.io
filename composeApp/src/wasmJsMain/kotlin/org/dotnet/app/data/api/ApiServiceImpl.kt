@@ -196,6 +196,7 @@ class ApiServiceImpl(private val appConfig: AppConfig) : ApiService {
         println("[API SERVICE] Token: $token")
         println(mapOf(
             "CarId" to offerRequest.CarId.toString(),
+            "RentalName" to offerRequest.RentalName,
             "CustomerId" to offerRequest.CustomerId.toString(),
             "PlannedStartDate" to offerRequest.PlannedStartDate,
             "PlannedEndDate" to offerRequest.PlannedEndDate,
@@ -204,6 +205,7 @@ class ApiServiceImpl(private val appConfig: AppConfig) : ApiService {
             contentType(ContentType.Application.Json)
             setBody(mapOf(
                 "CarId" to offerRequest.CarId.toString(),
+                "RentalName" to offerRequest.RentalName,
                 "CustomerId" to offerRequest.CustomerId.toString(),
                 "PlannedStartDate" to offerRequest.PlannedStartDate,
                 "PlannedEndDate" to offerRequest.PlannedEndDate,
@@ -246,7 +248,9 @@ class ApiServiceImpl(private val appConfig: AppConfig) : ApiService {
         return try {
             httpClient.post(appConfig.getRentedCarsUrl){
                 contentType(ContentType.Application.Json)
-                setBody(request)
+                mapOf(
+                    "UserId" to id.toString()
+                )
             }.body()
         } catch (e: Exception) {
             println("Error fetching my rentals ${e.message}")
