@@ -18,6 +18,7 @@ import org.dotnet.app.domain.cars.CarFilters
 import org.dotnet.app.domain.config.AppConfig
 import org.dotnet.app.domain.config.loadConfig
 import org.dotnet.app.domain.offer.OfferRequest
+import org.dotnet.app.domain.rentals.Rental
 import org.dotnet.app.domain.user.User
 import org.dotnet.app.domain.utils.ExampleTokenResponse
 import org.dotnet.app.utils.AppState
@@ -60,7 +61,10 @@ data class CarRentalUiState(
     val appState: AppState = AppState.Default,
 
     /* REQUESTING VALUATION AND THIS TYPE OF STUFF */
-    val selectedCar: Car? = null
+    val selectedCar: Car? = null,
+
+    /* RENTALS RELATED STUFF */
+    val myRentals: List<Rental> = emptyList()
 )
 
 class CarRentalAppViewModel : ViewModel() {
@@ -522,6 +526,20 @@ class CarRentalAppViewModel : ViewModel() {
         }
     }
 
+    fun getRentedCars() {
+        updateUiState { it.copy(isLoading = true) }
+        println("[API SERVICE] Fetching rented cars...")
+        viewModelScope.launch {
+            val rentals = uiState.value.user?.id?.let { apiService.getRentedCars(it) }
+            if(rentals != null) {
+                updateUiState { it.copy(
+                    isLoading = false,
+                    myRentals = rentals)
+                }
+            }
+            println("[API SERVICE] $rentals")
+        }
+    }
     /* ============================================================================================================= */
 
 }

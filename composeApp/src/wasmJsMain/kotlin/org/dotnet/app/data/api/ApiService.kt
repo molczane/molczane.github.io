@@ -6,6 +6,7 @@ import org.dotnet.app.domain.authentication.AuthResponse
 import org.dotnet.app.domain.cars.Car
 import org.dotnet.app.domain.offer.Offer
 import org.dotnet.app.domain.offer.OfferRequest
+import org.dotnet.app.domain.rentals.Rental
 import org.dotnet.app.domain.user.User
 
 interface ApiService {
@@ -28,4 +29,5 @@ interface ApiService {
     suspend fun getOffer(offerRequest: OfferRequest): Offer
     suspend fun getUserDetails(id: Int): User
     suspend fun getModelsByBrand(brand: String): List<String>
+    suspend fun getRentedCars(id: Int): List<Rental>
 }

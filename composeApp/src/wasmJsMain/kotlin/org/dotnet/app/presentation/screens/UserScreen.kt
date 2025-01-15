@@ -1,6 +1,8 @@
 package org.dotnet.app.presentation.screens
 
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.*
@@ -16,6 +18,7 @@ import org.dotnet.app.presentation.viewModels.CarRentalUiState
 import org.dotnet.app.utils.ValidatedTextFieldItem
 import org.dotnet.app.utils.validateDate
 import org.jetbrains.compose.resources.painterResource
+import org.dotnet.app.presentation.components.RentalCard
 
 @Composable
 fun UserScreen(
@@ -72,7 +75,33 @@ fun UserScreen(
                 style = MaterialTheme.typography.h6,
                 modifier = Modifier.padding(bottom = 8.dp)
             )
-            // RentalHistorySection(viewModel)
+
+            Button(
+                onClick = { viewModel.getRentedCars() },
+                colors = ButtonDefaults.buttonColors(backgroundColor = MaterialTheme.colors.primaryVariant),
+                modifier = Modifier
+                    .padding(bottom = 8.dp)
+            ) {
+                Text("Pobierz swoje wypozyczenia")
+            }
+
+            if(uiState.myRentals.isNotEmpty()) {
+//                LazyColumn(modifier = Modifier.fillMaxSize().padding(16.dp)) {
+//                    items(uiState.myRentals) { rental ->
+//                        RentalCard(
+//                            rental = rental,
+//                            onClick = {  }
+//                        )
+//                    }
+//                }
+            }
+            else {
+                Text(
+                    text = "No rentals available",
+                    modifier = Modifier.padding(16.dp),
+                    style = MaterialTheme.typography.body1
+                )
+            }
 
             Spacer(modifier = Modifier.height(16.dp))
 

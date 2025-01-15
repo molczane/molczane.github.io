@@ -19,5 +19,7 @@
   "distinctLocationsUrl": "http://localhost:5109/api/cars/distinctLocations",
   "getFilteredCarsUrl": "http://localhost:5109/api/cars/filteredCars",
 
-  "getOfferUrl": "http://localhost:5109/api/cars/getOffer"
+  "getOfferUrl": "http://localhost:5109/api/cars/getOffer",
+
+  "getRentedCarsUrl": "http://localhost:5109/api/cars/rentedCars"
 }

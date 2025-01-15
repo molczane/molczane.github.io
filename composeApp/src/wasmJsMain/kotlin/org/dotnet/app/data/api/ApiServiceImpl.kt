@@ -11,6 +11,8 @@ import org.dotnet.app.domain.authentication.AuthResponse
 import org.dotnet.app.domain.cars.Car
 import org.dotnet.app.domain.offer.Offer
 import org.dotnet.app.domain.offer.OfferRequest
+import org.dotnet.app.domain.rentals.Rental
+import org.dotnet.app.domain.rentals.RentedCarsRequest
 import org.dotnet.app.domain.user.User
 
 class ApiServiceImpl(private val appConfig: AppConfig) : ApiService {
@@ -234,6 +236,20 @@ class ApiServiceImpl(private val appConfig: AppConfig) : ApiService {
             httpClient.get(appConfig.modelsByBrandUrl + brand).body()
         } catch (e: Exception) {
             println("Error fetching distinct locations: ${e.message}")
+            emptyList()
+        }
+    }
+
+    override suspend fun getRentedCars(id: Int): List<Rental> {
+        val request = RentedCarsRequest(id)
+
+        return try {
+            httpClient.post(appConfig.getRentedCarsUrl){
+                contentType(ContentType.Application.Json)
+                setBody(request)
+            }.body()
+        } catch (e: Exception) {
+            println("Error fetching my rentals ${e.message}")
             emptyList()
         }
     }
