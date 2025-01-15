@@ -229,5 +229,12 @@ class ApiServiceImpl(private val appConfig: AppConfig) : ApiService {
         return response.body()
     }
 
-
+    override suspend fun getModelsByBrand(brand: String): List<String> {
+        return try {
+            httpClient.get(appConfig.modelsByBrandUrl + brand).body()
+        } catch (e: Exception) {
+            println("Error fetching distinct locations: ${e.message}")
+            emptyList()
+        }
+    }
 }

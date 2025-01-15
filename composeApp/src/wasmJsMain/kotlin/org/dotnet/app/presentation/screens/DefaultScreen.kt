@@ -36,7 +36,8 @@ fun DefaultScreen(uiState: CarRentalUiState, viewModel: CarRentalAppViewModel, i
                 onTypeSelected = { viewModel.updateSelectedType(it) },
                 onLocationSelected = { viewModel.updateSelectedLocation(it) },
                 onResetFilters = { viewModel.resetFilters() },
-                onFilter = { viewModel.getFilteredCars(it) }
+                onFilter = { viewModel.getFilteredCars(it) },
+                getModels = { brand: String -> viewModel.getModelsByBrand(brand) }
             )
         }
 

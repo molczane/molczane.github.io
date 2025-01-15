@@ -27,4 +27,5 @@ interface ApiService {
     ): List<Car>
     suspend fun getOffer(offerRequest: OfferRequest): Offer
     suspend fun getUserDetails(id: Int): User
+    suspend fun getModelsByBrand(brand: String): List<String>
 }

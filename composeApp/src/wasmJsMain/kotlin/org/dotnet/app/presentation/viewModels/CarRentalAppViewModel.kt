@@ -298,6 +298,13 @@ class CarRentalAppViewModel : ViewModel() {
         }
     }
 
+    fun getModelsByBrand(brand: String): Unit {
+        viewModelScope.launch {
+            val models = apiService.getModelsByBrand(brand)
+            updateUiState { it.copy(modelsByBrand = models) }
+        }
+    }
+
     fun changeAppState(appState: AppState) {
         updateUiState { it.copy(appState = appState) }
     }

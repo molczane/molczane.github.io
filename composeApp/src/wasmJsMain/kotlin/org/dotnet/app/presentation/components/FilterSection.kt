@@ -19,7 +19,8 @@ fun FilterSection(
     onTypeSelected: (String?) -> Unit,
     onLocationSelected: (String?) -> Unit,
     onResetFilters: () -> Unit,
-    onFilter: (CarFilters) -> Unit
+    onFilter: (CarFilters) -> Unit,
+    getModels: (String) -> Unit = {}
 ) {
     Column(
         modifier = Modifier
@@ -44,9 +45,10 @@ fun FilterSection(
 
         // Model Filter
         if (uiState.selectedBrand != null) {
+            getModels(uiState.selectedBrand)
             FilterItem(
                 title = "Model",
-                options = listOf("Model 1", "Model 2"), // Replace it with dynamic data
+                options = uiState.modelsByBrand, // Replace it with dynamic data
                 selectedOption = uiState.selectedModel,
                 onOptionSelected = onModelSelected
             )
