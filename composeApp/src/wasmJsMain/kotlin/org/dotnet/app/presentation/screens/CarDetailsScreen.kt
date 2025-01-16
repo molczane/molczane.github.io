@@ -2,6 +2,8 @@ package org.dotnet.app.presentation.screens
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -57,8 +59,10 @@ fun CarDetailsScreen(
             contentAlignment = Alignment.TopCenter // Centers content vertically and horizontally,
         ) {
             Column(
-                modifier = Modifier.fillMaxWidth(0.5f), // Ensure 50% width
-                horizontalAlignment = Alignment.CenterHorizontally
+                modifier = Modifier
+                    .fillMaxWidth(0.5f)
+                    .verticalScroll(rememberScrollState()), // Ensure 50% width
+                horizontalAlignment = Alignment.CenterHorizontally,
             ) {
                 CarDetailsContent(car = car)
                 Spacer(modifier = Modifier.height(16.dp))
