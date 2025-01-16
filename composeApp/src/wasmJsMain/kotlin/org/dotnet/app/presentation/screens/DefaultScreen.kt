@@ -53,7 +53,7 @@ fun DefaultScreen(uiState: CarRentalUiState, viewModel: CarRentalAppViewModel, i
             }
             /* DISPLAYING FILTERED CARS */
             else if(uiState.areCarsFiltered) {
-                FilteredCarsView(uiState, innerPadding)
+                FilteredCarsView(viewModel, uiState, innerPadding)
             }
             /* STANDARD DISPLAYING OF CARS */
             else if(!uiState.isLoading && !uiState.areCarsFiltered) {

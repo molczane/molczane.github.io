@@ -243,14 +243,12 @@ class ApiServiceImpl(private val appConfig: AppConfig) : ApiService {
     }
 
     override suspend fun getRentedCars(id: Int): List<Rental> {
-        val request = RentedCarsRequest(id)
-
         return try {
+            val request = RentedCarsRequest(id.toString())
+
             httpClient.post(appConfig.getRentedCarsUrl){
                 contentType(ContentType.Application.Json)
-                mapOf(
-                    "UserId" to id.toString()
-                )
+                setBody(request)
             }.body()
         } catch (e: Exception) {
             println("Error fetching my rentals ${e.message}")

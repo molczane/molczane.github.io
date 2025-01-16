@@ -20,7 +20,8 @@ fun RentalCard(
     Card(
         modifier = modifier
             .padding(8.dp)
-            .clickable { onClick() },
+            .clickable { onClick() }
+            .fillMaxWidth(.5f),
         elevation = 4.dp,
         backgroundColor = MaterialTheme.colors.surface
     ) {
