@@ -60,8 +60,8 @@ fun CarDetailsScreen(
         ) {
             Column(
                 modifier = Modifier
-                    .fillMaxWidth(0.5f)
-                    .verticalScroll(rememberScrollState()), // Ensure 50% width
+                    .fillMaxWidth(0.5f) // Ensure 50% width
+                    .verticalScroll(rememberScrollState()),
                 horizontalAlignment = Alignment.CenterHorizontally,
             ) {
                 CarDetailsContent(car = car)

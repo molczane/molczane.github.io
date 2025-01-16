@@ -10,7 +10,7 @@
 git add .
 
 # Commit changes with a message
-git commit -m "No changes, just deploy"
+git commit -m "Changed order of showing my rentals"
 
 # Push changes to the repository
 git push origin main

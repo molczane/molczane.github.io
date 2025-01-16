@@ -78,12 +78,32 @@ fun UserScreen(
                 Text("Pobierz swoje wypozyczenia")
             }
 
-            if(uiState.myRentals.isNotEmpty()) {
-                uiState.myRentals.forEach { rental ->
+//            if(uiState.myRentals.isNotEmpty()) {
+//                uiState.myRentals.forEach { rental ->
+//                    RentalCard(rental, onClick = {
+//                        if(rental.status == "planned" || rental.status == "pendingReturn" || rental.status == "inProgress") {
+//                            selectedRental = rental
+//                            //showReturnScreen.value = true
+//                            viewModel.toggleShowReturnScreen(true)
+//                        }
+//                    })
+//                }
+//            }
+            if (uiState.myRentals.isNotEmpty()) {
+                // Define the order of statuses
+                val statusOrder = listOf("planned", "inProgress", "pendingReturn", "ended")
+
+                // Sort rentals based on the defined order of statuses
+                val sortedRentals = uiState.myRentals.sortedBy { rental ->
+                    statusOrder.indexOf(rental.status)
+                }
+
+                // Display sorted rentals
+                sortedRentals.forEach { rental ->
                     RentalCard(rental, onClick = {
-                        if(rental.status == "planned" || rental.status == "pendingReturn" || rental.status == "inProgress") {
+                        if (rental.status in listOf("planned", "pendingReturn", "inProgress")) {
                             selectedRental = rental
-                            //showReturnScreen.value = true
+                            // Trigger return screen logic
                             viewModel.toggleShowReturnScreen(true)
                         }
                     })
