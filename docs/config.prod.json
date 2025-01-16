@@ -21,5 +21,7 @@
 
   "getOfferUrl": "https://user-api-dotnet.azurewebsites.net/api/cars/getOffer",
 
-  "getRentedCarsUrl": "https://user-api-dotnet.azurewebsites.net/api/cars/rentedCars"
+  "getRentedCarsUrl": "https://user-api-dotnet.azurewebsites.net/api/cars/rentedCars",
+
+  "returnCarUrl": "https://user-api-dotnet.azurewebsites.net/api/cars/return"
 }
