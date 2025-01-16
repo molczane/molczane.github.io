@@ -48,19 +48,11 @@ fun MainAppScreen(viewModel: CarRentalAppViewModel) {
                 backgroundColor = MaterialTheme.colors.primaryVariant,
                 actions = {
                     IconButton(
-                        onClick = { viewModel.sendTokenToBackend() },
-                        modifier = Modifier.padding(8.dp)
-                    ) {
-                        val carIcon = Res.drawable.directions_car
-                        Icon(
-                            painter = painterResource(carIcon),
-                            contentDescription = "Auto"
-                        )
-                    }
-
-                    IconButton(
                         onClick = {
-                            uiState.user?.id?.let { viewModel.getUserDetails(it) }
+                            uiState.user?.id?.let {
+                                viewModel.getUserDetails(it)
+                                viewModel.getRentedCars()
+                            }
                             viewModel.changeAppState(AppState.User)
                                   },
                         modifier = Modifier.padding(8.dp),

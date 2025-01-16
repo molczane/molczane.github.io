@@ -7,6 +7,7 @@ import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import dotnetwebapp.composeapp.generated.resources.Res
 import dotnetwebapp.composeapp.generated.resources.arrow_back
@@ -26,6 +27,8 @@ fun UserScreen(
     val user = uiState.user
 
     var selectedRental by remember { mutableStateOf<Rental?>(null) }
+
+    var showEndedRentals by remember { mutableStateOf(false) }
 
     if (user == null) {
         Text("User data not available.")
@@ -57,13 +60,13 @@ fun UserScreen(
                 .verticalScroll(rememberScrollState()),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            if(!uiState.isLoading) {
+            if(!uiState.isUserLoading) {
                 UserProfileSection(user = user, onUpdateUser = { updatedUser -> viewModel.updateUser(updatedUser) }, uiState = uiState)
             }
             else {
                 CircularProgressIndicator(
                     modifier = Modifier.size(24.dp),
-                    color = MaterialTheme.colors.onPrimary
+                    color = Color.DarkGray
                 )
             }
 
@@ -75,20 +78,8 @@ fun UserScreen(
                 modifier = Modifier
                     .padding(bottom = 8.dp)
             ) {
-                Text("Pobierz swoje wypozyczenia")
+                Text("Odśwież swoje wypozyczenia")
             }
-
-//            if(uiState.myRentals.isNotEmpty()) {
-//                uiState.myRentals.forEach { rental ->
-//                    RentalCard(rental, onClick = {
-//                        if(rental.status == "planned" || rental.status == "pendingReturn" || rental.status == "inProgress") {
-//                            selectedRental = rental
-//                            //showReturnScreen.value = true
-//                            viewModel.toggleShowReturnScreen(true)
-//                        }
-//                    })
-//                }
-//            }
             if (uiState.myRentals.isNotEmpty()) {
                 // Define the order of statuses
                 val statusOrder = listOf("planned", "inProgress", "pendingReturn", "ended")
@@ -98,8 +89,12 @@ fun UserScreen(
                     statusOrder.indexOf(rental.status)
                 }
 
-                // Display sorted rentals
-                sortedRentals.forEach { rental ->
+                // Filter rentals into active and ended
+                val activeRentals = sortedRentals.filter { it.status != "ended" }
+                val endedRentals = sortedRentals.filter { it.status == "ended" }
+
+                // Display active rentals
+                activeRentals.forEach { rental ->
                     RentalCard(rental, onClick = {
                         if (rental.status in listOf("planned", "pendingReturn", "inProgress")) {
                             selectedRental = rental
@@ -107,6 +102,25 @@ fun UserScreen(
                             viewModel.toggleShowReturnScreen(true)
                         }
                     })
+                }
+
+                Spacer(modifier = Modifier.height(16.dp))
+
+                // Button to toggle ended rentals visibility
+                Button(
+                    onClick = { showEndedRentals = !showEndedRentals },
+                    modifier = Modifier.fillMaxWidth(.5f).padding(16.dp)
+                ) {
+                    Text(if (showEndedRentals) "Hide Rental History" else "Show Rental History")
+                }
+
+                // Display ended rentals if toggled
+                if (showEndedRentals) {
+                    endedRentals.forEach { rental ->
+                        RentalCard(rental, onClick = {
+                            // Additional action for ended rentals, if needed
+                        })
+                    }
                 }
             }
             else {

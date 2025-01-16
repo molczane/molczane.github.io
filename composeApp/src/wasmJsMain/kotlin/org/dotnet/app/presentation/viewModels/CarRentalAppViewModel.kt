@@ -57,6 +57,7 @@ data class CarRentalUiState(
     val isUserLoggedIn: Boolean = false,
     val user: User? = null,
     val isUserFullyRegistered: Boolean = false,
+    val isUserLoading: Boolean = false,
 
     /* APP STATE */
     val appState: AppState = AppState.Default,
@@ -473,11 +474,11 @@ class CarRentalAppViewModel : ViewModel() {
         var user : User? = null
 
         viewModelScope.launch {
-            updateUiState { it.copy(isLoading = true) }
+            updateUiState { it.copy(isUserLoading = true) }
             user = apiService.getUserDetails(id)
             updateUiState { it.copy(user = user) }
             if(user != null) {
-                updateUiState { it.copy(isLoading = false) }
+                updateUiState { it.copy(isUserLoading = false) }
             }
         }
     }

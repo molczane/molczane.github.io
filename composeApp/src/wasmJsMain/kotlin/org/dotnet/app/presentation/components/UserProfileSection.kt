@@ -99,10 +99,10 @@ fun UserProfileSection(user: User, onUpdateUser: (User) -> Unit, uiState: CarRen
                 onUpdateUser(updatedUser)
             },
             modifier = Modifier.fillMaxWidth(),
-            enabled = !uiState.isLoading
+            enabled = !uiState.isUserLoading
         ) {
 
-            if (uiState.isLoading) {
+            if (uiState.isUserLoading) {
                 CircularProgressIndicator(
                     modifier = Modifier.size(24.dp),
                     color = MaterialTheme.colors.onPrimary
