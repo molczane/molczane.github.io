@@ -13,6 +13,8 @@ import org.dotnet.app.domain.offer.Offer
 import org.dotnet.app.domain.offer.OfferRequest
 import org.dotnet.app.domain.rentals.Rental
 import org.dotnet.app.domain.rentals.RentedCarsRequest
+import org.dotnet.app.domain.rentals.ReturnInfo
+import org.dotnet.app.domain.rentals.ReturnRequest
 import org.dotnet.app.domain.user.User
 
 class ApiServiceImpl(private val appConfig: AppConfig) : ApiService {
@@ -253,6 +255,23 @@ class ApiServiceImpl(private val appConfig: AppConfig) : ApiService {
         } catch (e: Exception) {
             println("Error fetching my rentals ${e.message}")
             emptyList()
+        }
+    }
+
+    override suspend fun returnCar(returnRequest: ReturnRequest): ReturnInfo {
+        val authToken = localStorage.getItem("auth_token")
+
+        return try {
+            httpClient.post(appConfig.returnCarUrl) {
+                contentType(ContentType.Application.Json)
+                setBody(returnRequest)
+                headers {
+                    append(HttpHeaders.Authorization, "Bearer $authToken")
+                }
+            }.body()
+        } catch (e: Exception) {
+            println("Error fetching my rentals ${e.message}")
+            throw e
         }
     }
 }

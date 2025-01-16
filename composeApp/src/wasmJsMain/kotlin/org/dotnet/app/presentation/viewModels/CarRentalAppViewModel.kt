@@ -19,6 +19,7 @@ import org.dotnet.app.domain.config.AppConfig
 import org.dotnet.app.domain.config.loadConfig
 import org.dotnet.app.domain.offer.OfferRequest
 import org.dotnet.app.domain.rentals.Rental
+import org.dotnet.app.domain.rentals.ReturnRequest
 import org.dotnet.app.domain.user.User
 import org.dotnet.app.domain.utils.ExampleTokenResponse
 import org.dotnet.app.utils.AppState
@@ -538,6 +539,14 @@ class CarRentalAppViewModel : ViewModel() {
                 }
             }
             println("[API SERVICE] $rentals")
+        }
+    }
+
+    fun returnCar(returnRequest: ReturnRequest) {
+        viewModelScope.launch {
+            println("[API SERVICE] Returning car...")
+            val result = apiService.returnCar(returnRequest)
+            println("[API SERVICE] Returned car: $result")
         }
     }
     /* ============================================================================================================= */

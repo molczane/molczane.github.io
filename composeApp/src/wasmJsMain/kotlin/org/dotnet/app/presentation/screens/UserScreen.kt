@@ -10,6 +10,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import dotnetwebapp.composeapp.generated.resources.Res
 import dotnetwebapp.composeapp.generated.resources.arrow_back
+import org.dotnet.app.domain.rentals.Rental
+import org.dotnet.app.domain.rentals.ReturnRequest
 import org.dotnet.app.presentation.viewModels.CarRentalAppViewModel
 import org.jetbrains.compose.resources.painterResource
 import org.dotnet.app.presentation.components.RentalCard
@@ -24,6 +26,8 @@ fun UserScreen(
     val user = uiState.user
 
     val showReturnScreen = remember { mutableStateOf(false) }
+
+    var selectedRental by remember { mutableStateOf<Rental?>(null) }
 
     if (user == null) {
         Text("User data not available.")
@@ -77,9 +81,10 @@ fun UserScreen(
             }
 
             if(uiState.myRentals.isNotEmpty()) {
-                uiState.myRentals.forEach { myRental ->
-                    RentalCard(myRental, onClick = {
-                        if(myRental.status == "planned" || myRental.status == "pendingReturn" || myRental.status == "inProgress") {
+                uiState.myRentals.forEach { rental ->
+                    RentalCard(rental, onClick = {
+                        if(rental.status == "planned" || rental.status == "pendingReturn" || rental.status == "inProgress") {
+                            selectedRental = rental
                             showReturnScreen.value = true
                         }
                     })
@@ -94,7 +99,17 @@ fun UserScreen(
             }
 
             if(showReturnScreen.value) {
-                   ReturnCarDialog(onReturnClick = { }, onDismiss = { showReturnScreen.value = false })
+                if(selectedRental != null) {
+                    val returnRequest = ReturnRequest(
+                        UserId = selectedRental!!.userId.toString(),
+                        RentalId = selectedRental!!.id.toString(),
+                        RentalName = selectedRental!!.car.rentalService
+                    )
+                    ReturnCarDialog(onReturnClick = { viewModel.returnCar(returnRequest) }, onDismiss = { showReturnScreen.value = false })
+                }
+                else {
+                    Text("Nie wybrano auta do zwrotu")
+                }
             }
             Spacer(modifier = Modifier.height(16.dp))
         }

@@ -36,7 +36,8 @@ data class AppConfig(
 
     /* GETTING OFFER AND RENTING RELATED STUFF */
     val getOfferUrl: String,
-    val getRentedCarsUrl: String
+    val getRentedCarsUrl: String,
+    val returnCarUrl: String
 )
 
 suspend fun loadConfig(): AppConfig {
