@@ -1,6 +1,6 @@
 {
   "clientId": "248107412465-i64fdf66a6f4nrj7232ghdmvbsg91pp3.apps.googleusercontent.com",
-  "redirectUri": "https://molczane.github.io/",
+  "redirectUri": "http://localhost:8080/",
 
   "getNumberOfPagesUrl": "https://user-api-dotnet.azurewebsites.net/api/cars/getCountPages",
   "getCarsFromPageUrl": "https://user-api-dotnet.azurewebsites.net/api/cars/getPage",
@@ -21,5 +21,7 @@
 
   "getOfferUrl": "https://user-api-dotnet.azurewebsites.net/api/cars/getOffer",
 
-  "getRentedCarsUrl": "https://user-api-dotnet.azurewebsites.net/api/cars/rentedCars"
+  "getRentedCarsUrl": "https://user-api-dotnet.azurewebsites.net/api/cars/rentedCars",
+
+  "returnCarUrl": "https://user-api-dotnet.azurewebsites.net/api/cars/return"
 }

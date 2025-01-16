@@ -1,8 +1,6 @@
 package org.dotnet.app.presentation.screens
 
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.*
@@ -12,13 +10,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import dotnetwebapp.composeapp.generated.resources.Res
 import dotnetwebapp.composeapp.generated.resources.arrow_back
-import org.dotnet.app.domain.user.User
+import org.dotnet.app.domain.rentals.Rental
+import org.dotnet.app.domain.rentals.ReturnRequest
 import org.dotnet.app.presentation.viewModels.CarRentalAppViewModel
-import org.dotnet.app.presentation.viewModels.CarRentalUiState
-import org.dotnet.app.utils.ValidatedTextFieldItem
-import org.dotnet.app.utils.validateDate
 import org.jetbrains.compose.resources.painterResource
 import org.dotnet.app.presentation.components.RentalCard
+import org.dotnet.app.presentation.components.UserProfileSection
 
 @Composable
 fun UserScreen(
@@ -27,6 +24,8 @@ fun UserScreen(
 ) {
     val uiState by viewModel.uiState.collectAsState()
     val user = uiState.user
+
+    var selectedRental by remember { mutableStateOf<Rental?>(null) }
 
     if (user == null) {
         Text("User data not available.")
@@ -59,7 +58,7 @@ fun UserScreen(
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             if(!uiState.isLoading) {
-                ProfileSection(user = user, onUpdateUser = { updatedUser -> viewModel.updateUser(updatedUser) }, uiState = uiState)
+                UserProfileSection(user = user, onUpdateUser = { updatedUser -> viewModel.updateUser(updatedUser) }, uiState = uiState)
             }
             else {
                 CircularProgressIndicator(
@@ -69,12 +68,6 @@ fun UserScreen(
             }
 
             Spacer(modifier = Modifier.height(16.dp))
-
-            Text(
-                text = "Historia wypożyczeń",
-                style = MaterialTheme.typography.h6,
-                modifier = Modifier.padding(bottom = 8.dp)
-            )
 
             Button(
                 onClick = { viewModel.getRentedCars() },
@@ -86,14 +79,15 @@ fun UserScreen(
             }
 
             if(uiState.myRentals.isNotEmpty()) {
-//                LazyColumn(modifier = Modifier.fillMaxSize().padding(16.dp)) {
-//                    items(uiState.myRentals) { rental ->
-//                        RentalCard(
-//                            rental = rental,
-//                            onClick = {  }
-//                        )
-//                    }
-//                }
+                uiState.myRentals.forEach { rental ->
+                    RentalCard(rental, onClick = {
+                        if(rental.status == "planned" || rental.status == "pendingReturn" || rental.status == "inProgress") {
+                            selectedRental = rental
+                            //showReturnScreen.value = true
+                            viewModel.toggleShowReturnScreen(true)
+                        }
+                    })
+                }
             }
             else {
                 Text(
@@ -103,119 +97,86 @@ fun UserScreen(
                 )
             }
 
-            Spacer(modifier = Modifier.height(16.dp))
+            if(/*showReturnScreen.value*/ uiState.showReturnScreen ) {
+                if(selectedRental != null) {
+                    val returnRequest = ReturnRequest(
+                        UserId = uiState.user!!.id!!.toString(),
+                        RentalId = selectedRental!!.id.toString(),
+                        RentalName = selectedRental!!.car.rentalService
+                    )
+                    ReturnCarDialog(onReturnClick = { viewModel.returnCar(returnRequest) }, onDismiss = { viewModel.toggleShowReturnScreen(false) })
+                }
+                else {
+                    Text("Nie wybrano auta do zwrotu")
+                }
+            }
 
-            Text(
-                text = "Aktywne wypożyczenia",
-                style = MaterialTheme.typography.h6,
-                modifier = Modifier.padding(bottom = 8.dp)
-            )
-            // CurrentRentalSection(viewModel)
+            if(/*showReturnScreen.value*/ uiState.showReturnRequestDialog ) {
+                if(selectedRental != null) {
+                    ReturnRequestedDialog(
+                        onReturnClick = { viewModel.toggleShowReturnRequestedScreen(false) },
+                        onDismiss = { viewModel.toggleShowReturnRequestedScreen(false) }
+                    )
+                }
+                else {
+                    Text("Nie wybrano auta do zwrotu")
+                }
+            }
+            Spacer(modifier = Modifier.height(16.dp))
         }
     }
 }
 
 @Composable
-fun ProfileSection(user: User, onUpdateUser: (User) -> Unit, uiState: CarRentalUiState) {
-    var login by remember { mutableStateOf(user.login ?: "") }
-    var firstname by remember { mutableStateOf(user.firstname ?: "") }
-    var lastname by remember { mutableStateOf(user.lastname ?: "") }
-    var email by remember { mutableStateOf(user.email ?: "") }
-    var birthday by remember { mutableStateOf(user.birthday ?: "") }
-    var birthdayError by remember { mutableStateOf<String?>(null) }
-    var driverLicenseReceiveDate by remember { mutableStateOf(user.driverLicenseReceiveDate ?: "") }
-    var driverLicenseError by remember { mutableStateOf<String?>(null) }
-
-    val datePattern = Regex("\\d{4}-\\d{2}-\\d{2}") // Format: YYYY-MM-DD
-
-    Column(
-        modifier = Modifier.fillMaxWidth(.5f)
-    ) {
-        TextField(
-            value = login,
-            onValueChange = { login = it },
-            label = { Text("Login") },
-            modifier = Modifier.fillMaxWidth()
-        )
-
-        Spacer(modifier = Modifier.height(8.dp))
-
-        TextField(
-            value = firstname,
-            onValueChange = { firstname = it },
-            label = { Text("Imię") },
-            modifier = Modifier.fillMaxWidth()
-        )
-
-        Spacer(modifier = Modifier.height(8.dp))
-
-        TextField(
-            value = lastname,
-            onValueChange = { lastname = it },
-            label = { Text("Nazwisko") },
-            modifier = Modifier.fillMaxWidth()
-        )
-
-        Spacer(modifier = Modifier.height(8.dp))
-
-        TextField(
-            value = email,
-            onValueChange = { email = it },
-            label = { Text("Mail") },
-            modifier = Modifier.fillMaxWidth()
-        )
-
-        Spacer(modifier = Modifier.height(8.dp))
-
-        ValidatedTextFieldItem(
-            value = birthday,
-            onValueChange = { newValue ->
-                birthday = newValue
-                birthdayError = validateDate(newValue, datePattern)
-            },
-            label = "Birthday (YYYY-MM-DD)",
-            error = birthdayError
-        )
-
-        Spacer(modifier = Modifier.height(16.dp))
-
-        ValidatedTextFieldItem(
-            value = driverLicenseReceiveDate,
-            onValueChange = { newValue ->
-                driverLicenseReceiveDate = newValue
-                driverLicenseError = validateDate(newValue, datePattern)
-            },
-            label = "Driver License Receive Date (YYYY-MM-DD)",
-            error = driverLicenseError
-        )
-
-        Spacer(modifier = Modifier.height(8.dp))
-
-        Button(
-            onClick = {
-                val updatedUser = user.copy(
-                    login = login,
-                    firstname = firstname,
-                    lastname = lastname,
-                    email = email,
-                    birthday = birthday,
-                    driverLicenseReceiveDate = driverLicenseReceiveDate
+fun ReturnCarDialog(onReturnClick: () -> Unit, onDismiss: () -> Unit) {
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        text = {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp),
+                horizontalAlignment = Alignment.CenterHorizontally, // Center contents horizontally
+                verticalArrangement = Arrangement.Center // Center contents vertically
+            ) {
+                Text(
+                    text = "Czy na pewno chcesz zgłosić zwrot auta do wypożyczalni?",
+                    style = MaterialTheme.typography.body1,
+                    modifier = Modifier.padding(bottom = 16.dp) // Add spacing below the text
                 )
-                onUpdateUser(updatedUser)
-            },
-            modifier = Modifier.fillMaxWidth(),
-            enabled = !uiState.isLoading
-        ) {
+                Button(
+                    onClick = onReturnClick,
+                    modifier = Modifier.align(Alignment.CenterHorizontally) // Center the button
+                ) {
+                    Text("Zgłoś zwrot auta do wypożyczalni")
+                }
+            }
+        },
+        modifier = Modifier.fillMaxWidth(),
+        buttons = {}
+    )
+}
 
-            if (uiState.isLoading) {
-                CircularProgressIndicator(
-                    modifier = Modifier.size(24.dp),
-                    color = MaterialTheme.colors.onPrimary
+@Composable
+fun ReturnRequestedDialog(onReturnClick: () -> Unit, onDismiss: () -> Unit) {
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        text = {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp),
+                horizontalAlignment = Alignment.CenterHorizontally, // Center contents horizontally
+                verticalArrangement = Arrangement.Center // Center contents vertically
+            ) {
+                Text(
+                    text = "Zwrot auta przyjęty do wypożyczalni!",
+                    style = MaterialTheme.typography.body1,
+                    modifier = Modifier.padding(bottom = 16.dp) // Add spacing below the text
                 )
             }
-            else {
-                Text("Save Changes")
-            }
-        }
-    }
+        },
+        modifier = Modifier.fillMaxWidth(),
+        buttons = {}
+    )
 }

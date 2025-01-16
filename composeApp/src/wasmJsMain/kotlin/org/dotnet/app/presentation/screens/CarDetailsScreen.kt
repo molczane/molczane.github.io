@@ -11,6 +11,7 @@ import dotnetwebapp.composeapp.generated.resources.Res
 import dotnetwebapp.composeapp.generated.resources.arrow_back
 import org.dotnet.app.domain.cars.Car
 import org.dotnet.app.domain.offer.OfferRequest
+import org.dotnet.app.presentation.components.NotificationSnackbar
 import org.dotnet.app.presentation.viewModels.CarRentalAppViewModel
 import org.dotnet.app.presentation.viewModels.CarRentalUiState
 import org.dotnet.app.utils.ValidatedTextFieldItem
@@ -62,12 +63,32 @@ fun CarDetailsScreen(
                 CarDetailsContent(car = car)
                 Spacer(modifier = Modifier.height(16.dp))
                 Button(
-                    onClick = { showValuationDialog = !showValuationDialog },
+                    onClick = {
+                        if (uiState.isUserLoggedIn) {
+                            showValuationDialog = !showValuationDialog
+                        }
+                        else {
+                            viewModel.toggleYouHaveToBeLoggedIn(true)
+                        }
+                    },
                     modifier = Modifier.fillMaxWidth(.5f),
                 ) {
                     Text("Proceed to valuation")
                 }
                 Spacer(modifier = Modifier.height(16.dp))
+
+                AnimatedVisibility(
+                    visible = uiState.showYouHaveToBeLoggedIn
+                ) {
+                    NotificationSnackbar("Aby poprosić o wycenę musisz być zalogowany!", { viewModel.toggleYouHaveToBeLoggedIn(false) })
+                }
+
+
+                AnimatedVisibility(
+                    visible = uiState.showRentalNotification
+                ) {
+                    NotificationSnackbar("Wysłano link z ofertą na maila!", { viewModel.toggleRentalNotification(false) })
+                }
 
                 // Animated Valuation Dialog
                 AnimatedVisibility(

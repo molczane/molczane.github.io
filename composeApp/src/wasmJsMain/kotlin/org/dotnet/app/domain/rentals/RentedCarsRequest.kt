@@ -4,5 +4,5 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class RentedCarsRequest(
-    val UserId: Int
+    val UserId: String
 )

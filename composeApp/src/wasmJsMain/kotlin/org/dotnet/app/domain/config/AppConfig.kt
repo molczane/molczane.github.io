@@ -36,21 +36,22 @@ data class AppConfig(
 
     /* GETTING OFFER AND RENTING RELATED STUFF */
     val getOfferUrl: String,
-    val getRentedCarsUrl: String
+    val getRentedCarsUrl: String,
+    val returnCarUrl: String
 )
 
 suspend fun loadConfig(): AppConfig {
     try {
         // Wczytaj plik konfiguracyjny używając fetch API
         // DEVELOPMENT
-//        val response: Response = window
-//            .fetch("/config.dev.json")
-//            .await()
+        val response: Response = window
+            .fetch("/config.dev.json")
+            .await()
 
         // PROD
-        val response: Response = window
-            .fetch("/config.prod.json")
-            .await()
+//        val response: Response = window
+//            .fetch("/config.prod.json")
+//            .await()
 
         if (!response.ok) {
             throw Exception("Nie udało się załadować pliku konfiguracyjnego: ${response.statusText}")
