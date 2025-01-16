@@ -21,5 +21,7 @@
 
   "getOfferUrl": "http://localhost:5109/api/cars/getOffer",
 
-  "getRentedCarsUrl": "http://localhost:5109/api/cars/rentedCars"
+  "getRentedCarsUrl": "http://localhost:5109/api/cars/rentedCars",
+
+  "returnCarUrl": "http://localhost:5109/api/cars/return"
 }

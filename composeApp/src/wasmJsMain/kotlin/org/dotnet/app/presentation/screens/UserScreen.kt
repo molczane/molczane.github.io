@@ -25,8 +25,6 @@ fun UserScreen(
     val uiState by viewModel.uiState.collectAsState()
     val user = uiState.user
 
-    val showReturnScreen = remember { mutableStateOf(false) }
-
     var selectedRental by remember { mutableStateOf<Rental?>(null) }
 
     if (user == null) {
@@ -85,7 +83,8 @@ fun UserScreen(
                     RentalCard(rental, onClick = {
                         if(rental.status == "planned" || rental.status == "pendingReturn" || rental.status == "inProgress") {
                             selectedRental = rental
-                            showReturnScreen.value = true
+                            //showReturnScreen.value = true
+                            viewModel.toggleShowReturnScreen(true)
                         }
                     })
                 }
@@ -98,14 +97,26 @@ fun UserScreen(
                 )
             }
 
-            if(showReturnScreen.value) {
+            if(/*showReturnScreen.value*/ uiState.showReturnScreen ) {
                 if(selectedRental != null) {
                     val returnRequest = ReturnRequest(
-                        UserId = selectedRental!!.userId.toString(),
+                        UserId = uiState.user!!.id!!.toString(),
                         RentalId = selectedRental!!.id.toString(),
                         RentalName = selectedRental!!.car.rentalService
                     )
-                    ReturnCarDialog(onReturnClick = { viewModel.returnCar(returnRequest) }, onDismiss = { showReturnScreen.value = false })
+                    ReturnCarDialog(onReturnClick = { viewModel.returnCar(returnRequest) }, onDismiss = { viewModel.toggleShowReturnScreen(false) })
+                }
+                else {
+                    Text("Nie wybrano auta do zwrotu")
+                }
+            }
+
+            if(/*showReturnScreen.value*/ uiState.showReturnRequestDialog ) {
+                if(selectedRental != null) {
+                    ReturnRequestedDialog(
+                        onReturnClick = { viewModel.toggleShowReturnRequestedScreen(false) },
+                        onDismiss = { viewModel.toggleShowReturnRequestedScreen(false) }
+                    )
                 }
                 else {
                     Text("Nie wybrano auta do zwrotu")
@@ -139,6 +150,30 @@ fun ReturnCarDialog(onReturnClick: () -> Unit, onDismiss: () -> Unit) {
                 ) {
                     Text("Zgłoś zwrot auta do wypożyczalni")
                 }
+            }
+        },
+        modifier = Modifier.fillMaxWidth(),
+        buttons = {}
+    )
+}
+
+@Composable
+fun ReturnRequestedDialog(onReturnClick: () -> Unit, onDismiss: () -> Unit) {
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        text = {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp),
+                horizontalAlignment = Alignment.CenterHorizontally, // Center contents horizontally
+                verticalArrangement = Arrangement.Center // Center contents vertically
+            ) {
+                Text(
+                    text = "Zwrot auta przyjęty do wypożyczalni!",
+                    style = MaterialTheme.typography.body1,
+                    modifier = Modifier.padding(bottom = 16.dp) // Add spacing below the text
+                )
             }
         },
         modifier = Modifier.fillMaxWidth(),

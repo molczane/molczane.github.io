@@ -4,8 +4,8 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class ReturnInfo(
-    val RentalId: String,
-    val Condition: String,
-    val EmployeeNotes: String,
-    val ReturnDate: String
+    val rentalId: String,
+    val condition: String? = null,
+    val employeeNotes: String? = null,
+    val returnDate: String
 )

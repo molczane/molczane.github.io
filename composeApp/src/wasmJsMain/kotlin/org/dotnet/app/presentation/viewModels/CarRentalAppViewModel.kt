@@ -65,7 +65,11 @@ data class CarRentalUiState(
     val selectedCar: Car? = null,
 
     /* RENTALS RELATED STUFF */
-    val myRentals: List<Rental> = emptyList()
+    val myRentals: List<Rental> = emptyList(),
+    val showRentalNotification: Boolean = false,
+    val showYouHaveToBeLoggedIn: Boolean = false,
+    val showReturnScreen: Boolean = false,
+    val showReturnRequestDialog: Boolean = false
 )
 
 class CarRentalAppViewModel : ViewModel() {
@@ -232,22 +236,6 @@ class CarRentalAppViewModel : ViewModel() {
         println(error)
     }
 
-    fun updateFilter(
-        brand: String? = uiState.value.selectedBrand,
-        model: String? = uiState.value.selectedModel,
-        year: String? = uiState.value.selectedYear,
-        type: String? = uiState.value.selectedType,
-        location: String? = uiState.value.selectedLocation
-    ) {
-        _uiState.value = uiState.value.copy(
-            selectedBrand = brand,
-            selectedModel = model,
-            selectedYear = year,
-            selectedType = type,
-            selectedLocation = location
-        )
-    }
-
     fun updatePageNumber(pageNumber: Int) {
         // currentPageNumber.value = pageNumber
         _uiState.value = uiState.value.copy(
@@ -348,31 +336,6 @@ class CarRentalAppViewModel : ViewModel() {
         kotlinx.browser.window.location.href = googleOAuthUrl
     }
 
-    fun handleLoginResult(authCode: String, onLoginSuccess: () -> Unit) {
-        viewModelScope.launch {
-            updateUiState { it.copy(isLoading = true, loginResult = null) }
-            try {
-                val response = apiService.authenticate(authCode)
-                updateUiState {
-                    it.copy(
-                        isLoading = false,
-                        isUserLoggedIn = true,
-                        isLoginDialogShown = false,
-                        loginResult = null // Clear any previous errors
-                    )
-                }
-                onLoginSuccess()
-            } catch (e: Exception) {
-                updateUiState {
-                    it.copy(
-                        isLoading = false,
-                        loginResult = "Login error: ${e.message}"
-                    )
-                }
-            }
-        }
-    }
-
     private fun generateRandomState(): String {
         return (1..32)
             .map { ('a'..'z') + ('A'..'Z') + ('0'..'9') }
@@ -384,12 +347,21 @@ class CarRentalAppViewModel : ViewModel() {
         updateUiState { it.copy(isLoginDialogShown = show) }
     }
 
-    fun toggleUserScreen(show: Boolean) {
-        updateUiState { it.copy(isUserScreenShown = show) }
+    fun toggleRentalNotification(show: Boolean) {
+        updateUiState { it.copy(showRentalNotification = show) }
     }
 
-    private val _authResponse = MutableStateFlow<AuthResponse?>(null)
-    val authResponse: StateFlow<AuthResponse?> = _authResponse
+    fun toggleYouHaveToBeLoggedIn(show: Boolean) {
+        updateUiState { it.copy(showYouHaveToBeLoggedIn = show) }
+    }
+
+    fun toggleShowReturnScreen(show: Boolean) {
+        updateUiState { it.copy(showReturnScreen = show) }
+    }
+
+    fun toggleShowReturnRequestedScreen(show: Boolean) {
+        updateUiState { it.copy(showReturnRequestDialog = show) }
+    }
 
     fun sendAuthCodeToBackend(authCode: String) {
         if (!_isConfigLoaded.value) {
@@ -451,17 +423,13 @@ class CarRentalAppViewModel : ViewModel() {
             )
         }
         localStorage.removeItem("auth_token")
-        _authResponse.value = null
+        localStorage.removeItem("userId")
 
         println("Logged out successfully")
     }
 
     private fun storeAuthToken(token: String) {
         localStorage.setItem("auth_token", token)
-    }
-
-    fun getStoredToken(): String? {
-        return localStorage.getItem("auth_token")
     }
 
     fun sendTokenToBackend() {
@@ -522,7 +490,10 @@ class CarRentalAppViewModel : ViewModel() {
         updateUiState { it.copy(isLoading = true) }
         viewModelScope.launch {
             val offer = apiService.getOffer(offerRequest)
-            updateUiState { it.copy(isLoading = false) }
+            updateUiState { it.copy(
+                isLoading = false,
+                showRentalNotification = true
+            ) }
             println(offer)
         }
     }
@@ -547,8 +518,12 @@ class CarRentalAppViewModel : ViewModel() {
             println("[API SERVICE] Returning car...")
             val result = apiService.returnCar(returnRequest)
             println("[API SERVICE] Returned car: $result")
+            updateUiState { it.copy(
+                isLoading = false,
+                showReturnRequestDialog = true,
+                showReturnScreen = false)
+            }
         }
     }
     /* ============================================================================================================= */
-
 }
